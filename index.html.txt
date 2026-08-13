@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NECESITO - Alta Accesibilidad</title>
+    <style>
+        /* ARQUITECTURA DE DISEÑO: ALTO CONTRASTE Y PRESTANCIA UNIVERSAL */
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        body { 
+            background-color: #f7f9fa;
+            display: flex; 
+            justify-content: center; 
+            padding: 15px; 
+            margin: 0; 
+        }
+
+        .contenedor-app {
+            width: 100%; 
+            max-width: 460px; 
+            background: #ffffff; 
+            border: 2px solid #e1e4e6;
+            border-radius: 24px; 
+            padding: 24px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            display: flex; 
+            flex-direction: column; 
+            min-height: 92vh;
+        }
+
+        /* 1. EL DOBLE MARCO REFORZADO DE "NECESITO" (IDENTIDAD DE MARCA) */
+        .cabecera {
+            border: 5px solid #cc0000;      /* MARCO EXTERNO GRUESO */
+            outline: 2.5px solid #cc0000;   /* MARCO INTERNO DELGADO */
+            outline-offset: -10px;          /* Separación exacta */
+            border-radius: 6px; 
+            padding: 20px 10px; 
+            text-align: center; 
+            margin-bottom: 40px; 
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(204, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .cabecera h1 {
+            font-size: 36px; 
+            font-weight: 900; 
+            margin: 0; 
+            color: #111111;
+            letter-spacing: 4px;
+            text-decoration: underline; 
+            text-underline-offset: 8px; 
+            text-transform: uppercase;
+        }
+
+        /* ESTADO DE ALERTA ROJO PARPADEANTE PARA NECESIDADES VITALES */
+        .cabecera.modo-vital {
+            background-color: #ffeeff; 
+            animation: pulsoVital 0.8s infinite alternate ease-in-out;
+        }
+        @keyframes pulsoVital {
+            from { border-color: #cc0000; outline-color: #cc0000; box-shadow: 0 0 15px #cc0000; }
+            to { border-color: #ff3333; outline-color: #ff3333; box-shadow: 0 0 25px #ff3333; }
+        }
+
+        /* FILAS INTERACTIVAS Y ESPACIADO */
+        .bloque-campo { 
+            margin-bottom: 30px;
+        }
+
+        .etiqueta { 
+            font-size: 19px; 
+            font-weight: bold; 
+            color: #222222;
+            text-decoration: underline; 
+            margin-bottom: 10px; 
+            display: block; 
+        }
+
+        .fila-interactiva { 
+            display: flex; 
+            gap: 40px; /* DISTANCIAMIENTO CRÍTICO DE SEGURIDAD (Evita toques erróneos) */
+            align-items: center; 
+        }
+
+        /* 3. CAJAS VERDES ERGONÓMICAS */
+        .caja-texto {
+            flex: 1; 
+            border: 3.5px solid #28a745;
+            border-radius: 8px; 
+            padding: 14px;
+            font-size: 17px; 
+            font-weight: bold;
+            background-color: #ffffff; 
+            color: #000000; 
+            min-height: 54px;
+            transition: all 0.2s ease;
+        }
+        .caja-texto::placeholder { color: #777777; font-style: italic; font-size: 15px; }
+
+        /* ENFOQUE ACTIVO DE ALTO CONTRASTE CONTRA EL RUIDO EN LA CALLE */
+        .caja-texto:focus { 
+            background-color: #f4fff7;
+            border-color: #000000;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+        }
+
+        /* 2. BOTONES DE VOZ GIGANTES 100% INTUITIVOS */
+        .btn-voz {
+            width: 58px; 
+            height: 58px; 
+            border: 3.5px solid #28a745; 
+            background: #ffffff;
+            border-radius: 10px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-voz:hover { 
+            border-color: #1e7e34; 
+            background-color: #f8fff9; 
+        }
+        .btn-voz:active { 
+            transform: scale(0.9);
+        }
+        .btn-voz.escuchando { 
+            background-color: #28a745; 
+            animation: escuchandoPulso 1s infinite alternate;
+        }
+        @keyframes escuchandoPulso {
+            from { box-shadow: 0 0 5px #28a745; }
+            to { box-shadow: 0 0 15px #28a745; }
+        }
+
+        /* BOTÓN ENVIAR ROBUSTO (VALIDADOR DE AUTENTICIDAD) */
+        .btn-enviar {
+            background-color: #000000; 
+            color: #ffffff; 
+            border: none; 
+            padding: 18px;
+            font-size: 22px; 
+            font-weight: 900; 
+            border-radius: 12px; 
+            width: 100%;
+            margin-top: auto; 
+            margin-bottom: 25px; 
+            cursor: pointer; 
+            letter-spacing: 2px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .btn-enviar:active { 
+            background-color: #222222; 
+            transform: scale(0.98); 
+        }
+
+        /* BARRA INFERIOR DE ACCESOS RÁPIDOS */
+        .barra-inferior {
+            display: flex; 
+            justify-content: space-around; 
+            border-top: 2px solid #f0f2f5; 
+            padding-top: 18px;
+        }
+        .btn-atajo {
+            background: none; 
+            border: 2px solid transparent; 
+            border-radius: 12px;
+            cursor: pointer; 
+            padding: 10px; 
+            font-size: 36px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .btn-atajo:active { 
+            background-color: #f0f2f5; 
+            transform: scale(0.9);
+        }
+        .btn-atajo span { 
+            font-size: 12px; 
+            font-weight: 900; 
+            margin-top: 6px; 
+            color: #111111; 
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contenedor-app">
+    
+    <!-- CABECERA CON DOBLE MARCO -->
+    <div class="cabecera" id="marcoCabecera">
+        <h1>NECESITO</h1>
+    </div>
+
+    <!-- CAJA 1: UBICACIÓN -->
+    <div class="bloque-campo">
+        <label class="etiqueta" for="inputUbicacion">Mi Ubicación actual es:</label>
+        <div class="fila-interactiva">
+            <input type="text" id="inputUbicacion" class="caja-texto" placeholder="Obteniendo GPS automáticamente...">
+            <button class="btn-voz" onclick="activarDictado('inputUbicacion')" aria-label="Dictar Ubicación">🎤</button>
+        </div>
+    </div>
+
+    <!-- CAJA 2: CATEGORÍA -->
+    <div class="bloque-campo">
+        <label class="etiqueta" for="inputNecesidad">Necesidad de: (Profesional o Comprar)</label>
+        <div class="fila-interactiva">
+            <input type="text" id="inputNecesidad" class="caja-texto" placeholder="Ej: Profesionales/Técnicos o Compras en Farmacia...">
+            <button class="btn-voz" onclick="activarDictado('inputNecesidad')" aria-label="Dictar Categoría">🎤</button>
+        </div>
+    </div>
+
+    <!-- CAJA 3: DESCRIPCIÓN (CORAZÓN OPERATIVO) -->
+    <div class="bloque-campo">
+        <label class="etiqueta" for="inputDescripcion">Descripcion de Necesidad:</label>
+        <div class="fila-interactiva">
+            <textarea id="inputDescripcion" class="caja-texto" rows="3" placeholder="Detalle su necesidad de forma precisa..."></textarea>
+            <button class="btn-voz" onclick="activarDictado('inputDescripcion')" aria-label="Dictar Descripción">🎤</button>
+        </div>
+    </div>
+
+    <!-- BOTÓN DE ENVÍO -->
+    <button class="btn-enviar" onclick="enviarASupabase()">ENVIAR SOLICITUD</button>
+
+    <!-- BARRA INFERIOR DE ACCESOS RÁPIDOS COMPLETADA -->
+    <div class="barra-inferior">
+        <button class="btn-atajo" onclick="seleccionarAtajo('GENERAL', 'Profesionales / Técnicos')" aria-label="Atajo Técnicos">👷<span>TÉCNICOS</span></button>
+        <button class="btn-atajo" onclick="seleccionarAtajo('GENERAL', 'Compras / Tiendas')" aria-label="Atajo Compras">🛒<span>COMPRAS</span></button>
+        <button class="btn-atajo" onclick="seleccionarAtajo('GENERAL', 'Farmacia / Medicinas')" aria-label="Atajo Farmacias">💊<span>FARMACIA</span></button>
+        <button class="btn-atajo" onclick="seleccionarAtajo('VITAL', 'Ambulancia / Emergencia Médica')" aria-label="Atajo Emergencia">🧑‍⚕️<span>VITAL</span></button>
+    </div>
+
+</div>
+
+<!-- ENLACE DE CONEXIÓN CON SUPABASE Y LÓGICA INTERACTIVA -->
+<script type="module">
+    import { createClient } from 'https://jsdelivr.net'
+
+    // REEMPLAZA ESTOS DOS CAMPOS CON TUS DATOS REALES DE SUPABASE PARA ACTIVAR EL ENVÍO
+    const SUPABASE_URL = 'TU_URL_DE_SUPABASE';
+    const SUPABASE_ANON_KEY = 'TU_KEY_ANONIMA_DE_SUPABASE';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let tipoActual = 'GENERAL';
+    let validadoPorTeclado = false;
+
+    // 1. Geolocalización automática de inicio
+    window.addEventListener('DOMContentLoaded', () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    document.getElementById('inputUbicacion').dataset.lat = lat;
+                    document.getElementById('inputUbicacion').dataset.lon = lon;
+                    document.getElementById('inputUbicacion').value = `GPS Activo (Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)})`;
+                },
+                () => {
+                    document.getElementById('inputUbicacion').value = "Chorrillos - Lima";
+                }
+            );
+        }
+    });
