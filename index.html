@@ -127,7 +127,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
-                    fetch(`https://openstreetmap.org{pos.coords.latitude}&lon=${pos.coords.longitude}&addressdetails=1`, {
+                    fetch("https://openstreetmap.org" + pos.coords.latitude + "&lon=" + pos.coords.longitude + "&addressdetails=1", {
                         headers: { 'User-Agent': 'NecesitoAltaAccesibilidadSocial/1.0' }
                     })
                     .then(res => res.json())
