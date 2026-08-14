@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
     
-    <!-- ESTILOS INTERNOS DIRECTOS PARA EVITAR BLOQUEOS DE VERCEL -->
+    <!-- ESTILOS INTERNOS DIRECTOS -->
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 90px; min-h: 100vh; display: flex; flex-direction: column; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 100px; min-height: 100vh; display: flex; flex-direction: column; }
         
-        header { background-color: #2563eb; color: white; padding: 18px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); sticky: top; }
-        header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; }
+        header { background-color: #2563eb; color: white; padding: 18px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: center; items-center; gap: 8px; }
         header p { font-size: 12px; color: #dbeafe; }
 
-        main { max-width: 450px; w: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        main { max-width: 450px; width: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
         .tarjeta { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .label-titulo { display: block; font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -24,16 +23,21 @@
         input[type="text"], select, textarea { width: 100%; background-color: #f1f5f9; border: none; border-radius: 12px; padding: 14px; font-size: 14px; color: #334155; outline: none; }
         textarea { resize: none; }
         
-        .btn-mic { background-color: #dbeafe; color: #2563eb; border: none; border-radius: 12px; width: 54px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        /* BOTÓN DE MICRÓFONO REPARADO */
+        .btn-mic { background-color: #dbeafe; border: none; border-radius: 12px; width: 54px; min-width: 54px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-mic svg { width: 22px; height: 22px; fill: #2563eb; }
         .btn-mic:active { transform: scale(0.9); }
-        .btn-mic.grabando { background-color: #ef4444 !important; color: white !important; animation: pulso 1.5s infinite; }
+        
+        /* ESTADO DE GRABACIÓN ACTIVA */
+        .btn-mic.grabando { background-color: #ef4444 !important; animation: pulso 1.5s infinite; }
+        .btn-mic.grabando svg { fill: white !important; }
 
-        .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); transition: all 0.2s; display: flex; justify-content: center; items-center; gap: 8px; }
+        .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-enviar:active { transform: scale(0.95); opacity: 0.9; }
 
         nav { background-color: white; border-top: 1px solid #e2e8f0; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.05); z-index: 100; }
         .nav-contenedor { max-width: 450px; margin: 0 auto; display: flex; justify-content: space-around; padding: 8px; }
-        .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; text-decoration: none; }
+        .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; }
         .nav-btn.activo { color: #2563eb; }
         .nav-btn span:first-child { font-size: 22px; }
 
@@ -44,7 +48,7 @@
 
     <!-- Encabezado Principal -->
     <header>
-        <h1><i class="fa-solid fa-hand-holding-hand"></i> NECESITO</h1>
+        <h1>🤝 NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
@@ -53,44 +57,45 @@
         
         <!-- Tarjeta de Ubicación -->
         <div class="tarjeta">
-            <label class="label-titulo"><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Mi Ubicación Actual</label>
+            <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
                 <input type="text" id="ubicacion" placeholder="Buscando señal de GPS..." readonly>
-                <button type="button" id="btn-audio-ubicacion" class="btn-mic">
-                    <i class="fa-solid fa-microphone"></i>
+                <button type="button" id="btn-audio-ubicacion" class="btn-mic" title="Dictar ubicación">
+                    <!-- Icono de Micrófono Seguro en SVG -->
+                    <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
         <!-- Tarjeta de Categoría -->
         <div class="tarjeta">
-            <label class="label-titulo"><i class="fa-solid fa-layer-group" style="color: #2563eb;"></i> Categoría de Necesidad</label>
+            <label class="label-titulo">📂 Categoría de Necesidad</label>
             <div class="control-grupo">
                 <select id="categoria">
                     <option value="">Selecciona tipo (Profesional o Comprar)</option>
                     <option value="profesional">Contratar un Profesional / Técnico</option>
                     <option value="comprar">Realizar una Compra / Abastecimiento</option>
                 </select>
-                <button type="button" id="btn-audio-categoria" class="btn-mic">
-                    <i class="fa-solid fa-microphone"></i>
+                <button type="button" id="btn-audio-categoria" class="btn-mic" title="Dictar categoría">
+                    <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
         <!-- Tarjeta de Descripción -->
         <div class="tarjeta">
-            <label class="label-titulo"><i class="fa-solid fa-pen-to-square" style="color: #2563eb;"></i> Descripción del Pedido</label>
+            <label class="label-titulo">📝 Descripción del Pedido</label>
             <div class="control-grupo">
                 <textarea id="descripcion" rows="3" placeholder="Explica detalladamente en qué necesitas ayuda..."></textarea>
-                <button type="button" id="btn-audio-descripcion" class="btn-mic">
-                    <i class="fa-solid fa-microphone"></i>
+                <button type="button" id="btn-audio-descripcion" class="btn-mic" title="Dictar descripción">
+                    <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
         <!-- Botón de Envío -->
         <button type="button" id="btn-enviar" class="btn-enviar">
-            <i class="fa-solid fa-paper-plane"></i> ENVIAR SOLICITUD
+            🚀 ENVIAR SOLICITUD
         </button>
 
     </main>
@@ -113,8 +118,9 @@
         </div>
     </nav>
 
-    <!-- SISTEMA LOGICO EN JAVASCRIPT -->
+    <!-- SISTEMA LOGICO RECONECTADO -->
     <script>
+        // GPS AUTOMÁTICO
         window.addEventListener('DOMContentLoaded', () => {
             const inputUbicacion = document.getElementById('ubicacion');
             if (navigator.geolocation) {
@@ -126,9 +132,8 @@
                     },
                     (error) => {
                         console.error(error);
-                        inputUbicacion.value = "Permiso de GPS denegado.";
+                        inputUbicacion.value = "GPS denegado. Escribe aquí manual...";
                         inputUbicacion.removeAttribute('readonly');
-                        inputUbicacion.placeholder = "Escribe tu dirección manualmente...";
                     }
                 );
             } else {
@@ -137,58 +142,43 @@
             }
         });
 
+        // RECONOCIMIENTO DE VOZ RECONECTADO
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
         if (SpeechRecognition) {
             const configurarMicrofono = (idBoton, idInput, esSelect = false) => {
                 const boton = document.getElementById(idBoton);
                 const inputElement = document.getElementById(idInput);
                 const rec = new SpeechRecognition();
                 
-                rec.lang = 'es-PE';
+                rec.lang = 'es-PE'; // Configurado para Perú
                 rec.interimResults = false;
                 rec.maxAlternatives = 1;
 
                 rec.onstart = () => {
-                    boton.classList.add('grabando');
+                    boton.classList.add('grabando'); // Se pone rojo vibrante al escuchar
                 };
 
                 rec.onend = () => {
-                    boton.classList.remove('grabando');
+                    boton.classList.remove('grabando'); // Vuelve a azul al terminar
                 };
 
                 rec.onresult = (event) => {
-                    const textoEscuchado = event.results.transcript.toLowerCase();
+                    const textoEscuchado = event.results[0][0].transcript;
+                    
                     if (esSelect) {
-                        if (textoEscuchado.includes('profesional') || textoEscuchado.includes('técnico') || textoEscuchado.includes('trabajo')) {
+                        const limpio = textoEscuchado.toLowerCase();
+                        if (limpio.includes('profesional') || limpio.includes('técnico') || limpio.includes('trabajo')) {
                             inputElement.value = 'profesional';
                             actualizarEstiloNav('nav-tec');
-                        } else if (textoEscuchado.includes('comprar') || textoEscuchado.includes('tienda') || textoEscuchado.includes('abastecer')) {
+                        } else if (limpio.includes('comprar') || limpio.includes('tienda') || limpio.includes('abastecer')) {
                             inputElement.value = 'comprar';
                             actualizarEstiloNav('nav-com');
                         } else {
-                            alert('Di "Profesional" o "Comprar"');
+                            alert('No entendí la categoría. Intenta diciendo "Profesional" o "Comprar"');
                         }
                     } else {
-                        inputElement.value = event.results.transcript;
+                        // Inserta el texto hablado en la casilla
+                        inputElement.value = textoEscuchado;
                     }
                 };
-
-                boton.addEventListener('click', () => {
-                    rec.start();
-                });
-            };
-
-            configurarMicrofono('btn-audio-ubicacion', 'ubicacion');
-            configurarMicrofono('btn-audio-categoria', 'categoria', true);
-            configurarMicrofono('btn-audio-descripcion', 'descripcion');
-        } else {
-            console.log("El reconocimiento de voz no es compatible.");
-        }
-
-        function cambiarFiltro(tipo, idBtn) {
-            const selectCategoria = document.getElementById('categoria');
-            if(selectCategoria) selectCategoria.value = tipo;
-            actualizarEstiloNav(idBtn);
-        }
-
-        function actualizarEstiloNav(idBtn) {
