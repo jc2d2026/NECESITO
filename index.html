@@ -25,6 +25,8 @@
         .btn-mic { background-color: #dbeafe; border: none; border-radius: 12px; width: 54px; min-width: 54px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-mic svg { width: 22px; height: 22px; fill: #2563eb; }
         .btn-mic:active { transform: scale(0.9); }
+        .btn-mic.grabando { background-color: #ef4444 !important; }
+        .btn-mic.grabando svg { fill: white !important; }
 
         .bloque-iconos-categoria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
         .btn-categoria-central { background-color: #f1f5f9; border: 2px solid transparent; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
@@ -33,15 +35,16 @@
         .btn-categoria-central.activo { background-color: #eff6ff; border-color: #2563eb; }
         .btn-categoria-central.activo span:last-child { color: #2563eb; }
 
+        /* RESULTADOS VISUALES */
         .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #2563eb; }
+        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; }
         .tecnico-info h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
         .tecnico-info p { font-size: 12px; color: #64748b; margin-bottom: 4px; }
         
         .calificacion-estrellas { color: #f59e0b; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
         .calificacion-opiniones { color: #94a3b8; font-size: 11px; font-weight: normal; }
         .tecnico-distancia { background-color: #f0fdf4; color: #16a34a; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 20px; text-align: center; }
-        .btn-contacto { background-color: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; margin-top: 5px; display: inline-block; }
+        .btn-contacto { background-color: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; margin-top: 5px; display: inline-block; }
 
         .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); display: flex; justify-content: center; align-items: center; gap: 8px; }
     </style>
@@ -54,12 +57,11 @@
     </header>
 
     <main>
-        <!-- Cuadro de Ubicación Automatizado -->
         <div class="tarjeta">
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
-                <input type="text" id="ubicacion" placeholder="Buscando ubicación automática...">
-                <button type="button" id="btn-audio-ubicacion" class="btn-mic" onclick="forzarTecladoVoz('ubicacion')">
+                <input type="text" id="ubicacion" placeholder="Escribe tu dirección o usa el micro...">
+                <button type="button" id="btn-audio-ubicacion" class="btn-mic">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
@@ -97,14 +99,15 @@
             <label class="label-titulo">📝 Detalle de tu Pedido</label>
             <div class="control-grupo">
                 <textarea id="descripcion" rows="3" placeholder="Presiona un icono o escribe el detalle aquí..."></textarea>
-                <button type="button" id="btn-audio-descripcion" class="btn-mic" onclick="forzarTecladoVoz('descripcion')">
+                <button type="button" id="btn-audio-descripcion" class="btn-mic">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
+        <!-- SECCIÓN DE RESULTADOS DINÁMICOS -->
         <div class="tarjeta" id="tarjeta-resultados" style="display: none;">
-            <label class="label-titulo">✨ Opciones Recomendadas por Cercanía y Confianza</label>
+            <label class="label-titulo" id="titulo-dinamico">✨ Locales y Respuestas Encontradas Cercanas</label>
             <div class="contenedor-tecnicos" id="lista-tecnicos"></div>
         </div>
 
@@ -112,25 +115,23 @@
     </main>
 
     <script>
-        let miLat = -12.04637; 
-        let miLon = -77.04279;
-
-        const baseDeDatosTecnicos = [
-            { nombre: "Servicios Eléctricos Díaz", tipo: "profesional", especialidad: "Electricista A domicilio", lat: -12.0490, lon: -77.0410, celular: "999888777", estrellas: "⭐⭐⭐⭐★ 4.8", opiniones: 42 },
-            { nombre: "Gasfitería Express San Martín", tipo: "profesional", especialidad: "Gasfitero e Instalaciones", lat: -12.0420, lon: -77.0460, celular: "944555666", estrellas: "⭐⭐⭐⭐⭐ 5.0", opiniones: 18 },
-            { nombre: "Multiservicios del Hogar Ramos", tipo: "profesional", especialidad: "Cerrajero y Reparaciones", lat: -12.0550, lon: -77.0390, celular: "922333444", estrellas: "⭐⭐⭐⭐☆ 4.2", opiniones: 56 },
-            { nombre: "Bodega Abastos Cercado", tipo: "comprar", especialidad: "Víveres y Alimentos Básicos", lat: -12.0450, lon: -77.0440, celular: "911222333", estrellas: "⭐⭐⭐⭐★ 4.7", opiniones: 120 },
-            { nombre: "InkaFarma Central", tipo: "farmacia", especialidad: "Medicamentos y Urgencias", lat: -12.0470, lon: -77.0415, celular: "977666555", estrellas: "⭐⭐⭐⭐★ 4.6", opiniones: 235 },
-            { nombre: "Botica Salud Total", tipo: "farmacia", especialidad: "Medicinas y Cuidado Personal", lat: -12.0510, lon: -77.0470, celular: "988777666", estrellas: "⭐⭐⭐⭐☆ 4.0", opiniones: 15 },
-            { nombre: "Rescate Médico Ambulancias", tipo: "vital", especialidad: "Atención Médica y Paramédicos", lat: -12.0440, lon: -77.0400, celular: "955444333", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 89 }
+        const baseDeDatosNegocios = [
+            { nombre: "Chifa Jin Hong Chorrillos", tipo: "comprar", especialidad: "Chifa, Balsámina de Pollo, Tipakay", celular: "987654321", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 140 },
+            { nombre: "Chifa Central Matellini", tipo: "comprar", especialidad: "Chaufa, Tallarín, Comida China", celular: "912345678", estrellas: "⭐⭐⭐⭐☆ 4.4", opiniones: 85 },
+            { nombre: "Market Abastos Las Antaras", tipo: "comprar", especialidad: "Víveres, Pollo Fresco, Abarrotes", celular: "955666777", estrellas: "⭐⭐⭐⭐★ 4.7", opiniones: 62 },
+            { nombre: "Servicios Eléctricos Díaz", tipo: "profesional", especialidad: "Electricista A domicilio", celular: "999888777", estrellas: "⭐⭐⭐⭐★ 4.8", opiniones: 42 },
+            { nombre: "Gasfitería Express San Martín", tipo: "profesional", especialidad: "Gasfitero e Instalaciones", celular: "944555666", estrellas: "⭐⭐⭐⭐⭐ 5.0", opiniones: 18 },
+            { nombre: "InkaFarma Av. Chorrillos", tipo: "farmacia", especialidad: "Medicamentos y Urgencias", celular: "977666555", estrellas: "⭐⭐⭐⭐★ 4.6", opiniones: 235 },
+            { nombre: "Ambulancias Alerta Médica", tipo: "vital", especialidad: "Atención Médica Urgente", celular: "955444333", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 90 }
         ];
 
-        // SISTEMA DE UBICACIÓN REFORZADO CON USER-AGENT
+        // INTENTO AUTOMÁTICO DE GPS DE FONDO
         window.addEventListener('DOMContentLoaded', () => {
-            const campoUbi = document.getElementById('ubicacion');
-            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
-                    miLat = pos.coords.latitude;
-                    miLon = pos.coords.longitude;
-                    
+                    fetch(`https://openstreetmap.org{pos.coords.latitude}&lon=${pos.coords.longitude}&addressdetails=1`, {
+                        headers: { 'User-Agent': 'NecesitoAltaAccesibilidadSocial/1.0' }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.address) {
