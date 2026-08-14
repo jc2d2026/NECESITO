@@ -4,103 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
-    <!-- Importamos Tailwind CSS para diseño estético -->
-    <script src="https://jsdelivr.net"></script>
     <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <!-- ESTILOS INTERNOS DIRECTOS PARA EVITAR BLOQUEOS DE VERCEL -->
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 90px; min-h: 100vh; display: flex; flex-direction: column; }
+        
+        header { background-color: #2563eb; color: white; padding: 18px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); sticky: top; }
+        header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; }
+        header p { font-size: 12px; color: #dbeafe; }
+
+        main { max-width: 450px; w: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .tarjeta { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .label-titulo { display: block; font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        
+        .control-grupo { display: flex; gap: 10px; align-items: stretch; }
+        input[type="text"], select, textarea { width: 100%; background-color: #f1f5f9; border: none; border-radius: 12px; padding: 14px; font-size: 14px; color: #334155; outline: none; }
+        textarea { resize: none; }
+        
+        .btn-mic { background-color: #dbeafe; color: #2563eb; border: none; border-radius: 12px; width: 54px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-mic:active { transform: scale(0.9); }
+        .btn-mic.grabando { background-color: #ef4444 !important; color: white !important; animation: pulso 1.5s infinite; }
+
+        .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); transition: all 0.2s; display: flex; justify-content: center; items-center; gap: 8px; }
+        .btn-enviar:active { transform: scale(0.95); opacity: 0.9; }
+
+        nav { background-color: white; border-top: 1px solid #e2e8f0; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-contenedor { max-width: 450px; margin: 0 auto; display: flex; justify-content: space-around; padding: 8px; }
+        .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; text-decoration: none; }
+        .nav-btn.activo { color: #2563eb; }
+        .nav-btn span:first-child { font-size: 22px; }
+
+        @keyframes pulso { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col pb-24">
+<body>
 
     <!-- Encabezado Principal -->
-    <header class="bg-blue-600 text-white shadow-md p-4 text-center sticky top-0 z-50">
-        <h1 class="text-2xl font-black tracking-wider flex justify-center items-center gap-2">
-            <i class="fa-solid fa-hand-holding-hand"></i> NECESITO
-        </h1>
-        <p class="text-xs text-blue-100 mt-1">Plataforma de Alta Accesibilidad Social</p>
+    <header>
+        <h1><i class="fa-solid fa-hand-holding-hand"></i> NECESITO</h1>
+        <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <!-- Contenido Principal -->
-    <main class="flex-1 max-w-md w-full mx-auto p-4 space-y-5">
+    <main>
         
         <!-- Tarjeta de Ubicación -->
-        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                <i class="fa-solid fa-location-dot text-red-500 mr-1"></i> Mi Ubicación Actual
-            </label>
-            <div class="flex gap-2">
-                <input type="text" id="ubicacion" placeholder="Buscando señal de GPS..." 
-                    class="w-full bg-slate-100 border-none rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
-                <button type="button" id="btn-audio-ubicacion" class="bg-blue-100 text-blue-600 rounded-xl px-4 hover:bg-blue-200 transition active:scale-90">
-                    <i class="fa-solid fa-microphone text-lg"></i>
+        <div class="tarjeta">
+            <label class="label-titulo"><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Mi Ubicación Actual</label>
+            <div class="control-grupo">
+                <input type="text" id="ubicacion" placeholder="Buscando señal de GPS..." readonly>
+                <button type="button" id="btn-audio-ubicacion" class="btn-mic">
+                    <i class="fa-solid fa-microphone"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Tarjeta de Categoría de Necesidad -->
-        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                <i class="fa-solid fa-layer-group text-blue-500 mr-1"></i> Categoría de Necesidad
-            </label>
-            <div class="flex gap-2">
-                <select id="categoria" class="w-full bg-slate-100 border-none rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+        <!-- Tarjeta de Categoría -->
+        <div class="tarjeta">
+            <label class="label-titulo"><i class="fa-solid fa-layer-group" style="color: #2563eb;"></i> Categoría de Necesidad</label>
+            <div class="control-grupo">
+                <select id="categoria">
                     <option value="">Selecciona tipo (Profesional o Comprar)</option>
                     <option value="profesional">Contratar un Profesional / Técnico</option>
                     <option value="comprar">Realizar una Compra / Abastecimiento</option>
                 </select>
-                <button type="button" id="btn-audio-categoria" class="bg-blue-100 text-blue-600 rounded-xl px-4 hover:bg-blue-200 transition active:scale-90">
-                    <i class="fa-solid fa-microphone text-lg"></i>
+                <button type="button" id="btn-audio-categoria" class="btn-mic">
+                    <i class="fa-solid fa-microphone"></i>
                 </button>
             </div>
         </div>
 
         <!-- Tarjeta de Descripción -->
-        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                <i class="fa-solid fa-pen-to-square text-blue-500 mr-1"></i> Descripción del Pedido
-            </label>
-            <div class="flex gap-2 items-start">
-                <textarea id="descripcion" rows="3" placeholder="Explica detalladamente en qué necesitas ayuda..." 
-                    class="w-full bg-slate-100 border-none rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-                <button type="button" id="btn-audio-descripcion" class="bg-blue-100 text-blue-600 rounded-xl p-4 hover:bg-blue-200 transition active:scale-90">
-                    <i class="fa-solid fa-microphone text-lg"></i>
+        <div class="tarjeta">
+            <label class="label-titulo"><i class="fa-solid fa-pen-to-square" style="color: #2563eb;"></i> Descripción del Pedido</label>
+            <div class="control-grupo">
+                <textarea id="descripcion" rows="3" placeholder="Explica detalladamente en qué necesitas ayuda..."></textarea>
+                <button type="button" id="btn-audio-descripcion" class="btn-mic">
+                    <i class="fa-solid fa-microphone"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Botón de Envío Acción Principal -->
-        <button type="button" id="btn-enviar" class="w-full bg-emerald-500 text-white font-bold rounded-2xl p-4 shadow-lg hover:bg-emerald-600 transition transform active:scale-95 flex justify-center items-center gap-2 text-base">
+        <!-- Botón de Envío -->
+        <button type="button" id="btn-enviar" class="btn-enviar">
             <i class="fa-solid fa-paper-plane"></i> ENVIAR SOLICITUD
         </button>
 
     </main>
 
-    <!-- Barra de Navegación Inferior Estilo App Móvil -->
-    <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shadow-xl">
-        <div class="max-w-md mx-auto flex justify-around p-2 text-center">
-            <button class="flex flex-col items-center text-blue-600 font-bold text-xs gap-1 flex-1" onclick="cambiarFiltro('profesional')">
-                <span class="text-xl">👷</span>
-                <span>TÉCNICOS</span>
+    <!-- Barra de Navegación Inferior -->
+    <nav>
+        <div class="nav-contenedor">
+            <button class="nav-btn activo" id="nav-tec" onclick="cambiarFiltro('profesional', 'nav-tec')">
+                <span>👷</span><span>TÉCNICOS</span>
             </button>
-            <button class="flex flex-col items-center text-slate-400 hover:text-blue-500 font-medium text-xs gap-1 flex-1" onclick="cambiarFiltro('comprar')">
-                <span class="text-xl">🛒</span>
-                <span>COMPRAS</span>
+            <button class="nav-btn" id="nav-com" onclick="cambiarFiltro('comprar', 'nav-com')">
+                <span>🛒</span><span>COMPRAS</span>
             </button>
-            <button class="flex flex-col items-center text-slate-400 hover:text-blue-500 font-medium text-xs gap-1 flex-1" onclick="alert('Sección de Farmacia en desarrollo')">
-                <span class="text-xl">💊</span>
-                <span>FARMACIA</span>
+            <button class="nav-btn" onclick="alert('Sección de Farmacia en desarrollo')">
+                <span>💊</span><span>FARMACIA</span>
             </button>
-            <button class="flex flex-col items-center text-slate-400 hover:text-blue-500 font-medium text-xs gap-1 flex-1" onclick="alert('Sección Vital/Emergencia en desarrollo')">
-                <span class="text-xl">🧑‍⚕️</span>
-                <span>VITAL</span>
+            <button class="nav-btn" onclick="alert('Sección Vital en desarrollo')">
+                <span>🧑‍⚕️</span><span>VITAL</span>
             </button>
         </div>
     </nav>
 
     <!-- SISTEMA LOGICO EN JAVASCRIPT -->
     <script>
-        // 1. OBTENCIÓN AUTOMÁTICA DE UBICACIÓN (GPS)
         window.addEventListener('DOMContentLoaded', () => {
             const inputUbicacion = document.getElementById('ubicacion');
-            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -110,55 +126,50 @@
                     },
                     (error) => {
                         console.error(error);
-                        inputUbicacion.value = "Permiso de GPS denegado por el usuario.";
+                        inputUbicacion.value = "Permiso de GPS denegado.";
                         inputUbicacion.removeAttribute('readonly');
                         inputUbicacion.placeholder = "Escribe tu dirección manualmente...";
                     }
                 );
             } else {
-                inputUbicacion.value = "Tu navegador no soporta localización.";
+                inputUbicacion.value = "GPS no soportado.";
                 inputUbicacion.removeAttribute('readonly');
             }
         });
 
-        // 2. SISTEMA DE RECONOCIMIENTO DE VOZ (SPEECH TO TEXT)
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
         if (SpeechRecognition) {
             const configurarMicrofono = (idBoton, idInput, esSelect = false) => {
                 const boton = document.getElementById(idBoton);
                 const inputElement = document.getElementById(idInput);
                 const rec = new SpeechRecognition();
                 
-                rec.lang = 'es-PE'; // Configurado para español peruano
+                rec.lang = 'es-PE';
                 rec.interimResults = false;
                 rec.maxAlternatives = 1;
 
                 rec.onstart = () => {
-                    boton.classList.remove('bg-blue-100', 'text-blue-600');
-                    boton.classList.add('bg-red-500', 'text-white', 'animate-pulse');
+                    boton.classList.add('grabando');
                 };
 
                 rec.onend = () => {
-                    boton.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
-                    boton.classList.add('bg-blue-100', 'text-blue-600');
+                    boton.classList.remove('grabando');
                 };
 
                 rec.onresult = (event) => {
-                    const textoEscuchado = event.results[0][0].transcript.toLowerCase();
-                    
+                    const textoEscuchado = event.results.transcript.toLowerCase();
                     if (esSelect) {
-                        // Lógica de llenado automático inteligente para el selector de categoría
                         if (textoEscuchado.includes('profesional') || textoEscuchado.includes('técnico') || textoEscuchado.includes('trabajo')) {
                             inputElement.value = 'profesional';
+                            actualizarEstiloNav('nav-tec');
                         } else if (textoEscuchado.includes('comprar') || textoEscuchado.includes('tienda') || textoEscuchado.includes('abastecer')) {
                             inputElement.value = 'comprar';
+                            actualizarEstiloNav('nav-com');
                         } else {
-                            alert('No entendí la categoría. Di "Profesional" o "Comprar"');
+                            alert('Di "Profesional" o "Comprar"');
                         }
                     } else {
-                        // Llenado de texto estándar
-                        inputElement.value = event.results[0][0].transcript;
+                        inputElement.value = event.results.transcript;
                     }
                 };
 
@@ -167,16 +178,17 @@
                 });
             };
 
-            // Activamos los tres botones de dictado por voz de la interfaz
             configurarMicrofono('btn-audio-ubicacion', 'ubicacion');
             configurarMicrofono('btn-audio-categoria', 'categoria', true);
             configurarMicrofono('btn-audio-descripcion', 'descripcion');
-
         } else {
-            // Si el navegador es antiguo o no compatible (como algunos navegadores integrados de Facebook)
-            const deshabilitarMics = ['btn-audio-ubicacion', 'btn-audio-categoria', 'btn-audio-descripcion'];
-            deshabilitarMics.forEach(id => {
-                const btn = document.getElementById(id);
-                btn.style.display = 'none';
-            });
-            console.log("El reconocimiento de voz no es compatible con este navegador.");
+            console.log("El reconocimiento de voz no es compatible.");
+        }
+
+        function cambiarFiltro(tipo, idBtn) {
+            const selectCategoria = document.getElementById('categoria');
+            if(selectCategoria) selectCategoria.value = tipo;
+            actualizarEstiloNav(idBtn);
+        }
+
+        function actualizarEstiloNav(idBtn) {
