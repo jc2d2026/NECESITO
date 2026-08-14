@@ -7,7 +7,7 @@
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 100px; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 110px; min-height: 100vh; display: flex; flex-direction: column; }
         
         header { background-color: #2563eb; color: white; padding: 18px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px; }
@@ -34,8 +34,8 @@
 
         nav { background-color: white; border-top: 1px solid #e2e8f0; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.05); z-index: 100; }
         .nav-contenedor { max-width: 450px; margin: 0 auto; display: flex; justify-content: space-around; padding: 8px; }
-        .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; }
-        .nav-btn.activo { color: #2563eb; }
+        .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; padding: 6px 0; }
+        .nav-btn.activo { color: #2563eb; background-color: #eff6ff; border-radius: 12px; }
         .nav-btn span:first-child { font-size: 22px; }
 
         @keyframes pulso { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
@@ -50,7 +50,7 @@
 
     <main>
         
-        <!-- Tarjeta de Ubicación (YA NO ESTÁ BLOQUEADA, SE PUEDE ESCRIBIR O DICTAR) -->
+        <!-- Tarjeta de Ubicación Totalmente Desbloqueada -->
         <div class="tarjeta">
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Tarjeta de Categoría (SINTETIZADA Y LIMPIA) -->
+        <!-- Tarjeta de Categoría Simplificada -->
         <div class="tarjeta">
             <label class="label-titulo">📂 Categoría de Necesidad</label>
             <div class="control-grupo">
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <!-- Tarjeta de Descripción (CON RECONOCIMIENTO INTELIGENTE SIMULTÁNEO) -->
+        <!-- Tarjeta de Descripción con Llenado Simultáneo e Inteligente -->
         <div class="tarjeta">
             <label class="label-titulo">📝 Descripción del Pedido</label>
             <div class="control-grupo">
@@ -93,25 +93,26 @@
 
     </main>
 
+    <!-- Barra de Navegación Inferior (BOTONES CONFIGURADOS COMO ACCESOS DIRECTOS GLOBALES) -->
     <nav>
         <div class="nav-contenedor">
-            <button class="nav-btn" id="nav-tec" onclick="cambiarFiltro('profesional', 'nav-tec')">
+            <button class="nav-btn" id="nav-tec" onclick="ejecutarAccesoDirecto('profesional', 'nav-tec', 'Busco un Profesional / Técnico en: ')">
                 <span>👷</span><span>TÉCNICOS</span>
             </button>
-            <button class="nav-btn" id="nav-com" onclick="cambiarFiltro('comprar', 'nav-com')">
+            <button class="nav-btn" id="nav-com" onclick="ejecutarAccesoDirecto('comprar', 'nav-com', 'Necesito realizar una Compra / Abastecimiento de: ')">
                 <span>🛒</span><span>COMPRAS</span>
             </button>
-            <button class="nav-btn" onclick="alert('Sección de Farmacia en desarrollo')">
+            <button class="nav-btn" id="nav-far" onclick="ejecutarAccesoDirecto('comprar', 'nav-far', 'Necesito comprar de la Farmacia lo siguiente: ')">
                 <span>💊</span><span>FARMACIA</span>
             </button>
-            <button class="nav-btn" onclick="alert('Sección Vital en desarrollo')">
+            <button class="nav-btn" id="nav-vit" onclick="ejecutarAccesoDirecto('profesional', 'nav-vit', '¡EMERGENCIA VITAL! Necesito ayuda inmediata con: ')">
                 <span>🧑‍⚕️</span><span>VITAL</span>
             </button>
         </div>
     </nav>
 
     <script>
-        // GPS AUTOMÁTICO (Si falla el GPS de red, deja el campo libre de inmediato)
+        // GPS AUTOMÁTICO INICIAL
         window.addEventListener('DOMContentLoaded', () => {
             const inputUbicacion = document.getElementById('ubicacion');
             if (navigator.geolocation) {
@@ -122,13 +123,13 @@
                         inputUbicacion.value = `Lat: ${lat}, Lon: ${lon}`;
                     },
                     (error) => {
-                        console.log("GPS no disponible instantáneamente.");
+                        console.log("GPS no otorgado al inicio. Campo libre.");
                     }
                 );
             }
         });
 
-        // RECONOCIMIENTO DE VOZ AVANZADO
+        // RECONOCIMIENTO DE VOZ REESTRUCTURADO
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (SpeechRecognition) {
@@ -157,11 +158,12 @@
                             actualizarEstiloNav('nav-com');
                         }
                     } else if (esDescripcion) {
-                        // Escribe el texto de la descripción
-                        inputElement.value = textoEscuchado;
+                        // Concatena si ya hay texto base o escribe directo
+                        if(inputElement.value.trim() !== "" && (inputElement.value.includes(': '))) {
+                            inputElement.value = inputElement.value + textoEscuchado;
+                        } else {
+                            inputElement.value = textoEscuchado;
+                        }
                         
-                        // INTERACCIÓN SIMULTÁNEA INTELIGENTE: Analiza el dictado para pre-seleccionar la categoría automáticamente
+                        // ANÁLISIS SIMULTÁNEO DE TEXTO DICTADO
                         const selectCategoria = document.getElementById('categoria');
-                        if (limpio.includes('comprar') || limpio.includes('compra') || limpio.includes('traer') || limpio.includes('tienda') || limpio.includes('farmacia') || limpio.includes('mercado') || limpio.includes('comida')) {
-                            selectCategoria.value = 'comprar';
-                            actualizarEstiloNav('nav-com');
