@@ -10,7 +10,7 @@
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 140px; min-height: 100vh; display: flex; flex-direction: column; }
         
         header { background-color: #2563eb; color: white; padding: 18px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: center; items-center; gap: 8px; }
         header p { font-size: 12px; color: #dbeafe; }
 
         main { max-width: 450px; width: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
@@ -25,12 +25,17 @@
         .btn-mic { background-color: #dbeafe; border: none; border-radius: 12px; width: 54px; min-width: 54px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-mic svg { width: 22px; height: 22px; fill: #2563eb; }
 
-        /* LISTA DE RESPUESTAS / TÉCNICOS */
+        /* LISTA DE RESPUESTAS CON ESTRELLAS */
         .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         .tarjeta-tecnico { background: #ffffff; border-left: 5px solid #2563eb; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .tecnico-info h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
-        .tecnico-info p { font-size: 12px; color: #64748b; }
-        .tecnico-distancia { background-color: #f0fdf4; color: #16a34a; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 20px; }
+        .tecnico-info p { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+        
+        /* DISEÑO DE ESTRELLAS DE CALIFICACIÓN */
+        .calificacion-estrellas { color: #f59e0b; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+        .calificacion-opiniones { color: #94a3b8; font-size: 11px; font-weight: normal; }
+        
+        .tecnico-distancia { background-color: #f0fdf4; color: #16a34a; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 20px; text-align: center; }
         .btn-contacto { background-color: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; margin-top: 5px; display: inline-block; }
 
         nav { background-color: white; border-top: 1px solid #e2e8f0; position: fixed; bottom: 0; left: 0; right: 0; box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.05); z-index: 100; }
@@ -48,7 +53,6 @@
     </header>
 
     <main>
-        <!-- Ubicación Inteligente (Traduce coordenadas a Calle y Número) -->
         <div class="tarjeta">
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
@@ -59,7 +63,6 @@
             </div>
         </div>
 
-        <!-- Categoría de Necesidad Integrada -->
         <div class="tarjeta">
             <label class="label-titulo">📂 Categoría de Necesidad</label>
             <div class="control-grupo">
@@ -77,11 +80,11 @@
             </div>
         </div>
 
-        <!-- SECCIÓN DE RESPUESTAS EN TIEMPO REAL -->
+        <!-- SECCIÓN DE RESULTADOS CON EL SISTEMA DE CONFIANZA -->
         <div class="tarjeta" id="tarjeta-resultados" style="display: none;">
-            <label class="label-titulo" id="titulo-resultados">✨ Opciones Disponibles Cercanas</label>
+            <label class="label-titulo">✨ Opciones Recomendadas por Cercanía y Confianza</label>
             <div class="contenedor-tecnicos" id="lista-tecnicos">
-                <!-- Aquí se inyectan los 5 técnicos dinámicamente -->
+                <!-- Aquí se inyectan los técnicos calificados -->
             </div>
         </div>
 
@@ -105,31 +108,27 @@
     </nav>
 
     <script>
-        // Coordenadas globales por defecto del usuario solicitante
         let miLat = -12.04637; 
         let miLon = -77.04279;
 
-        // BASE DE DATOS GRATUITA INTEGRADA (5 Empresas/Técnicos de Prueba en Lima)
+        // NUEVA BASE DE DATOS: Incluye Estrellas de Calificación y número de opiniones
         const baseDeDatosTecnicos = [
-            { nombre: "Servicios Eléctricos Díaz", tipo: "profesional", especialidad: "Electricista Adomicilio", lat: -12.0490, lon: -77.0410, celular: "999888777" },
-            { nombre: "Gasfitería Express San Martín", tipo: "profesional", especialidad: "Gasfitero e Instalaciones", lat: -12.0420, lon: -77.0460, celular: "944555666" },
-            { nombre: "Multiservicios del Hogar Ramos", tipo: "profesional", especialidad: "Cerrajero y Maestro Albañil", lat: -12.0550, lon: -77.0390, celular: "922333444" },
-            { nombre: "Bodega Abastos Cercado", tipo: "comprar", especialidad: "Víveres y Alimentos Básicos", lat: -12.0450, lon: -77.0440, celular: "911222333" },
-            { nombre: "InkaFarma Central", tipo: "farmacia", especialidad: "Medicamentos y Urgencias", lat: -12.0470, lon: -77.0415, celular: "977666555" },
-            { nombre: "Botica Salud Total", tipo: "farmacia", especialidad: "Medicinas y Cuidado Personal", lat: -12.0510, lon: -77.0470, celular: "988777666" },
-            { nombre: "Rescate Médico Ambulancias", tipo: "vital", especialidad: "Atención Médica y Paramédicos", lat: -12.0440, lon: -77.0400, celular: "955444333" }
+            { nombre: "Servicios Eléctricos Díaz", tipo: "profesional", especialidad: "Electricista A domicilio", lat: -12.0490, lon: -77.0410, celular: "999888777", estrellas: "⭐⭐⭐⭐★ 4.8", opiniones: 42 },
+            { nombre: "Gasfitería Express San Martín", tipo: "profesional", especialidad: "Gasfitero e Instalaciones", lat: -12.0420, lon: -77.0460, celular: "944555666", estrellas: "⭐⭐⭐⭐⭐ 5.0", opiniones: 18 },
+            { nombre: "Multiservicios del Hogar Ramos", tipo: "profesional", especialidad: "Cerrajero y Reparaciones", lat: -12.0550, lon: -77.0390, celular: "922333444", estrellas: "⭐⭐⭐⭐☆ 4.2", opiniones: 56 },
+            { nombre: "Bodega Abastos Cercado", tipo: "comprar", especialidad: "Víveres y Alimentos Básicos", lat: -12.0450, lon: -77.0440, celular: "911222333", estrellas: "⭐⭐⭐⭐★ 4.7", opiniones: 120 },
+            { nombre: "InkaFarma Central", tipo: "farmacia", especialidad: "Medicamentos y Urgencias", lat: -12.0470, lon: -77.0415, celular: "977666555", estrellas: "⭐⭐⭐⭐★ 4.6", opiniones: 235 },
+            { nombre: "Botica Salud Total", tipo: "farmacia", especialidad: "Medicinas y Cuidado Personal", lat: -12.0510, lon: -77.0470, celular: "988777666", estrellas: "⭐⭐⭐⭐☆ 4.0", opiniones: 15 },
+            { nombre: "Rescate Médico Ambulancias", tipo: "vital", especialidad: "Atención Médica y Paramédicos", lat: -12.0440, lon: -77.0400, celular: "955444333", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 89 }
         ];
 
-        // ETAPA 1: TRADUCIR COORDENADAS A CALLE Y NUMERACIÓN REAL (REVERSE GEOCODING)
+        // Traducir coordenadas a dirección real
         window.addEventListener('DOMContentLoaded', () => {
             const campoUbi = document.getElementById('ubicacion');
-            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
                     miLat = pos.coords.latitude;
                     miLon = pos.coords.longitude;
-                    
-                    // Consultamos al servidor libre de OpenStreetMap pasándole el GPS
                     fetch(`https://openstreetmap.org{miLat}&lon=${miLon}&addressdetails=1`)
                         .then(res => res.json())
                         .then(data => {
@@ -138,15 +137,8 @@
                                 const numero = data.address.house_number || "S/N";
                                 const distrito = data.address.district || data.address.city || "";
                                 campoUbi.value = `${calle} ${numero}, ${distrito}`;
-                            } else {
-                                campoUbi.value = "Dirección detectada correctamente.";
                             }
-                        })
-                        .catch(() => {
-                            campoUbi.value = "Lima, Perú (Ubicación por Red)";
-                        });
-                }, () => {
-                    campoUbi.value = "Centro de Lima, Perú";
+                        }).catch(() => { campoUbi.value = "Lima, Perú"; });
                 });
             }
         });
