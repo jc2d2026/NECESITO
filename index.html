@@ -29,19 +29,9 @@
         .btn-categoria-central { background-color: #f1f5f9; border: 2px solid transparent; border-radius: 12px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
         .btn-categoria-central span:first-child { font-size: 28px; }
         .btn-categoria-central span:last-child { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        
         .btn-categoria-central.activo { background-color: #eff6ff; border-color: #2563eb; }
         .btn-categoria-central.activo span:last-child { color: #2563eb; }
-
-        .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; margin-bottom: 8px; }
-        .tecnico-info h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
-        .tecnico-info p { font-size: 12px; color: #64748b; margin-bottom: 2px; }
-        
-        .precio-cotizado { font-size: 16px; font-weight: bold; color: #16a34a; margin-top: 4px; margin-bottom: 4px; }
-        .calificacion-estrellas { color: #f59e0b; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
-        .calificacion-opiniones { color: #94a3b8; font-size: 11px; font-weight: normal; }
-        .tecnico-distancia { background-color: #f0fdf4; color: #16a34a; font-weight: 700; font-size: 11px; padding: 6px 10px; border-radius: 20px; text-align: center; white-space: nowrap; }
-        .btn-contacto { background-color: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; margin-top: 5px; display: inline-block; }
 
         .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; }
     </style>
@@ -59,13 +49,13 @@
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
                 <input type="text" id="ubicacion" value="Las Antaras 186, Chorrillos">
-                <button type="button" class="btn-mic" onclick="forzarActivacionTeclado('ubicacion')">
+                <button type="button" class="btn-mic" onclick="forzarTecladoCelular('ubicacion')">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
-        <!-- 2. CATEGORÍA CENTRALIZADA -->
+        <!-- 2. CATEGORÍA CENTRALIZADA (EL LOGRO DE LAS 10:19) -->
         <div class="tarjeta">
             <label class="label-titulo">📂 Categoría Seleccionada</label>
             <div class="control-grupo" style="margin-bottom: 12px;">
@@ -73,82 +63,79 @@
             </div>
             
             <div class="bloque-iconos-categoria">
-                <button type="button" class="btn-categoria-central activo" id="img-com" onclick="seleccionarAlternativaDirecta('Compra / Abastecimiento', 'img-com', 'Necesito una Compra / Abastecimiento de: ')">
+                <button type="button" class="btn-categoria-central activo" id="img-com" onclick="seleccionarCategoriaLimpiamente('Compra / Abastecimiento', 'img-com', 'Necesito una Compra / Abastecimiento de: ')">
                     <span>🛒</span><span>Compras</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="img-tec" onclick="seleccionarAlternativaDirecta('Profesional / Técnico', 'img-tec', 'Busco un Profesional / Técnico en: ')">
+                <button type="button" class="btn-categoria-central" id="img-tec" onclick="seleccionarCategoriaLimpiamente('Profesional / Técnico', 'img-tec', 'Busco un Profesional / Técnico en: ')">
                     <span>👷</span><span>Técnicos</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="img-far" onclick="seleccionarAlternativaDirecta('Farmacia / Medicinas', 'img-far', 'Necesito comprar de la Farmacia lo siguiente: ')">
+                <button type="button" class="btn-categoria-central" id="img-far" onclick="seleccionarCategoriaLimpiamente('Farmacia / Medicinas', 'img-far', 'Necesito comprar de la Farmacia lo siguiente: ')">
                     <span>💊</span><span>Farmacia</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="img-vit" onclick="seleccionarAlternativaDirecta('Emergencia Vital', 'img-vit', '¡EMERGENCIA VITAL! Necesito ayuda con: ')">
+                <button type="button" class="btn-categoria-central" id="img-vit" onclick="seleccionarCategoriaLimpiamente('Emergencia Vital', 'img-vit', '¡EMERGENCIA VITAL! Necesito ayuda con: ')">
                     <span>🧑‍⚕️</span><span>Vital</span>
                 </button>
             </div>
         </div>
 
-        <!-- 3. DETALLE -->
+        <!-- 3. DETALLE DEL PEDIDO (EL LOGRO DE LAS 10:29) -->
         <div class="tarjeta">
             <label class="label-titulo">📝 Detalle de tu Pedido</label>
             <div class="control-grupo">
                 <textarea id="descripcion" rows="3" placeholder="Ejemplo: Chifa arroz chaufa o medicinas..."></textarea>
-                <button type="button" class="btn-mic" onclick="forzarActivacionTeclado('descripcion')">
+                <button type="button" class="btn-mic" onclick="forzarTecladoCelular('descripcion')">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
             </div>
         </div>
 
-        <button type="button" id="btn-enviar-maestro" class="btn-enviar" onclick="procesarEnvioRealConCotizaciones()">🚀 ENVIAR SOLICITUD</button>
-
-        <!-- 4. SECCIÓN DE RESULTADOS MULTI-COTIZADOS -->
-        <div class="tarjeta" id="tarjeta-resultados">
-            <label class="label-titulo" id="registro-tiempo">✨ Locales y Respuestas Encontradas Cercanas</label>
-            <div class="contenedor-tecnicos" id="lista-tecnicos">
-                <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 15px;" id="mensaje-estado">
-                    Al presionar "Enviar Solicitud" se calcularán los precios en red por orden de llegada...
-                </p>
-            </div>
-        </div>
+        <!-- 4. ENVIAR SOLICITUD POR RED -->
+        <button type="button" class="btn-enviar" onclick="enviarReporteFinalWhatsApp()">🚀 ENVIAR SOLICITUD</button>
     </main>
 
     <script>
-        const TELEFONO_DESTINO_WHATSAPP = "51999888777"; 
+        const TELEFONO_CENTRAL = "51999888777"; 
 
-        // REPARADO: Función directa libre de bloqueos sintácticos
-        function seleccionarAlternativaDirecta(nombreCategoria, idBoton, textoPlantilla) {
-            document.getElementById('categoria-texto').value = nombreCategoria;
-            document.getElementById('descripcion').value = textoPlantilla;
+        // Lógica limpia para las categorías (10:19)
+        function seleccionarCategoriaLimpiamente(nombre, idBoton, textoSugerido) {
+            document.getElementById('categoria-texto').value = nombre;
+            document.getElementById('descripcion').value = textoSugerido;
             
-            document.querySelectorAll('.btn-categoria-central').forEach(function(b) {
-                b.classList.remove('activo');
+            document.querySelectorAll('.btn-categoria-central').forEach(function(btn) {
+                btn.classList.remove('activo');
             });
             
             document.getElementById(idBoton).classList.add('activo');
-            forzarActivacionTeclado('descripcion');
+            forzarTecladoCelular('descripcion');
         }
 
-        function forzarActivacionTeclado(idInput) {
-            const elemento = document.getElementById(idInput);
-            elemento.focus();
-            elemento.click();
+        // Lógica limpia para forzar la voz nativa del teclado (10:29)
+        function forzarTecladoCelular(idInput) {
+            const campoTexto = document.getElementById(idInput);
+            campoTexto.focus();
+            campoTexto.click();
         }
 
-        function procesarEnvioRealConCotizaciones() {
-            const direccion = document.getElementById('ubicacion').value;
-            const categoriaElegida = document.getElementById('categoria-texto').value;
-            const detalleCuerpo = document.getElementById('descripcion').value;
+        // Acción del botón verde por red
+        function enviarReporteFinalWhatsApp() {
+            const ubi = document.getElementById('ubicacion').value;
+            const cat = document.getElementById('categoria-texto').value;
+            const desc = document.getElementById('descripcion').value;
 
-            if (detalleCuerpo.trim() === "") {
-                alert("Por favor, escribe o dicta tu necesidad en el cuadro de texto.");
+            if (desc.trim() === "") {
+                alert("Por favor, escribe o dicta tu necesidad antes de enviar.");
                 return;
             }
 
-            const ahora = new Date();
-            const fechaTxt = ahora.toLocaleDateString('es-PE');
-            const horaTxt = ahora.toLocaleTimeString('es-PE');
+            let mensajeText = "🚨 *SOLICITUD DE ASISTENCIA - NECESITO* 🚨\n\n";
+            mensajeText += "📍 *Dirección:* " + ubi + "\n";
+            mensajeText += "📂 *Categoría:* " + cat + "\n";
+            mensajeText += "📝 *Detalle:* " + desc + "\n\n";
+            mensajeText += "_Por favor, enviar cotización de atención al solicitante._";
 
-            document.getElementById('registro-tiempo').innerHTML = '⏱️ Solicitud Registrada: ' + fechaTxt + ' - ' + horaTxt;
-
-            const listaDiv = document.getElementById('lista-tecnicos');
-            let htmlFinal = "";
+            const urlWhatsApp = "https://whatsapp.com" + TELEFONO_CENTRAL + "&text=" + encodeURIComponent(mensajeText);
+            window.open(urlWhatsApp, '_blank');
+        }
+    </script>
+</body>
+</html>
