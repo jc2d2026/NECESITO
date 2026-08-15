@@ -36,7 +36,7 @@
         .btn-categoria-central.activo span:last-child { color: #2563eb; }
 
         .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; }
+        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; margin-bottom: 8px; }
         .tecnico-info h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
         .tecnico-info p { font-size: 12px; color: #64748b; margin-bottom: 4px; }
         
@@ -59,7 +59,7 @@
         <div class="tarjeta">
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
-                <input type="text" id="ubicacion" placeholder="Escribe tu dirección o usa el micro...">
+                <input type="text" id="ubicacion" placeholder="Las Antaras 186, Chorrillos">
                 <button type="button" id="btn-audio-ubicacion" class="btn-mic">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
@@ -97,7 +97,7 @@
         <div class="tarjeta">
             <label class="label-titulo">📝 Detalle de tu Pedido</label>
             <div class="control-grupo">
-                <textarea id="descripcion" rows="3" placeholder="Presiona un icono o escribe el detalle aquí..."></textarea>
+                <textarea id="descripcion" rows="3" placeholder="Ejemplo: Chifa arroz chaufa..."></textarea>
                 <button type="button" id="btn-audio-descripcion" class="btn-mic">
                     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
                 </button>
@@ -106,30 +106,45 @@
 
         <button type="button" id="btn-enviar" class="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
-        <!-- SECCIÓN DE RESULTADOS DINÁMICOS -->
-        <div class="tarjeta" id="tarjeta-resultados" style="display: none; margin-top: 20px;">
+        <!-- SECCIÓN DE RESULTADOS: SIEMPRE VISIBLE PARA EVITAR ERRORES DE PANTALLA -->
+        <div class="tarjeta" id="tarjeta-resultados">
             <label class="label-titulo">✨ Locales y Respuestas Encontradas Cercanas</label>
-            <div class="contenedor-tecnicos" id="lista-tecnicos"></div>
+            <div class="contenedor-tecnicos" id="lista-tecnicos">
+                <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 10px;" id="mensaje-estado">
+                    Esperando que ingreses un pedido y presiones "Enviar Solicitud"...
+                </p>
+            </div>
         </div>
     </main>
 
     <script>
-        const baseDeDatosNegocios = [
-            { nombre: "Chifa Jin Hong Chorrillos", tipo: "comprar", especialidad: "Chifa, Arroz Chaufa, Balsámina de Pollo", celular: "987654321", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 140 },
-            { nombre: "Chifa Central Matellini", tipo: "comprar", especialidad: "Chaufa, Aeropuerto, Comida China", celular: "912345678", estrellas: "⭐⭐⭐⭐☆ 4.4", opiniones: 85 },
-            { nombre: "Market Abastos Las Antaras", tipo: "comprar", especialidad: "Víveres, Pollo Fresco, Verduras", celular: "955666777", estrellas: "⭐⭐⭐⭐★ 4.7", opiniones: 62 },
-            { nombre: "Servicios Eléctricos Díaz", tipo: "profesional", especialidad: "Electricista A domicilio", celular: "999888777", estrellas: "⭐⭐⭐⭐★ 4.8", opiniones: 42 },
-            { nombre: "Gasfitería San Martín Chorrillos", tipo: "profesional", especialidad: "Gasfitero e Instalaciones", celular: "944555666", estrellas: "⭐⭐⭐⭐⭐ 5.0", opiniones: 18 },
-            { nombre: "InkaFarma Av. Chorrillos", tipo: "farmacia", especialidad: "Medicamentos y Urgencias", celular: "977666555", estrellas: "⭐⭐⭐⭐★ 4.6", opiniones: 235 },
-            { nombre: "Ambulancias Alerta Médica", tipo: "vital", especialidad: "Atención Médica Urgente", celular: "955444333", estrellas: "⭐⭐⭐⭐⭐ 4.9", opiniones: 90 }
-        ];
-
+        // Clonamos la dirección en el input si el GPS del celular sigue inactivo
         window.addEventListener('DOMContentLoaded', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    fetch("https://openstreetmap.org" + pos.coords.latitude + "&lon=" + pos.coords.longitude + "&addressdetails=1", {
-                        headers: { 'User-Agent': 'NecesitoAltaAccesibilidadSocial/1.0' }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.address) {
+            const campo = document.getElementById('ubicacion');
+            if(campo.value === "") {
+                campo.value = "Las Antaras 186, Chorrillos";
+            }
+        });
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        function iniciarDictadoVoz(idInput, idBoton) {
+            if (!SpeechRecognition) return;
+            const campo = document.getElementById(idInput);
+            const btn = document.getElementById(idBoton);
+            campo.focus();
+            const rec = new SpeechRecognition();
+            rec.lang = 'es-PE';
+            rec.onstart = () => btn.classList.add('grabando');
+            rec.onend = () => btn.classList.remove('grabando');
+            rec.onresult = (e) => { campo.value = e.results.transcript; };
+            rec.start();
+        }
+
+        document.getElementById('btn-audio-ubicacion').addEventListener('click', () => iniciarDictadoVoz('ubicacion', 'btn-audio-ubicacion'));
+        document.getElementById('btn-audio-descripcion').addEventListener('click', () => iniciarDictadoVoz('descripcion', 'btn-audio-descripcion'));
+
+        function ejecutarAccesoCentral(valorCategoria, idBtn, plantillaTexto) {
+            document.getElementById('categoria').value = valorCategoria;
+            document.getElementById('descripcion').value = plantillaTexto;
+            document.querySelectorAll('.btn-categoria-central').forEach(b => b.classList.remove('activo'));
+            document.getElementById(idBtn).classList.add('activo');
