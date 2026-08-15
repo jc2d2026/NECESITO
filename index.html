@@ -30,7 +30,6 @@
         .btn-categoria-central span:first-child { font-size: 24px; }
         .btn-categoria-central span:last-child { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; }
         .btn-categoria-central.activo { background-color: #eff6ff; border-color: #2563eb; }
-        .btn-categoria-central.activo span:last-child { color: #2563eb; }
 
         .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; margin-bottom: 8px; }
@@ -66,7 +65,6 @@
         <div class="tarjeta">
             <label class="label-titulo">📂 Categoría de Necesidad</label>
             <div class="control-grupo">
-                <!-- Se actualiza de forma automática según el icono que se presione abajo -->
                 <select id="categoria" onchange="sincronizarBotonesDesdeSelect()">
                     <option value="comprar">Compra / Abastecimiento</option>
                     <option value="profesional">Profesional / Técnico</option>
@@ -101,19 +99,24 @@
             </div>
         </div>
 
-        <button type="button" class="btn-enviar" onclick="procesarEnvioInmediato()">🚀 ENVIAR SOLICITUD</button>
+        <!-- BOTÓN VERDE REPROGRAMADO PARA ACCIÓN EN RED DIRECTA -->
+        <button type="button" class="btn-enviar" onclick="procesarEnvioRealWhatsApp()">🚀 ENVIAR SOLICITUD</button>
 
         <div class="tarjeta" id="tarjeta-resultados">
             <label class="label-titulo">✨ Locales y Respuestas Encontradas Cercanas</label>
             <div class="contenedor-tecnicos" id="lista-tecnicos">
                 <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 15px;" id="mensaje-estado">
-                    Esperando que ingreses un pedido y presiones "Enviar Solicitud"...
+                    Al presionar "Enviar Solicitud" se abrirá la central de atención en red...
                 </p>
             </div>
         </div>
     </main>
 
     <script>
+        // TELÉFONO DE LA CENTRAL O TU PROPIO CELULAR DE PRUEBAS PARA RECIBIR LAS COTIZACIONES
+        // (Por ahora está configurado con un número de ejemplo, puedes cambiarlo luego)
+        const TELEFONO_CENTRAL_ALERTAS = "51999888777"; 
+
         function ejecutarAccesoCentral(valorCategoria, idBtn, plantillaTexto) {
             document.getElementById('categoria').value = valorCategoria;
             document.getElementById('descripcion').value = plantillaTexto;
@@ -131,15 +134,15 @@
             if (val === 'vital') document.getElementById('cat-vit').classList.add('activo');
         }
 
-        function procesarEnvioInmediato() {
-            const listaDiv = document.getElementById('lista-tecnicos');
-            let htmlFinal = "";
+        // FUNCIÓN DE CONEXIÓN REAL MÓVIL
+        function procesarEnvioRealWhatsApp() {
+            const direccion = document.getElementById('ubicacion').value;
+            const categoriaSelect = document.getElementById('categoria');
+            const textoCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].text;
+            const detallePedido = document.getElementById('descripcion').value;
 
-            // Inyectamos de forma estática los resultados calificados de prueba
-            htmlFinal += '<div class="tarjeta-tecnico">';
-            htmlFinal += '<div class="tecnico-info"><h3>Chifa Jin Hong Chorrillos</h3>';
-            htmlFinal += '<div class="calificacion-estrellas">⭐⭐⭐⭐⭐ 4.9 <span class="calificacion-opiniones">(140 v.)</span></div>';
-            htmlFinal += '<p>🍱 Especialidad: Arroz Chaufa, Balsámina de Pollo</p>';
-            htmlFinal += '<a href="tel:987654321" class="btn-contacto">📞 Solicitar Cotización</a></div>';
-            htmlFinal += '<div class="tecnico-distancia">A 150m</div></div>';
-            
+            if (detallePedido.trim() === "") {
+                alert("Por favor, escribe o dicta el detalle de tu pedido antes de enviar.");
+                return;
+            }
+
