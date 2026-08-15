@@ -19,27 +19,21 @@
         .label-titulo { display: block; font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         
         .control-grupo { display: flex; gap: 10px; align-items: stretch; }
-        input[type="text"], select, textarea { width: 100%; background-color: #f1f5f9; border: none; border-radius: 12px; padding: 14px; font-size: 14px; color: #334155; outline: none; }
+        input[type="text"], textarea { width: 100%; background-color: #f1f5f9; border: none; border-radius: 12px; padding: 14px; font-size: 14px; color: #334155; outline: none; }
         textarea { resize: none; }
         
-        .btn-mic { background-color: #dbeafe; border: none; border-radius: 12px; width: 54px; min-width: 54px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-mic { background-color: #dbeafe; border: none; border-radius: 12px; width: 54px; min-width: 54px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-mic svg { width: 22px; height: 22px; fill: #2563eb; }
 
-        .bloque-iconos-categoria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .btn-categoria-central { background-color: #f1f5f9; border: 2px solid transparent; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
-        .btn-categoria-central span:first-child { font-size: 24px; }
-        .btn-categoria-central span:last-child { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-        .btn-categoria-central.activo { background-color: #eff6ff; border-color: #2563eb; }
-
-        .contenedor-tecnicos { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .tarjeta-tecnico { background: #ffffff; padding: 14px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; border-left: 5px solid #10b981; margin-bottom: 8px; }
-        .tecnico-info h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
-        .tecnico-info p { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+        /* DISEÑO DE LAS 4 IMÁGENES/BOTONES DE CATEGORÍA CENTRALIZADOS */
+        .bloque-iconos-categoria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 5px; }
+        .btn-categoria-central { background-color: #f1f5f9; border: 2px solid transparent; border-radius: 12px; padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
+        .btn-categoria-central span:first-child { font-size: 28px; } /* Tamaño de imagen grande */
+        .btn-categoria-central span:last-child { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; }
         
-        .calificacion-estrellas { color: #f59e0b; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
-        .calificacion-opiniones { color: #94a3b8; font-size: 11px; font-weight: normal; }
-        .tecnico-distancia { background-color: #f0fdf4; color: #16a34a; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 20px; text-align: center; }
-        .btn-contacto { background-color: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; margin-top: 5px; display: inline-block; }
+        /* Efecto visual al estar seleccionado */
+        .btn-categoria-central.activo { background-color: #eff6ff; border-color: #2563eb; }
+        .btn-categoria-central.activo span:last-child { color: #2563eb; }
 
         .btn-enviar { width: 100%; background-color: #10b981; color: white; font-weight: 700; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; }
     </style>
@@ -52,6 +46,7 @@
     </header>
 
     <main>
+        <!-- 1. UBICACIÓN -->
         <div class="tarjeta">
             <label class="label-titulo">📍 Mi Ubicación Actual</label>
             <div class="control-grupo">
@@ -62,33 +57,31 @@
             </div>
         </div>
 
+        <!-- 2. CATEGORÍA (NUEVO DISEÑO INTEGRADO SIN MENÚS DESPLEGABLES CONFLICTIVOS) -->
         <div class="tarjeta">
-            <label class="label-titulo">📂 Categoría de Necesidad</label>
-            <div class="control-grupo">
-                <select id="categoria" onchange="sincronizarBotonesDesdeSelect()">
-                    <option value="comprar">Compra / Abastecimiento</option>
-                    <option value="profesional">Profesional / Técnico</option>
-                    <option value="farmacia">Farmacia / Medicinas</option>
-                    <option value="vital">Emergencia Vital</option>
-                </select>
+            <label class="label-titulo">📂 Categoría Seleccionada</label>
+            <div class="control-grupo" style="margin-bottom: 12px;">
+                <input type="text" id="categoria-texto" value="Compra / Abastecimiento" readonly style="font-weight: bold; color: #2563eb; background-color: #f8fafc; text-align: center;">
             </div>
             
+            <!-- Bloque de Selección de Alternativas Directas -->
             <div class="bloque-iconos-categoria">
-                <button type="button" class="btn-categoria-central activo" id="cat-com" onclick="ejecutarAccesoCentral('comprar', 'cat-com', 'Necesito una Compra / Abastecimiento de: ')">
+                <button type="button" class="btn-categoria-central activo" id="img-com" onclick="seleccionarAlternativaDirecta('Compra / Abastecimiento', 'img-com', 'Necesito una Compra / Abastecimiento de: ')">
                     <span>🛒</span><span>Compras</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="cat-tec" onclick="ejecutarAccesoCentral('profesional', 'cat-tec', 'Busco un Profesional / Técnico en: ')">
+                <button type="button" class="btn-categoria-central" id="img-tec" onclick="seleccionarAlternativaDirecta('Profesional / Técnico', 'img-tec', 'Busco un Profesional / Técnico en: ')">
                     <span>👷</span><span>Técnicos</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="cat-far" onclick="ejecutarAccesoCentral('farmacia', 'cat-far', 'Necesito comprar de la Farmacia lo siguiente: ')">
+                <button type="button" class="btn-categoria-central" id="img-far" onclick="seleccionarAlternativaDirecta('Farmacia / Medicinas', 'img-far', 'Necesito comprar de la Farmacia lo siguiente: ')">
                     <span>💊</span><span>Farmacia</span>
                 </button>
-                <button type="button" class="btn-categoria-central" id="cat-vit" onclick="ejecutarAccesoCentral('vital', 'cat-vit', '¡EMERGENCIA VITAL! Necesito ayuda con: ')">
+                <button type="button" class="btn-categoria-central" id="img-vit" onclick="seleccionarAlternativaDirecta('Emergencia Vital', 'img-vit', '¡EMERGENCIA VITAL! Necesito ayuda con: ')">
                     <span>🧑‍⚕️</span><span>Vital</span>
                 </button>
             </div>
         </div>
 
+        <!-- 3. DETALLE DEL PEDIDO -->
         <div class="tarjeta">
             <label class="label-titulo">📝 Detalle de tu Pedido</label>
             <div class="control-grupo">
@@ -99,50 +92,55 @@
             </div>
         </div>
 
-        <!-- BOTÓN VERDE REPROGRAMADO PARA ACCIÓN EN RED DIRECTA -->
-        <button type="button" class="btn-enviar" onclick="procesarEnvioRealWhatsApp()">🚀 ENVIAR SOLICITUD</button>
-
-        <div class="tarjeta" id="tarjeta-resultados">
-            <label class="label-titulo">✨ Locales y Respuestas Encontradas Cercanas</label>
-            <div class="contenedor-tecnicos" id="lista-tecnicos">
-                <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 15px;" id="mensaje-estado">
-                    Al presionar "Enviar Solicitud" se abrirá la central de atención en red...
-                </p>
-            </div>
-        </div>
+        <!-- 4. BOTÓN DE ENVÍO DIRECTO A LA CENTRAL -->
+        <button type="button" class="btn-enviar" onclick="enviarReporteAWhatsAppCentral()">🚀 ENVIAR SOLICITUD</button>
     </main>
 
     <script>
-        // TELÉFONO DE LA CENTRAL O TU PROPIO CELULAR DE PRUEBAS PARA RECIBIR LAS COTIZACIONES
-        // (Por ahora está configurado con un número de ejemplo, puedes cambiarlo luego)
-        const TELEFONO_CENTRAL_ALERTAS = "51999888777"; 
+        // Cambia este número por tu propio celular de pruebas para recibir tus cotizaciones (Mantén el 51 adelante)
+        const TELEFONO_DESTINO_WHATSAPP = "51999888777"; 
 
-        function ejecutarAccesoCentral(valorCategoria, idBtn, plantillaTexto) {
-            document.getElementById('categoria').value = valorCategoria;
-            document.getElementById('descripcion').value = plantillaTexto;
+        // FUNCIÓN DE ALTERNATIVA DIRECTA: Sincroniza la casilla y la descripción al mismo tiempo al tocar la imagen
+        function seleccionarAlternativaDirecta(nombreCategoria, idBoton, textoPlantilla) {
+            // Escribe el nombre limpio en la casilla de categoría
+            document.getElementById('categoria-texto').value = nombreCategoria;
+            
+            // Inyecta la frase sugerida en la caja de descripción
+            document.getElementById('descripcion').value = textoPlantilla;
+            
+            // Ilumina el recuadro de la imagen seleccionada
             document.querySelectorAll('.btn-categoria-central').forEach(b => b.classList.remove('activo'));
-            document.getElementById(idBtn).classList.add('activo');
+            document.getElementById(idBoton).classList.add('activo');
+            
+            // Posiciona el cursor listo para escribir o dictar
             document.getElementById('descripcion').focus();
         }
 
-        function sincronizarBotonesDesdeSelect() {
-            const val = document.getElementById('categoria').value;
-            document.querySelectorAll('.btn-categoria-central').forEach(b => b.classList.remove('activo'));
-            if (val === 'profesional') document.getElementById('cat-tec').classList.add('activo');
-            if (val === 'comprar') document.getElementById('cat-com').classList.add('activo');
-            if (val === 'farmacia') document.getElementById('cat-far').classList.add('activo');
-            if (val === 'vital') document.getElementById('cat-vit').classList.add('activo');
-        }
+        // MOTOR DE ENVÍO EXTERNO SIN INTERFERENCIA DE BLOQUEOS
+        function enviarReporteAWhatsAppCentral() {
+            const direccionSolicitante = document.getElementById('ubicacion').value;
+            const categoriaElegida = document.getElementById('categoria-texto').value;
+            const detalleCuerpo = document.getElementById('descripcion').value;
 
-        // FUNCIÓN DE CONEXIÓN REAL MÓVIL
-        function procesarEnvioRealWhatsApp() {
-            const direccion = document.getElementById('ubicacion').value;
-            const categoriaSelect = document.getElementById('categoria');
-            const textoCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].text;
-            const detallePedido = document.getElementById('descripcion').value;
-
-            if (detallePedido.trim() === "") {
-                alert("Por favor, escribe o dicta el detalle de tu pedido antes de enviar.");
+            if (detalleCuerpo.trim() === "") {
+                alert("Por favor, escribe o dicta tu necesidad en el cuadro de texto.");
                 return;
             }
 
+            // REDACCIÓN AUTOMÁTICA DEL REPORTE
+            let formatoMensaje = "🚨 *NUEVA SOLICITUD DE ASISTENCIA - APP NECESITO* 🚨\n\n";
+            formatoMensaje += "📍 *Dirección:* " + direccionSolicitante + "\n";
+            formatoMensaje += "📂 *Categoría:* " + categoriaElegida + "\n";
+            formatoMensaje += "📝 *Pedido:* " + detalleCuerpo + "\n\n";
+            formatoMensaje += "_Sistema de Alta Accesibilidad Social. Enviar precio o cotización al solicitante._";
+
+            // Encriptado de caracteres seguro para internet
+            const mensajeListo = encodeURIComponent(formatoMensaje);
+            const urlFinalWhatsApp = "https://whatsapp.com" + TELEFONO_DESTINO_WHATSAPP + "&text=" + mensajeListo;
+
+            // Abrimos WhatsApp de forma forzada e inmediata
+            window.open(urlFinalWhatsApp, '_blank');
+        }
+    </script>
+</body>
+</html>
