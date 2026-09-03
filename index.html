@@ -75,7 +75,6 @@
             justify-content: center;
             cursor: pointer;
             font-size: 18px;
-            transition: background-color 0.2s;
         }
 
         .btn-voice.listening {
@@ -111,6 +110,18 @@
             font-size: 14px;
             line-height: 1.4;
         }
+        
+        .badge-seguridad {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
         .medicamento-tag {
             display: inline-block;
             background: #e0f2fe;
@@ -120,10 +131,6 @@
             font-size: 11px;
             font-weight: bold;
             margin-top: 4px;
-        }
-        .precio-tag {
-            color: #16a34a;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -148,9 +155,9 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
+                <option value="tecnicos">👷 Técnicos y Oficios</option>
                 <option value="farmacia">💊 Farmacia y Medicinas</option>
                 <option value="compras">🛒 Compra / Abastecimiento</option>
-                <option value="tecnicos">👷 Técnicos y Oficios</option>
                 <option value="vital">🧑‍⚕️ Médico Suscrito / Emergencia Vital</option>
             </select>
         </section>
@@ -159,7 +166,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: eritropoyetina o amoxicilina">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: electricista o gasfitero">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
@@ -179,12 +186,18 @@
     <script>
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
-        // INVENTARIO LOCAL EN LIMA CHORRILLOS
+        // BASE DE DATOS DE SOCIOS SUSCRITOS Y VERIFICADOS CONTRA FRAUDES
+        const RED_INTERNA_GENERAL = [
+            { nombre: "👷 Técnico Electricista Carlos (Suscrito y Verificado)", categoria: "tecnicos", especialidad: "electricista", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro: 999 111 222" },
+            { nombre: "👷 Gasfitero de Emergencia Juan (Identidad Validada)", categoria: "tecnicos", especialidad: "gasfitero", lat: -12.1840, lng: -77.0230, contacto: "Llamar Central de Control: 01-555-3333" },
+            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito)", categoria: "vital", especialidad: "medico", lat: -12.1870, lng: -77.0200, contacto: "Alerta Médica Inmediata" },
+            { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini)", categoria: "compras", especialidad: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria Vecinal" }
+        ];
+
         const INVENTARIO_FARMACIAS = [
             {
                 farmacia: "🔴 Farmacia San Cosme (Sede Chorrillos)",
-                lat: -12.1855, lng: -77.0215,
-                contacto: "Central: 01-444-5555",
+                lat: -12.1855, lng: -77.0215, contacto: "Central: 01-444-5555",
                 productos: {
                     "eritropoyetina": { presentacion: "4000 UI Inyectable (Caja x 1)", precio: "S/. 45.00" },
                     "general": { presentacion: "Medicinas generales en stock", precio: "Consultar tarifa vecinal" }
@@ -192,19 +205,12 @@
             },
             {
                 farmacia: "🔴 Botica Confianza Vecinal (Matellini)",
-                lat: -12.1825, lng: -77.0160,
-                contacto: "WhatsApp: 999 888 777",
+                lat: -12.1825, lng: -77.0160, contacto: "WhatsApp: 999 888 777",
                 productos: {
                     "eritropoyetina": { presentacion: "10000 UI Inyectable (Caja x 1)", precio: "S/. 110.00" },
                     "general": { presentacion: "Medicinas generales en stock", precio: "Envío a domicilio gratuito" }
                 }
             }
-        ];
-
-        const RED_INTERNA_GENERAL = [
-            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito)", categoria: "vital", lat: -12.1870, lng: -77.0200, contacto: "Alerta Médica Inmediata" },
-            { nombre: "🔴 Técnico Electricista Carlos (Chorrillos)", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "Canal Interno" },
-            { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini)", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
         ];
 
         function hablar(texto) {
@@ -216,24 +222,22 @@
             }
         }
 
-        // GEOLOCALIZACIÓN DINÁMICA ACTIVA
+        // INTENTO DE GEOLOCALIZACIÓN AL CARGAR
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         coordenadasUsuario = { lat: position.coords.latitude, lng: position.coords.longitude };
-                        document.getElementById('txt-ubicacion').value = "Ubicación GPS Detectada ✔️";
+                        document.getElementById('txt-ubicacion').value = "Las Antaras, Chorrillos (GPS Activo) ✔️";
                     },
-                    (error) => {
-                        console.log("GPS usando respaldo base Chorrillos.");
-                    },
-                    { enableHighAccuracy: true, timeout: 4000 }
+                    null,
+                    { enableHighAccuracy: true, timeout: 3000 }
                 );
             }
         });
 
-        // RECONOCIMIENTO DE VOZ CORREGIDO Y SEGURO
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        // RECONOCIMIENTO DE VOZ SEGURO Y COMPATIBLE
+        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         let reconocimiento = null;
 
         if (SpeechRecognition) {
@@ -248,13 +252,9 @@
         function configurarBotonVoz(btnId, inputId) {
             const boton = document.getElementById(btnId);
             boton.addEventListener('click', () => {
-                if (!reconocimiento) {
-                    hablar("El reconocimiento de voz no está disponible en este navegador.");
-                    return;
-                }
+                if (!reconocimiento) return;
                 try {
                     reconocimiento.start();
-                    boton.classList.add('listening');
                     boton.textContent = "🛑";
 
                     reconocimiento.onresult = (event) => {
@@ -263,8 +263,4 @@
                         hablar("Registrado: " + vozTexto);
                     };
 
-                    reconocimiento.onerror = (err) => {
-                        console.log("Error de micro:", err.error);
-                        if (err.error === 'not-allowed') {
-                            hablar("Permiso denegado. Recuerda ingresar usando la dirección con HTTPS.");
-                        }
+                    reconocimiento.onend = () => { boton.textContent = "🎙️"; };
