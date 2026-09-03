@@ -1,0 +1,85 @@
+let coordenadasUsuario = null;
+
+const RED_INTERNA_CONFIANZA = [
+    { nombre: "🔴 Farmacia San Cosme (Red Interna)", categoria: "farmacia", lat: -12.0464, lng: -77.0428, contacto: "Llamar Central Interna" },
+    { nombre: "🔴 Técnico Electricista Carlos (Red Interna)", categoria: "tecnicos", lat: -12.0500, lng: -77.0400, contacto: "WhatsApp Directo Seguro" },
+    { nombre: "🔴 Abastos y Víveres Lucía (Red Interna)", categoria: "compras", lat: -12.0450, lng: -77.0410, contacto: "Entrega Prioritaria" }
+];
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const reconocimiento = new SpeechRecognition();
+    reconocimiento.lang = 'es-PE';
+    reconocimiento.continuous = false;
+
+    document.getElementById('btn-voz-ubicacion').addEventListener('click', () => {
+        reconocimiento.start();
+        document.getElementById('btn-voz-ubicacion').textContent = "🛑";
+        reconocimiento.onresult = (event) => {
+            document.getElementById('txt-ubicacion').value = event.results.0.transcript;
+        };
+        reconocimiento.onend = () => { document.getElementById('btn-voz-ubicacion').textContent = "🎙️"; };
+    });
+
+    document.getElementById('btn-voz-pedido').addEventListener('click', () => {
+        reconocimiento.start();
+        document.getElementById('btn-voz-pedido').textContent = "🛑";
+        reconocimiento.onresult = (event) => {
+            document.getElementById('txt-pedido').value = event.results.0.transcript;
+        };
+        reconocimiento.onend = () => { document.getElementById('btn-voz-pedido').textContent = "🎙️"; };
+    });
+}
+
+window.addEventListener('load', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                coordenadasUsuario = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                document.getElementById('txt-ubicacion').value = `GPS Activo (${coordenadasUsuario.lat.toFixed(4)}, ${coordenadasUsuario.lng.toFixed(4)})`;
+            },
+            () => {
+                document.getElementById('txt-ubicacion').value = "Por favor, escribe tu dirección manualmente.";
+            }
+        );
+    }
+});
+
+document.getElementById('btn-enviar').addEventListener('click', () => {
+    const categoriaSeleccionada = document.getElementById('select-categoria').value;
+    const listaResultados = document.getElementById('lista-resultados');
+    
+    listaResultados.innerHTML = "Buscando primero en redes internas seguras...";
+
+    const resultadosFiltrados = RED_INTERNA_CONFIANZA.filter(item => item.categoria === categoriaSeleccionada);
+
+    if (resultadosFiltrados.length > 0) {
+        mostrarEnPantalla("Socios Verificados de la App NECESITO", resultadosFiltrados);
+    } else {
+        listaResultados.innerHTML = "Buscando establecimientos públicos de respaldo en mapas de la zona...";
+        
+        setTimeout(() => {
+            const resultadosGoogleMock = [
+                { nombre: `🏢 Establecimiento Público (${categoriaSeleccionada.toUpperCase()}) vía Google Maps`, contacto: "Ver ruta pública en mapa" },
+                { nombre: `🏢 Opción Secundaria de Emergencia en la zona`, contacto: "Ver ficha de Google" }
+            ];
+            mostrarEnPantalla("Entidades Públicas Externas (Google Maps)", resultadosGoogleMock);
+        }, 1500);
+    }
+});
+
+function mostrarEnPantalla(origen, datos) {
+    const listaResultados = document.getElementById('lista-resultados');
+    listaResultados.innerHTML = `<p style="font-weight: bold; color: #2563eb;">Origen: ${origen}</p>`;
+    
+    datos.forEach(item => {
+        const elemento = document.createElement('div');
+        elemento.className = 'result-item';
+        elemento.innerHTML = `<strong>${item.nombre}</strong><br><small>Acción: ${item.contacto}</small>`;
+        listaResultados.appendChild(elemento);
+    });
+}
