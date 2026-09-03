@@ -29,7 +29,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 { margin: 0; font-size: 24px; font-weight: bold; }
+        header h1 { margin: 0; font-size: 26px; font-weight: bold; }
         header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; }
 
         main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
@@ -44,7 +44,7 @@
         }
 
         .card-title {
-            font-size: 12px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #64748b;
@@ -56,32 +56,40 @@
 
         .input-control {
             flex: 1;
-            padding: 14px;
-            border: 1px solid #e2e8f0;
+            padding: 16px;
+            border: 1px solid #cbd5e1;
             background-color: #f1f5f9;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px;
             color: var(--text-dark);
             outline: none;
         }
 
         .btn-voice {
             background-color: #dbeafe;
-            border: none;
+            border: 2px solid var(--primary-blue);
             border-radius: 12px;
-            width: 48px;
+            width: 55px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 22px;
         }
 
         .btn-voice.listening {
             background-color: #ef4444 !important;
+            color: white !important;
+            animation: pulse 1.5s infinite;
         }
 
-        select.input-control { width: 100%; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        select.input-control { width: 100%; font-size: 16px; height: 54px; }
 
         .btn-submit {
             width: 100%;
@@ -89,60 +97,60 @@
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
+            padding: 18px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
         }
 
         .results-section { margin-top: 20px; padding: 10px; }
-        .results-title { font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .results-title { font-size: 13px; font-weight: bold; color: #64748b; text-transform: uppercase; }
         
         .result-item {
-            padding: 14px;
+            padding: 16px;
             background: #ffffff;
-            margin: 8px 0;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-blue);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            font-size: 14px;
-            line-height: 1.4;
+            margin: 10px 0;
+            border-radius: 12px;
+            border-left: 6px solid var(--primary-blue);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 15px;
+            line-height: 1.5;
         }
         
         .badge-seguridad {
             display: inline-block;
             background: #dcfce7;
             color: #15803d;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-bottom: 6px;
         }
 
         .badge-google {
             display: inline-block;
             background: #fef08a;
             color: #a16207;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-bottom: 6px;
         }
 
         .btn-google-link {
-            display: inline-block;
-            margin-top: 8px;
-            background-color: #f1f5f9;
-            color: #2563eb;
-            padding: 6px 12px;
-            border-radius: 6px;
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 12px;
-            border: 1px solid #cbd5e1;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -167,10 +175,9 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="tecnicos">👷 Técnicos y Oficios</option>
-                <option value="farmacia">💊 Farmacia y Medicinas</option>
-                <option value="compras">🛒 Compra / Abastecimiento</option>
-                <option value="vital">🧑‍⚕️ Médico Suscrito / Emergencia Vital</option>
+                <option value="tecnicos"> Solicitud de Técnico Confiable</option>
+                <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
+                <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
         </section>
 
@@ -178,51 +185,31 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: electricista o gasfitero">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: electricista urgente o gasfitero">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
 
         <!-- Botón Enviar -->
         <button class="btn-submit" id="btn-enviar">
-            🚀 ENVIAR SOLICITUD
+            🚀 ENVIAR SOLICITUD DE AUXILIO
         </button>
 
         <!-- Panel de Resultados -->
         <section class="results-section" id="panel-resultados">
-            <div class="results-title">✨ Resultados cercanos</div>
-            <div id="lista-resultados">Los resultados de búsqueda aparecerán aquí al presionar Enviar.</div>
+            <div class="results-title">✨ Soluciones e Identidades Encontradas</div>
+            <div id="lista-resultados">Los resultados de urgencia aparecerán aquí.</div>
         </section>
     </main>
 
     <script>
+        // Ubicación predeterminada fija si falla el GPS
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
-        const RED_INTERNA_GENERAL = [
-            { nombre: "👷 Técnico Electricista Carlos (Suscrito y Verificado)", categoria: "tecnicos", especialidad: "electricista", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro: 999 111 222" },
-            { nombre: "👷 Gasfitero de Emergencia Juan (Identidad Validada)", categoria: "tecnicos", especialidad: "gasfitero", lat: -12.1840, lng: -77.0230, contacto: "Llamar Central: 01-555-3333" },
-            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito)", categoria: "vital", especialidad: "medico", lat: -12.1870, lng: -77.0200, contacto: "Alerta Médica Inmediata" }
-        ];
+        // BASE DE DATOS DE SUSCRITOS VERIFICADOS (Simulación inicial contra falsos técnicos)
+        const RED_INTERNA_GENERAL = []; // Inicialmente vacía para forzar el salto a redes públicas si no hay nadie
 
-        const INVENTARIO_FARMACIAS = [
-            {
-                farmacia: "🔴 Farmacia San Cosme (Sede Chorrillos)",
-                lat: -12.1855, lng: -77.0215, contacto: "Central: 01-444-5555",
-                productos: {
-                    "eritropoyetina": { presentacion: "4000 UI Inyectable (Caja x 1)", precio: "S/. 45.00" },
-                    "general": { presentacion: "Medicinas generales en stock", precio: "Consultar tarifa vecinal" }
-                }
-            },
-            {
-                farmacia: "🔴 Botica Confianza Vecinal (Matellini)",
-                lat: -12.1825, lng: -77.0160, contacto: "WhatsApp: 999 888 777",
-                productos: {
-                    "eritropoyetina": { presentacion: "10000 UI Inyectable (Caja x 1)", precio: "S/. 110.00" },
-                    "general": { presentacion: "Medicinas generales en stock", precio: "Envío a domicilio gratuito" }
-                }
-            }
-        ];
-
+        // Sistema de lectura por Voz (Text-to-Speech)
         function hablar(texto) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -232,26 +219,15 @@
             }
         }
 
-        window.addEventListener('load', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        coordenadasUsuario = { lat: position.coords.latitude, lng: position.coords.longitude };
-                        document.getElementById('txt-ubicacion').value = "Las Antaras, Chorrillos (GPS Activo) ✔️";
-                    },
-                    null,
-                    { enableHighAccuracy: true, timeout: 3000 }
-                );
-            }
-        });
-
-        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+        // RECONOCIMIENTO DE VOZ REPROGRAMADO CON PROTOCOLOS DE NAVEGACIÓN MODERNA
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
         if (SpeechRecognition) {
             reconocimiento = new SpeechRecognition();
             reconocimiento.lang = 'es-PE';
-            reconocimiento.continuous = false;
+            reconocimiento.continuous = true; // Escucha continua activa
+            reconocimiento.interimResults = false;
 
             configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
             configurarBotonVoz('btn-voz-pedido', 'txt-pedido');
@@ -259,20 +235,51 @@
 
         function configurarBotonVoz(btnId, inputId) {
             const boton = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            let escuchando = false;
+
             boton.addEventListener('click', () => {
-                if (!reconocimiento) return;
-                try {
-                    reconocimiento.start();
-                    boton.textContent = "🛑";
+                if (!reconocimiento) {
+                    hablar("El micrófono no es compatible con este navegador.");
+                    return;
+                }
 
-                    reconocimiento.onresult = (event) => {
-                        const vozTexto = event.results.transcript;
-                        document.getElementById(inputId).value = vozTexto;
-                        hablar("Registrado " + vozTexto);
-                    };
+                if (!escuchando) {
+                    try {
+                        reconocimiento.start();
+                        escuchando = true;
+                        boton.classList.add('listening');
+                        boton.textContent = "🛑";
+                        hablar("Escuchando, hable ahora.");
 
-                    reconocimiento.onend = () => { boton.textContent = "🎙️"; };
-                } catch(e) { console.log("Instancia activa."); }
+                        reconocimiento.onresult = (event) => {
+                            const resultadoActual = event.resultIndex;
+                            const vozTexto = event.results[resultadoActual][0].transcript;
+                            input.value = vozTexto;
+                            hablar("Registrado: " + vozTexto);
+                        };
+
+                        reconocimiento.onerror = (err) => {
+                            console.log("Error detectado: ", err.error);
+                            if(err.error === 'not-allowed') {
+                                hablar("Acceso denegado. Active el candado de permisos arriba.");
+                            }
+                        };
+
+                    } catch(e) { console.log(e); }
+                } else {
+                    reconocimiento.stop();
+                    escuchando = false;
+                    boton.classList.remove('listening');
+                    boton.textContent = "🎙️";
+                }
             });
         }
 
+        // FÓRMULA GEOGRÁFICA HAVERSINE
+        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
