@@ -196,10 +196,8 @@
     </main>
 
     <script>
-        // Coordenadas base fijas en Chorrillos
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
-        // 1. BASE DE DATOS DE SOCIOS INTERNOS SUSCRITOS
         const RED_INTERNA_GENERAL = [
             { nombre: "👷 Técnico Electricista Carlos (Suscrito y Verificado)", categoria: "tecnicos", especialidad: "electricista", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro: 999 111 222" },
             { nombre: "👷 Gasfitero de Emergencia Juan (Identidad Validada)", categoria: "tecnicos", especialidad: "gasfitero", lat: -12.1840, lng: -77.0230, contacto: "Llamar Central: 01-555-3333" },
@@ -234,7 +232,6 @@
             }
         }
 
-        // INTENTO DE GEOLOCALIZACIÓN AL CARGAR
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -248,7 +245,6 @@
             }
         });
 
-        // 2. RECONOCIMIENTO DE VOZ CORREGIDO
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         let reconocimiento = null;
 
@@ -268,8 +264,15 @@
                 try {
                     reconocimiento.start();
                     boton.textContent = "🛑";
-                    boton.classList.add('listening');
 
                     reconocimiento.onresult = (event) => {
-                        const vozTexto = event.results[0][0].transcript;
+                        const vozTexto = event.results.transcript;
                         document.getElementById(inputId).value = vozTexto;
+                        hablar("Registrado " + vozTexto);
+                    };
+
+                    reconocimiento.onend = () => { boton.textContent = "🎙️"; };
+                } catch(e) { console.log("Instancia activa."); }
+            });
+        }
+
