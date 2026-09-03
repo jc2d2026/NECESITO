@@ -21,6 +21,29 @@
             color: var(--text-dark);
         }
 
+        /* Pantalla de activación inicial para accesibilidad */
+        #capa-activacion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 9999;
+            padding: 20px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        #capa-activacion h2 { font-size: 26px; margin-bottom: 15px; }
+        #capa-activacion p { font-size: 18px; opacity: 0.9; }
+
         header {
             background-color: var(--primary-blue);
             color: white;
@@ -29,24 +52,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: bold;
-        }
+        header h1 { margin: 0; font-size: 28px; font-weight: bold; }
+        header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
 
-        header p {
-            margin: 5px 0 0 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        main {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 15px;
-            box-sizing: border-box;
-        }
+        main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
 
         .card {
             background: var(--card-bg);
@@ -66,10 +75,7 @@
             font-weight: 700;
         }
 
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
+        .input-group { display: flex; gap: 10px; }
 
         .input-control {
             flex: 1;
@@ -94,10 +100,7 @@
             font-size: 24px;
         }
 
-        select.input-control {
-            width: 100%;
-            font-size: 18px;
-        }
+        select.input-control { width: 100%; font-size: 18px; }
 
         .btn-submit {
             width: 100%;
@@ -112,17 +115,8 @@
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
         }
 
-        .results-section {
-            margin-top: 20px;
-            padding: 10px;
-        }
-
-        .results-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #64748b;
-            text-transform: uppercase;
-        }
+        .results-section { margin-top: 20px; padding: 10px; }
+        .results-title { font-size: 14px; font-weight: bold; color: #64748b; text-transform: uppercase; }
         
         .result-item {
             padding: 16px;
@@ -137,6 +131,12 @@
 </head>
 <body>
 
+    <!-- Capa de Activación por toque requerida por los navegadores móviles -->
+    <div id="capa-activacion">
+        <h2>🤝 APP NECESITO</h2>
+        <p>Toca cualquier parte de la pantalla para iniciar el asistente de voz y activar el GPS de auxilio automático.</p>
+    </div>
+
     <header>
         <h1>🤝 NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
@@ -145,41 +145,41 @@
     <main>
         <!-- Ubicación -->
         <section class="card">
-            <div class="card-title" aria-label="Mi ubicación actual">📍 Mi ubicación actual</div>
+            <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" placeholder="Buscando tu ubicación...">
-                <button class="btn-voice" id="btn-voz-ubicacion" aria-label="Dictar ubicación">🎙️</button>
+                <input type="text" class="input-control" id="txt-ubicacion" placeholder="Esperando activación de pantalla...">
+                <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
 
         <!-- Categoría -->
         <section class="card">
-            <div class="card-title" aria-label="Categoría de necesidad">📁 Categoría de necesidad</div>
-            <select class="input-control" id="select-categoria" aria-label="Seleccionar Categoría">
+            <div class="card-title">📁 Categoría de necesidad</div>
+            <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas</option>
                 <option value="compras">🛒 Compra / Abastecimiento</option>
                 <option value="tecnicos">👷 Técnicos y Oficios</option>
-                <option value="vital">🧑‍⚕️ Emergencia / Vital</option>
+                <option value="vital">🧑‍⚕️ Médico Suscrito / Emergencia Vital</option>
             </select>
         </section>
 
         <!-- Detalle del pedido -->
         <section class="card">
-            <div class="card-title" aria-label="Detalle de tu pedido">📝 Detalle de tu pedido</div>
+            <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-pedido" placeholder="¿Qué necesitas?">
-                <button class="btn-voice" id="btn-voz-pedido" aria-label="Dictar pedido">🎙️</button>
+                <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
 
         <!-- Botón Enviar -->
-        <button class="btn-submit" id="btn-enviar" aria-label="Enviar Solicitud">
-            🚀 ENVIAR SOLICITUD
+        <button class="btn-submit" id="btn-enviar">
+            🚀 ENVIAR SOLICITUD DE AUXILIO
         </button>
 
         <!-- Panel de Resultados -->
         <section class="results-section" id="panel-resultados">
-            <div class="results-title">✨ Resultados cercanos</div>
+            <div class="results-title">✨ Resultados y Auxilio Cercano</div>
             <div id="lista-resultados" class="result-item">Los resultados aparecerán aquí.</div>
         </section>
     </main>
@@ -189,16 +189,17 @@
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
         const RED_INTERNA_CONFIANZA = [
-            { nombre: "Farmacia San Cosme, Sede Chorrillos", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Llamar Central Lima" },
-            { nombre: "Botica Confianza Vecinal en Matellini", categoria: "farmacia", lat: -12.1825, lng: -77.0160, contacto: "Servicio a Domicilio" },
-            { nombre: "Técnico Electricista Carlos, Zona Sur Chorrillos", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro" },
-            { nombre: "Abastos y Víveres Lucía, Mercado Matellini", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
+            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito de Cabecera)", categoria: "vital", lat: -12.1870, lng: -77.0200, contacto: "Llamar Alerta Médica Inmediata" },
+            { nombre: "🔴 Farmacia San Cosme, Sede Chorrillos", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Llamar Central Lima" },
+            { nombre: "🔴 Botica Confianza Vecinal en Matellini", categoria: "farmacia", lat: -12.1825, lng: -77.0160, contacto: "Servicio a Domicilio" },
+            { nombre: "🔴 Técnico Electricista Carlos, Zona Sur Chorrillos", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro" },
+            { nombre: "🔴 Abastos y Víveres Lucía, Mercado Matellini", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
         ];
 
-        // SÍNTESIS DE VOZ (La app habla)
+        // SÍNTESIS DE VOZ 
         function hablar(texto) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Detiene cualquier audio previo
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'es-PE';
                 utterance.rate = 1.0; 
@@ -206,7 +207,7 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ (La app escucha)
+        // RECONOCIMIENTO DE VOZ
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -214,7 +215,6 @@
             reconocimiento = new SpeechRecognition();
             reconocimiento.lang = 'es-PE';
             reconocimiento.continuous = false;
-
             configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
             configurarBotonVoz('btn-voz-pedido', 'txt-pedido');
         }
@@ -225,15 +225,16 @@
                     reconocimiento.start();
                     document.getElementById(btnId).textContent = "🛑";
                     reconocimiento.onresult = (event) => {
-                        const vozTexto = event.results[0][0].transcript;
+                        const vozTexto = event.results[0].transcript;
                         document.getElementById(inputId).value = vozTexto;
-                        hablar("Entendido: " + vozTexto);
+                        hablar("Registrado: " + vozTexto);
                     };
                     reconocimiento.onend = () => { document.getElementById(btnId).textContent = "🎙️"; };
                 }
             });
         }
 
+        // ESCUCHA ACTIVA SI FALLA EL GPS
         function activarMicrofonoAutomatico(inputId, btnId, mensajeAnuncio) {
             hablar(mensajeAnuncio);
             setTimeout(() => {
@@ -242,28 +243,17 @@
                         reconocimiento.start();
                         document.getElementById(btnId).textContent = "🛑";
                         reconocimiento.onresult = (event) => {
-                            const vozTexto = event.results[0][0].transcript;
+                            const vozTexto = event.results[0].transcript;
                             document.getElementById(inputId).value = vozTexto;
-                            hablar("Ubicación registrada: " + vozTexto);
+                            hablar("Dirección capturada: " + vozTexto);
                         };
                         reconocimiento.onend = () => { document.getElementById(btnId).textContent = "🎙️"; };
                     } catch(e) { console.log(e); }
                 }
-            }, 5000); // Espera que termine de hablar antes de abrir el micro
+            }, 6000);
         }
 
-        // GEOLOCALIZACIÓN ASISTIDA POR AUDIO
-        window.addEventListener('load', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        coordenadasUsuario = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos";
-                        hablar("Ubicación automática establecida con éxito en Chorrillos.");
-                    },
-                    (error) => {
-                        // Si falla el GPS, la app toma el control por voz automáticamente
-                        document.getElementById('txt-ubicacion').value = "";
+        // INICIALIZACIÓN POR INTERACCIÓN OBLIGATORIA (Rompe el bloqueo de Android/Chrome)
+        document.getElementById('capa-activacion').addEventListener('click', () => {
+            document.getElementById('capa-activacion').style.display = 'none';
+            document.getElementById('txt-ubicacion').value = "Buscando satélites GPS...";
