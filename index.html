@@ -29,7 +29,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 { margin: 0; font-size: 26px; font-weight: bold; }
+        header h1 { margin: 0; font-size: 24px; font-weight: bold; }
         header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; }
 
         main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
@@ -44,7 +44,7 @@
         }
 
         .card-title {
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #64748b;
@@ -56,11 +56,11 @@
 
         .input-control {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid #cbd5e1;
             background-color: #f1f5f9;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-dark);
             outline: none;
         }
@@ -69,12 +69,12 @@
             background-color: #dbeafe;
             border: 2px solid var(--primary-blue);
             border-radius: 12px;
-            width: 55px;
+            width: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .btn-voice.listening {
@@ -89,7 +89,13 @@
             100% { transform: scale(1); }
         }
 
-        select.input-control { width: 100%; font-size: 16px; height: 54px; }
+        /* Ajuste de tamaño optimizado para que entren todas las opciones en móviles */
+        select.input-control { 
+            width: 100%; 
+            font-size: 15px; 
+            height: 48px;
+            padding: 10px;
+        }
 
         .btn-submit {
             width: 100%;
@@ -175,8 +181,9 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="tecnicos"> Solicitud de Técnico Confiable</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
+                <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
         </section>
@@ -185,7 +192,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: electricista urgente o gasfitero">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: arroz chaufa, ferretería o amoxicilina">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
@@ -203,30 +210,28 @@
     </main>
 
     <script>
-        // Ubicación predeterminada fija si falla el GPS
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
-        // BASE DE DATOS DE SUSCRITOS VERIFICADOS (Simulación inicial contra falsos técnicos)
-        const RED_INTERNA_GENERAL = []; // Inicialmente vacía para forzar el salto a redes públicas si no hay nadie
+        const RED_INTERNA_GENERAL = [
+            { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini - Suscrita)", categoria: "compras", especialidad: "alimentos", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria Vecinal" }
+        ];
 
-        // Sistema de lectura por Voz (Text-to-Speech)
         function hablar(texto) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+                window.webkitSpeechSynthesis ? window.speechSynthesis.cancel() : null;
                 const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // RECONOCIMIENTO DE VOZ REPROGRAMADO CON PROTOCOLOS DE NAVEGACIÓN MODERNA
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
         if (SpeechRecognition) {
             reconocimiento = new SpeechRecognition();
             reconocimiento.lang = 'es-PE';
-            reconocimiento.continuous = true; // Escucha continua activa
+            reconocimiento.continuous = true;
             reconocimiento.interimResults = false;
 
             configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
@@ -239,10 +244,7 @@
             let escuchando = false;
 
             boton.addEventListener('click', () => {
-                if (!reconocimiento) {
-                    hablar("El micrófono no es compatible con este navegador.");
-                    return;
-                }
+                if (!reconocimiento) return;
 
                 if (!escuchando) {
                     try {
@@ -254,16 +256,9 @@
 
                         reconocimiento.onresult = (event) => {
                             const resultadoActual = event.resultIndex;
-                            const vozTexto = event.results[resultadoActual][0].transcript;
+                            const vozTexto = event.results[resultadoActual].transcript;
                             input.value = vozTexto;
                             hablar("Registrado: " + vozTexto);
-                        };
-
-                        reconocimiento.onerror = (err) => {
-                            console.log("Error detectado: ", err.error);
-                            if(err.error === 'not-allowed') {
-                                hablar("Acceso denegado. Active el candado de permisos arriba.");
-                            }
                         };
 
                     } catch(e) { console.log(e); }
@@ -276,10 +271,16 @@
             });
         }
 
-        // FÓRMULA GEOGRÁFICA HAVERSINE
         function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
             const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
