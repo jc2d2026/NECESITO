@@ -75,6 +75,12 @@
             justify-content: center;
             cursor: pointer;
             font-size: 18px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-voice.listening {
+            background-color: #ef4444 !important;
+            color: white !important;
         }
 
         select.input-control { width: 100%; }
@@ -96,12 +102,28 @@
         .results-title { font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase; }
         
         .result-item {
-            padding: 12px;
+            padding: 14px;
             background: #ffffff;
             margin: 8px 0;
             border-radius: 8px;
             border-left: 4px solid var(--primary-blue);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .medicamento-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .precio-tag {
+            color: #16a34a;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -137,7 +159,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="¿Qué necesitas?">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: eritropoyetina o amoxicilina">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
@@ -155,13 +177,32 @@
     </main>
 
     <script>
-        // Ubicación por defecto forzada para Lima, Chorrillos
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
-        const RED_INTERNA_CONFIANZA = [
+        // INVENTARIO LOCAL EN LIMA CHORRILLOS
+        const INVENTARIO_FARMACIAS = [
+            {
+                farmacia: "🔴 Farmacia San Cosme (Sede Chorrillos)",
+                lat: -12.1855, lng: -77.0215,
+                contacto: "Central: 01-444-5555",
+                productos: {
+                    "eritropoyetina": { presentacion: "4000 UI Inyectable (Caja x 1)", precio: "S/. 45.00" },
+                    "general": { presentacion: "Medicinas generales en stock", precio: "Consultar tarifa vecinal" }
+                }
+            },
+            {
+                farmacia: "🔴 Botica Confianza Vecinal (Matellini)",
+                lat: -12.1825, lng: -77.0160,
+                contacto: "WhatsApp: 999 888 777",
+                productos: {
+                    "eritropoyetina": { presentacion: "10000 UI Inyectable (Caja x 1)", precio: "S/. 110.00" },
+                    "general": { presentacion: "Medicinas generales en stock", precio: "Envío a domicilio gratuito" }
+                }
+            }
+        ];
+
+        const RED_INTERNA_GENERAL = [
             { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito)", categoria: "vital", lat: -12.1870, lng: -77.0200, contacto: "Alerta Médica Inmediata" },
-            { nombre: "🔴 Farmacia San Cosme (Sede Chorrillos)", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Central Lima" },
-            { nombre: "🔴 Botica Confianza Vecinal (Matellini)", categoria: "farmacia", lat: -12.1825, lng: -77.0160, contacto: "Servicio Telefónico" },
             { nombre: "🔴 Técnico Electricista Carlos (Chorrillos)", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "Canal Interno" },
             { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini)", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
         ];
@@ -175,21 +216,23 @@
             }
         }
 
-        // Si el GPS del celular responde, actualiza las coordenadas reales
+        // GEOLOCALIZACIÓN DINÁMICA ACTIVA
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         coordenadasUsuario = { lat: position.coords.latitude, lng: position.coords.longitude };
-                        document.getElementById('txt-ubicacion').value = "Las Antaras, Chorrillos (GPS Activo) ✔️";
+                        document.getElementById('txt-ubicacion').value = "Ubicación GPS Detectada ✔️";
                     },
-                    null,
-                    { enableHighAccuracy: true, timeout: 3000 }
+                    (error) => {
+                        console.log("GPS usando respaldo base Chorrillos.");
+                    },
+                    { enableHighAccuracy: true, timeout: 4000 }
                 );
             }
         });
 
-        // RECONOCIMIENTO DE VOZ
+        // RECONOCIMIENTO DE VOZ CORREGIDO Y SEGURO
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -203,51 +246,25 @@
         }
 
         function configurarBotonVoz(btnId, inputId) {
-            document.getElementById(btnId).addEventListener('click', () => {
-                if (reconocimiento) {
-                    try {
-                        reconocimiento.start();
-                        document.getElementById(btnId).textContent = "🛑";
-                        reconocimiento.onresult = (event) => {
-                            const vozTexto = event.results[0][0].transcript;
-                            document.getElementById(inputId).value = vozTexto;
-                            hablar("Registrado: " + vozTexto);
-                        };
-                        reconocimiento.onend = () => { document.getElementById(btnId).textContent = "🎙️"; };
-                    } catch(e) {
-                        alert("Por favor, activa los permisos de micrófono en la esquina superior del navegador.");
-                    }
+            const boton = document.getElementById(btnId);
+            boton.addEventListener('click', () => {
+                if (!reconocimiento) {
+                    hablar("El reconocimiento de voz no está disponible en este navegador.");
+                    return;
                 }
-            });
-        }
+                try {
+                    reconocimiento.start();
+                    boton.classList.add('listening');
+                    boton.textContent = "🛑";
 
-        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
+                    reconocimiento.onresult = (event) => {
+                        const vozTexto = event.results[0][0].transcript;
+                        document.getElementById(inputId).value = vozTexto;
+                        hablar("Registrado: " + vozTexto);
+                    };
 
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const listaResultados = document.getElementById('lista-resultados');
-            
-            listaResultados.innerHTML = "Buscando aliados seguros...";
-            hablar("Buscando las opciones más cercanas.");
-
-            let resultadosFiltrados = RED_INTERNA_CONFIANZA.filter(item => item.categoria === categoriaSeleccionada);
-
-            resultadosFiltrados = resultadosFiltrados.map(item => {
-                const distancia = calcularDistanciaKm(coordenadasUsuario.lat, coordenadasUsuario.lng, item.lat, item.lng);
-                return { ...item, distancia: distancia };
-            });
-            
-            resultadosFiltrados.sort((a, b) => a.distancia - b.distancia);
-
-            setTimeout(() => {
-                listaResultados.innerHTML = "";
-                if (resultadosFiltrados.length > 0) {
+                    reconocimiento.onerror = (err) => {
+                        console.log("Error de micro:", err.error);
+                        if (err.error === 'not-allowed') {
+                            hablar("Permiso denegado. Recuerda ingresar usando la dirección con HTTPS.");
+                        }
