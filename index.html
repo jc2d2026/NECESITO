@@ -21,29 +21,6 @@
             color: var(--text-dark);
         }
 
-        /* Pantalla de activación inicial para accesibilidad */
-        #capa-activacion {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-blue);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 9999;
-            padding: 20px;
-            box-sizing: border-box;
-            cursor: pointer;
-        }
-
-        #capa-activacion h2 { font-size: 26px; margin-bottom: 15px; }
-        #capa-activacion p { font-size: 18px; opacity: 0.9; }
-
         header {
             background-color: var(--primary-blue);
             color: white;
@@ -52,10 +29,24 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 { margin: 0; font-size: 28px; font-weight: bold; }
-        header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-        main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        header p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        main {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
 
         .card {
             background: var(--card-bg);
@@ -67,40 +58,45 @@
         }
 
         .card-title {
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #475569;
+            color: #64748b;
             margin-bottom: 12px;
             font-weight: 700;
         }
 
-        .input-group { display: flex; gap: 10px; }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
 
         .input-control {
             flex: 1;
-            padding: 16px;
-            border: 1px solid #cbd5e1;
-            background-color: #f8fafc;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            background-color: #f1f5f9;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 15px;
             color: var(--text-dark);
             outline: none;
         }
 
         .btn-voice {
             background-color: #dbeafe;
-            border: 2px solid var(--primary-blue);
+            border: none;
             border-radius: 12px;
-            width: 60px;
+            width: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 18px;
         }
 
-        select.input-control { width: 100%; font-size: 18px; }
+        select.input-control {
+            width: 100%;
+        }
 
         .btn-submit {
             width: 100%;
@@ -108,34 +104,36 @@
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 20px;
-            font-size: 20px;
+            padding: 16px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
         }
 
-        .results-section { margin-top: 20px; padding: 10px; }
-        .results-title { font-size: 14px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .results-section {
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .results-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+        }
         
         .result-item {
-            padding: 16px;
+            padding: 12px;
             background: #ffffff;
             margin: 8px 0;
             border-radius: 8px;
-            border-left: 6px solid var(--primary-blue);
+            border-left: 4px solid var(--primary-blue);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            font-size: 16px;
         }
     </style>
 </head>
 <body>
-
-    <!-- Capa de Activación por toque requerida por los navegadores móviles -->
-    <div id="capa-activacion">
-        <h2>🤝 APP NECESITO</h2>
-        <p>Toca cualquier parte de la pantalla para iniciar el asistente de voz y activar el GPS de auxilio automático.</p>
-    </div>
 
     <header>
         <h1>🤝 NECESITO</h1>
@@ -147,8 +145,8 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" placeholder="Esperando activación de pantalla...">
-                <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
+                <input type="text" class="input-control" id="txt-ubicacion" placeholder="Buscando tu ubicación...">
+                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
 
@@ -168,42 +166,65 @@
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-pedido" placeholder="¿Qué necesitas?">
-                <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
+                <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
 
         <!-- Botón Enviar -->
         <button class="btn-submit" id="btn-enviar">
-            🚀 ENVIAR SOLICITUD DE AUXILIO
+            🚀 ENVIAR SOLICITUD
         </button>
 
         <!-- Panel de Resultados -->
         <section class="results-section" id="panel-resultados">
-            <div class="results-title">✨ Resultados y Auxilio Cercano</div>
-            <div id="lista-resultados" class="result-item">Los resultados aparecerán aquí.</div>
+            <div class="results-title">✨ Resultados cercanos</div>
+            <div id="lista-resultados">Los resultados de búsqueda aparecerán aquí.</div>
         </section>
     </main>
 
     <script>
-        // Coordenadas por defecto inicializadas en Chorrillos (Las Antaras 186)
+        // Coordenadas base por defecto (Las Antaras 186, Chorrillos)
         let coordenadasUsuario = { lat: -12.1861, lng: -77.0194 }; 
 
         const RED_INTERNA_CONFIANZA = [
-            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito de Cabecera)", categoria: "vital", lat: -12.1870, lng: -77.0200, contacto: "Llamar Alerta Médica Inmediata" },
-            { nombre: "🔴 Farmacia San Cosme, Sede Chorrillos", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Llamar Central Lima" },
-            { nombre: "🔴 Botica Confianza Vecinal en Matellini", categoria: "farmacia", lat: -12.1825, lng: -77.0160, contacto: "Servicio a Domicilio" },
-            { nombre: "🔴 Técnico Electricista Carlos, Zona Sur Chorrillos", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Seguro" },
-            { nombre: "🔴 Abastos y Víveres Lucía, Mercado Matellini", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
+            { nombre: "👨‍⚕️ Dr. Manuel Silva (Tu Médico Suscrito)", categoria: "vital", lat: -12.1870, lng: -77.0200, contacto: "Alerta Médica Inmediata" },
+            { nombre: "🔴 Farmacia San Cosme (Sede Chorrillos)", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Central Lima" },
+            { nombre: "🔴 Botica Confianza Vecinal (Matellini)", categoria: "farmacia", lat: -12.1825, lng: -77.0160, contacto: "Servicio Telefónico" },
+            { nombre: "🔴 Técnico Electricista Carlos (Chorrillos)", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "Canal Interno" },
+            { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini)", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
         ];
 
-        // SÍNTESIS DE VOZ 
+        // Función nativa de lectura en voz alta
         function hablar(texto) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'es-PE';
-                utterance.rate = 1.0; 
                 window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Intento silencioso de geolocalización al cargar la página
+        window.addEventListener('load', () => {
+            solicitarGpsSilencioso();
+        });
+
+        function solicitarGpsSilencioso() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        coordenadasUsuario = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        document.getElementById('txt-ubicacion').value = "Las Antaras, Chorrillos Detectado ✔️";
+                    },
+                    (error) => {
+                        // Si falla o se queda en espera, asume la dirección base de forma amigable
+                        document.getElementById('txt-ubicacion').value = "Chorrillos, Lima (Ubicación Base)";
+                    },
+                    { enableHighAccuracy: true, timeout: 6000 }
+                );
             }
         }
 
@@ -215,6 +236,7 @@
             reconocimiento = new SpeechRecognition();
             reconocimiento.lang = 'es-PE';
             reconocimiento.continuous = false;
+
             configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
             configurarBotonVoz('btn-voz-pedido', 'txt-pedido');
         }
@@ -234,26 +256,23 @@
             });
         }
 
-        // ESCUCHA ACTIVA SI FALLA EL GPS
-        function activarMicrofonoAutomatico(inputId, btnId, mensajeAnuncio) {
-            hablar(mensajeAnuncio);
-            setTimeout(() => {
-                if (reconocimiento) {
-                    try {
-                        reconocimiento.start();
-                        document.getElementById(btnId).textContent = "🛑";
-                        reconocimiento.onresult = (event) => {
-                            const vozTexto = event.results[0].transcript;
-                            document.getElementById(inputId).value = vozTexto;
-                            hablar("Dirección capturada: " + vozTexto);
-                        };
-                        reconocimiento.onend = () => { document.getElementById(btnId).textContent = "🎙️"; };
-                    } catch(e) { console.log(e); }
-                }
-            }, 6000);
+        // FÓRMULA MATEMÁTICA HAVERSINE
+        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
         }
 
-        // INICIALIZACIÓN POR INTERACCIÓN OBLIGATORIA (Rompe el bloqueo de Android/Chrome)
-        document.getElementById('capa-activacion').addEventListener('click', () => {
-            document.getElementById('capa-activacion').style.display = 'none';
-            document.getElementById('txt-ubicacion').value = "Buscando satélites GPS...";
+        // ACCIÓN PRINCIPAL AL PRESIONAR ENVIAR
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const listaResultados = document.getElementById('lista-resultados');
+            
+            listaResultados.innerHTML = "Buscando aliados seguros...";
+            hablar("Buscando las opciones más cercanas.");
+
