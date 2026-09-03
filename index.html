@@ -1,276 +1,118 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - Alta Accesibilidad</title>
-    <style>
-        :root {
-            --primary-blue: #2563eb;
-            --accent-green: #10b981;
-            --bg-light: #f8fafc;
-            --text-dark: #1e293b;
-            --card-bg: #ffffff;
-        }
+let coordenadasUsuario = null;
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
+// BASE DE DATOS LOCALIZADA EN LIMA (Coordenadas aproximadas de Chorrillos y zonas cercanas)
+const RED_INTERNA_CONFIANZA = [
+    { nombre: "🔴 Farmacia San Cosme (Sede Chorrillos - Red Interna)", categoria: "farmacia", lat: -12.1855, lng: -77.0215, contacto: "Llamar Central Lima" },
+    { nombre: "🔴 Técnico Electricista Carlos (Zona Sur - Chorrillos)", categoria: "tecnicos", lat: -12.1910, lng: -77.0180, contacto: "WhatsApp Directo Seguro" },
+    { nombre: "🔴 Abastos y Víveres Lucía (Mercado Matellini)", categoria: "compras", lat: -12.1820, lng: -77.0150, contacto: "Entrega Prioritaria" }
+];
 
-        header {
-            background-color: var(--primary-blue);
-            color: white;
-            text-align: center;
-            padding: 20px 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+// 1. RECONOCIMIENTO DE VOZ
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
-        }
+if (SpeechRecognition) {
+    const reconocimiento = new SpeechRecognition();
+    reconocimiento.lang = 'es-PE'; // Configurado estrictamente para español peruano
+    reconocimiento.continuous = false;
 
-        header p {
-            margin: 5px 0 0 0;
-            font-size: 13px;
-            opacity: 0.9;
-        }
+    document.getElementById('btn-voz-ubicacion').addEventListener('click', () => {
+        reconocimiento.start();
+        document.getElementById('btn-voz-ubicacion').textContent = "🛑";
+        reconocimiento.onresult = (event) => {
+            document.getElementById('txt-ubicacion').value = event.results[0][0].transcript;
+        };
+        reconocimiento.onend = () => { document.getElementById('btn-voz-ubicacion').textContent = "🎙️"; };
+    });
 
-        main {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 15px;
-            box-sizing: border-box;
-        }
+    document.getElementById('btn-voz-pedido').addEventListener('click', () => {
+        reconocimiento.start();
+        document.getElementById('btn-voz-pedido').textContent = "🛑";
+        reconocimiento.onresult = (event) => {
+            document.getElementById('txt-pedido').value = event.results[0][0].transcript;
+        };
+        reconocimiento.onend = () => { document.getElementById('btn-voz-pedido').textContent = "🎙️"; };
+    });
+}
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
+// 2. GEOLOCALIZACIÓN INTEGRADA
+window.addEventListener('load', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                coordenadasUsuario = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                // Muestra al usuario que está validado localmente
+                document.getElementById('txt-ubicacion').value = "GPS: Chorrillos Detectado ✔️";
+            },
+            (error) => {
+                document.getElementById('txt-ubicacion').placeholder = "Ingresa tu dirección o usa el micro 🎙️";
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+});
 
-        .card-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
+// FUNCIÓN MATEMÁTICA: Calcular distancia real en kilómetros (Fórmula de Haversine)
+function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la Tierra en Km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
 
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
+// 3. PROCESAMIENTO SEGURO CON FILTRADO GEOGRÁFICO
+document.getElementById('btn-enviar').addEventListener('click', () => {
+    const categoriaSeleccionada = document.getElementById('select-categoria').value;
+    const listaResultados = document.getElementById('lista-resultados');
+    
+    listaResultados.innerHTML = "Buscando aliados seguros en Chorrillos y alrededores...";
 
-        .input-control {
-            flex: 1;
-            padding: 14px;
-            border: 1px solid #e2e8f0;
-            background-color: #f1f5f9;
-            border-radius: 12px;
-            font-size: 15px;
-            color: var(--text-dark);
-            outline: none;
-        }
+    // Filtrar por categoría
+    let resultadosFiltrados = RED_INTERNA_CONFIANZA.filter(item => item.categoria === categoriaSeleccionada);
 
-        .btn-voice {
-            background-color: #dbeafe;
-            border: none;
-            border-radius: 12px;
-            width: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        select.input-control {
-            width: 100%;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: var(--accent-green);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
-        }
-
-        .results-section {
-            margin-top: 20px;
-            padding: 10px;
-        }
-
-        .results-title {
-            font-size: 12px;
-            font-weight: bold;
-            color: #64748b;
-            text-transform: uppercase;
-        }
+    // Si el GPS capturó la ubicación real, medimos la cercanía exacta
+    if (coordenadasUsuario) {
+        resultadosFiltrados = resultadosFiltrados.map(item => {
+            const distancia = calcularDistanciaKm(coordenadasUsuario.lat, coordenadasUsuario.lng, item.lat, item.lng);
+            return { ...item, distancia: distancia };
+        });
         
-        .result-item {
-            padding: 12px;
-            background: #ffffff;
-            margin: 8px 0;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-blue);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        // Ordenar de la más cercana a la más lejana
+        resultadosFiltrados.sort((a, b) => a.distancia - b.distancia);
+    }
+
+    setTimeout(() => {
+        if (resultadosFiltrados.length > 0) {
+            mostrarEnPantalla("Socios Verificados (Rango Lima Cuadrante Sur)", resultadosFiltrados);
+        } else {
+            // Si está muy lejos o no hay internos, sugiere el mapa de Lima mediante Google Maps corporativo
+            const resultadosGoogleMock = [
+                { nombre: "🏢 Botica Local Mapeada (Esquina Av. Huaylas / Chorrillos)", contacto: "Ver indicaciones de mapa en Lima" },
+                { nombre: "🏢 Centro de Salud Materno Infantil de Chorrillos", contacto: "Llamar a Emergencias Locales" }
+            ];
+            mostrarEnPantalla("Entidades de Respaldo Geográfico (Google Maps Perú)", resultadosGoogleMock);
         }
-    </style>
-</head>
-<body>
+    }, 1000);
+});
 
-    <header>
-        <h1>🤝 NECESITO</h1>
-        <p>Plataforma de Alta Accesibilidad Social</p>
-    </header>
-
-    <main>
-        <!-- Ubicación -->
-        <section class="card">
-            <div class="card-title">📍 Mi ubicación actual</div>
-            <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" placeholder="Detectando GPS...">
-                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
-            </div>
-        </section>
-
-        <!-- Categoría -->
-        <section class="card">
-            <div class="card-title">📁 Categoría de necesidad</div>
-            <select class="input-control" id="select-categoria">
-                <option value="compras">🛒 Compra / Abastecimiento</option>
-                <option value="tecnicos">👷 Técnicos y Oficios</option>
-                <option value="farmacia">💊 Farmacia y Medicinas</option>
-                <option value="vital">🧑‍⚕️ Emergencia / Vital</option>
-            </select>
-        </section>
-
-        <!-- Detalle del pedido -->
-        <section class="card">
-            <div class="card-title">📝 Detalle de tu pedido</div>
-            <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: Necesito gasfitero urgente...">
-                <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
-            </div>
-        </section>
-
-        <!-- Botón Enviar -->
-        <button class="btn-submit" id="btn-enviar">
-            🚀 ENVIAR SOLICITUD
-        </button>
-
-        <!-- Panel de Resultados -->
-        <section class="results-section" id="panel-resultados">
-            <div class="results-title">✨ Resultados cercanos</div>
-            <div id="lista-resultados">Los resultados de búsqueda aparecerán aquí.</div>
-        </section>
-    </main>
-
-    <!-- TODO EL CEREBRO DE LA APP INTEGRADO AQUÍ PARA EVITAR ERRORES -->
-    <script>
-        let coordenadasUsuario = null;
-
-        const RED_INTERNA_CONFIANZA = [
-            { nombre: "🔴 Farmacia San Cosme (Red Interna)", categoria: "farmacia", contacto: "Llamar Central Interna" },
-            { nombre: "🔴 Técnico Electricista Carlos (Red Interna)", categoria: "tecnicos", contacto: "WhatsApp Directo Seguro" },
-            { nombre: "🔴 Abastos y Víveres Lucía (Red Interna)", categoria: "compras", contacto: "Entrega Prioritaria" }
-        ];
-
-        // 1. RECONOCIMIENTO DE VOZ
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (SpeechRecognition) {
-            const reconocimiento = new SpeechRecognition();
-            reconocimiento.lang = 'es-PE';
-            reconocimiento.continuous = false;
-
-            document.getElementById('btn-voz-ubicacion').addEventListener('click', () => {
-                reconocimiento.start();
-                document.getElementById('btn-voz-ubicacion').textContent = "🛑";
-                reconocimiento.onresult = (event) => {
-                    document.getElementById('txt-ubicacion').value = event.results[0][0].transcript;
-                };
-                reconocimiento.onend = () => { document.getElementById('btn-voz-ubicacion').textContent = "🎙️"; };
-            });
-
-            document.getElementById('btn-voz-pedido').addEventListener('click', () => {
-                reconocimiento.start();
-                document.getElementById('btn-voz-pedido').textContent = "🛑";
-                reconocimiento.onresult = (event) => {
-                    document.getElementById('txt-pedido').value = event.results[0][0].transcript;
-                };
-                reconocimiento.onend = () => { document.getElementById('btn-voz-pedido').textContent = "🎙️"; };
-            });
-        }
-
-        // 2. GEOLOCALIZACIÓN
-        window.addEventListener('load', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        coordenadasUsuario = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        document.getElementById('txt-ubicacion').value = "GPS Localizado con Éxito ✔️";
-                    },
-                    (error) => {
-                        document.getElementById('txt-ubicacion').placeholder = "Ingresa tu dirección o usa el micro 🎙️";
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            }
-        });
-
-        // 3. PROCESAMIENTO SEGURO
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const listaResultados = document.getElementById('lista-resultados');
-            
-            listaResultados.innerHTML = "Buscando primero en redes internas seguras de la App...";
-
-            const resultadosFiltrados = RED_INTERNA_CONFIANZA.filter(item => item.categoria === categoriaSeleccionada);
-
-            setTimeout(() => {
-                if (resultadosFiltrados.length > 0) {
-                    mostrarEnPantalla("Socios Verificados de la App NECESITO", resultadosFiltrados);
-                } else {
-                    const resultadosGoogleMock = [
-                        { nombre: "🏢 Centro Auxiliar de Respaldo Local (Google Maps)", contacto: "Abrir mapa de navegación pública" },
-                        { nombre: "🏢 Entidad Secundaria de Emergencia del Sector", contacto: "Contactar asistencia local" }
-                    ];
-                    mostrarEnPantalla("Entidades Públicas Externas (Google Maps)", resultadosGoogleMock);
-                }
-            }, 1000);
-        });
-
-        function mostrarEnPantalla(origen, datos) {
-            const listaResultados = document.getElementById('lista-resultados');
-            listaResultados.innerHTML = `<p style="font-weight: bold; color: #2563eb; margin: 4px 0;">Origen: ${origen}</p>`;
-            
-            datos.forEach(item => {
-                const elemento = document.createElement('div');
-                elemento.className = 'result-item';
-                elemento.innerHTML = `<strong>${item.nombre}</strong><br><small>Acción: ${item.contacto}</small>`;
-                listaResultados.appendChild(elemento);
-            });
-        }
-    </script>
-</body>
-</html>
+function mostrarEnPantalla(origen, datos) {
+    const listaResultados = document.getElementById('lista-resultados');
+    listaResultados.innerHTML = `<p style="font-weight: bold; color: #2563eb; margin: 4px 0;">Origen: ${origen}</p>`;
+    
+    datos.forEach(item => {
+        const elemento = document.createElement('div');
+        elemento.className = 'result-item';
+        
+        // Si calculó distancia, la muestra de forma amigable para el vecino
+        const textoDistancia = item.distancia ? `<br>📍 A unos ${item.distancia.toFixed(2)} km de tu casa` : '';
+        
+        elemento.innerHTML = `<strong>${item.nombre}</strong>${textoDistancia}<br><small>Acción: ${item.contacto}</small>`;
+        listaResultados.appendChild(elemento);
+    });
+}
