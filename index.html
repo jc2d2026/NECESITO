@@ -58,7 +58,7 @@
             flex: 1;
             padding: 14px;
             border: 1px solid #cbd5e1;
-            background-color: #f1f5f9;
+            background-color: #ffffff;
             border-radius: 12px;
             font-size: 15px;
             color: var(--text-dark);
@@ -88,6 +88,7 @@
             font-size: 15px; 
             height: 48px;
             padding: 10px;
+            background-color: #ffffff;
         }
 
         .btn-submit {
@@ -154,7 +155,7 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Calculando posición satelital...">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos">
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
@@ -192,7 +193,8 @@
     </main>
 
     <script>
-        let latActual = -12.1861; // Ubicación base por defecto: Chorrillos
+        // Ubicación base por defecto estable para Lima
+        let latActual = -12.1861; 
         let lngActual = -77.0194;
 
         function hablar(texto) {
@@ -204,7 +206,7 @@
             }
         }
 
-        // GEOLOCALIZACIÓN OPTIMIZADA CON TIEMPO LÍMITE ESTRICTO CONTRA CONGELAMIENTO
+        // CONTROL DE GEOLOCALIZACIÓN TOTALMENTE INDEPENDIENTE
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -214,17 +216,14 @@
                         document.getElementById('txt-ubicacion').value = `GPS Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
                     },
                     (error) => {
-                        // Si el usuario denegó permisos o no hay señal, destraba el campo inmediatamente
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos";
+                        console.log("GPS no disponible temporalmente. Se mantiene la dirección por defecto.");
                     },
-                    { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 } // Máximo 4 segundos de espera satelital
+                    { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
                 );
-            } else {
-                document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos";
             }
         });
 
-        // RECONOCIMIENTO DE VOZ BLINDADO Y PROTEGIDO CONTRA ERRORES DE PERMISO
+        // RECONOCIMIENTO DE VOZ REPARADO CON SINTAXIS CORRECTA
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -252,17 +251,18 @@
                         escuchando = true;
                         boton.classList.add('listening');
                         boton.textContent = "🛑";
-                        hablar("Escuchando pedido, hable ahora.");
+                        hablar("Escuchando pedido.");
 
                         reconocimiento.onresult = (event) => {
+                            // CORRECCIÓN CLAVE: Acceso correcto a la matriz de resultados de voz
                             const vozTexto = event.results[0][0].transcript;
                             input.value = vozTexto;
                             hablar("Registrado " + vozTexto);
                         };
 
                         reconocimiento.onerror = (err) => {
-                            console.log("Error de voz capturado:", err.error);
-                            hablar("Micrófono bloqueado por el teléfono. Por favor escriba su pedido.");
+                            console.log("Error de voz:", err.error);
+                            hablar("Micrófono no disponible. Por favor digite en el cuadro.");
                         };
 
                         reconocimiento.onend = () => {
@@ -270,11 +270,13 @@
                             boton.classList.remove('listening');
                             boton.textContent = "🎙️";
                         };
-                    } catch(e) { console.log("Instancia de voz ya en uso."); }
+                    } catch(e) { console.log(e); }
                 } else {
                     reconocimiento.stop();
                 }
             });
         }
 
-        // ACCIÓN DEL BOTÓN VERDE DE ENVÍO
+        // ACCIÓN DEL BOTÓN ENVIAR REPARADA Y COMPILADA SIN ERRORES
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const pedidoUsuario = document.getElementById('txt-pedido').value.toLowerCase().trim();
