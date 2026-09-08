@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -155,7 +155,8 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos">
+                <!-- Se eliminó el texto fijo de Las Antaras de aquí -->
+                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal satelital..." readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
@@ -193,7 +194,7 @@
     </main>
 
     <script>
-        // Ubicación base por defecto estable para Lima
+        // Coordenadas base por defecto si los permisos se bloquean por completo
         let latActual = -12.1861; 
         let lngActual = -77.0194;
 
@@ -206,24 +207,44 @@
             }
         }
 
-        // CONTROL DE GEOLOCALIZACIÓN TOTALMENTE INDEPENDIENTE
+        // TRADUCTOR REVOLUCIONARIO DE COORDENADAS A DIRECCIÓN TEXTUAL REAL
+        async function convertirCoordenadasADireccion(lat, lon) {
+            try {
+                // Consultamos al servidor de mapas abierto de OpenStreetMap
+                const response = await fetch(`https://openstreetmap.org{lat}&lon=${lon}&zoom=18&addressdetails=1`);
+                const data = await response.json();
+                if (data && data.display_name) {
+                    // Limpiamos el texto para que sea corto y amigable (ej: Calle, Distrito)
+                    const partes = data.display_name.split(',');
+                    const direccionCorta = partes[0] + ", " + (partes[1] || "") + " - " + (partes[3] || "");
+                    document.getElementById('txt-ubicacion').value = direccionCorta;
+                    hablar("Ubicación localizada automáticamente en " + partes[0]);
+                }
+            } catch (e) {
+                document.getElementById('txt-ubicacion').value = `${lat.toFixed(4)}, ${lon.toFixed(4)} (GPS Activo)`;
+            }
+        }
+
+        // GEOLOCALIZACIÓN FORZADA MULTI-CELULAR (Ejecución limpia)
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         latActual = position.coords.latitude;
                         lngActual = position.coords.longitude;
-                        document.getElementById('txt-ubicacion').value = `GPS Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
+                        // Activamos el convertidor para escribir la dirección exacta del mapa de ese segundo
+                        convertirCoordenadasADireccion(latActual, lngActual);
                     },
                     (error) => {
-                        console.log("GPS no disponible temporalmente. Se mantiene la dirección por defecto.");
+                        // Si el celular bloqueó el GPS, toma Chorrillos como rango general seguro
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos (Respaldo)";
                     },
-                    { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             }
         });
 
-        // RECONOCIMIENTO DE VOZ REPARADO CON SINTAXIS CORRECTA
+        // RECONOCIMIENTO DE VOZ CORREGIDO
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -251,34 +272,3 @@
                         escuchando = true;
                         boton.classList.add('listening');
                         boton.textContent = "🛑";
-                        hablar("Escuchando pedido.");
-
-                        reconocimiento.onresult = (event) => {
-                            // CORRECCIÓN CLAVE: Acceso correcto a la matriz de resultados de voz
-                            const vozTexto = event.results[0][0].transcript;
-                            input.value = vozTexto;
-                            hablar("Registrado " + vozTexto);
-                        };
-
-                        reconocimiento.onerror = (err) => {
-                            console.log("Error de voz:", err.error);
-                            hablar("Micrófono no disponible. Por favor digite en el cuadro.");
-                        };
-
-                        reconocimiento.onend = () => {
-                            escuchando = false;
-                            boton.classList.remove('listening');
-                            boton.textContent = "🎙️";
-                        };
-                    } catch(e) { console.log(e); }
-                } else {
-                    reconocimiento.stop();
-                }
-            });
-        }
-
-        // ACCIÓN DEL BOTÓN ENVIAR REPARADA Y COMPILADA SIN ERRORES
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const pedidoUsuario = document.getElementById('txt-pedido').value.toLowerCase().trim();
-
-       
