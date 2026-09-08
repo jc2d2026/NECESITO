@@ -154,7 +154,7 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Calculando posición satelital..." readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Calculando posición satelital...">
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
@@ -192,9 +192,8 @@
     </main>
 
     <script>
-        // Coordenadas iniciales dinámicas (se sobrescribirán con el GPS real)
-        let latActual = null;
-        let lngActual = null;
+        let latActual = -12.1861; // Ubicación base por defecto: Chorrillos
+        let lngActual = -77.0194;
 
         function hablar(texto) {
             if ('speechSynthesis' in window) {
@@ -205,31 +204,27 @@
             }
         }
 
-        // GEOLOCALIZACIÓN CONSTANTE Y FORZADA (Rastrea el teléfono real en movimiento)
-        function activarRastreoGpsReal() {
+        // GEOLOCALIZACIÓN OPTIMIZADA CON TIEMPO LÍMITE ESTRICTO CONTRA CONGELAMIENTO
+        window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         latActual = position.coords.latitude;
                         lngActual = position.coords.longitude;
-                        // Mostramos las coordenadas exactas de donde está parado el celular en ese segundo
                         document.getElementById('txt-ubicacion').value = `GPS Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
                     },
                     (error) => {
-                        // Respaldo secundario si el satélite falla por falta de señal en esa calle
-                        document.getElementById('txt-ubicacion').value = "Chorrillos, Lima (Rango General)";
+                        // Si el usuario denegó permisos o no hay señal, destraba el campo inmediatamente
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos";
                     },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // maximumAge: 0 obliga a borrar la caché de tu casa
+                    { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 } // Máximo 4 segundos de espera satelital
                 );
             } else {
-                document.getElementById('txt-ubicacion').value = "GPS No soportado por el navegador.";
+                document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos";
             }
-        }
+        });
 
-        // Disparar escaneo al cargar la página
-        window.addEventListener('load', activarRastreoGpsReal);
-
-        // RECONOCIMIENTO DE VOZ OPTIMIZADO PARA EVITAR CONGELAMIENTOS
+        // RECONOCIMIENTO DE VOZ BLINDADO Y PROTEGIDO CONTRA ERRORES DE PERMISO
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -253,14 +248,11 @@
 
                 if (!escuchando) {
                     try {
-                        // Re-activar GPS al interactuar
-                        activarRastreoGpsReal();
-                        
                         reconocimiento.start();
                         escuchando = true;
                         boton.classList.add('listening');
                         boton.textContent = "🛑";
-                        hablar("Escuchando, hable ahora.");
+                        hablar("Escuchando pedido, hable ahora.");
 
                         reconocimiento.onresult = (event) => {
                             const vozTexto = event.results[0][0].transcript;
@@ -268,10 +260,21 @@
                             hablar("Registrado " + vozTexto);
                         };
 
-                        reconocimiento.onerror = () => {
-                            hablar("Error de audio. Verifique el candado de permisos arriba.");
+                        reconocimiento.onerror = (err) => {
+                            console.log("Error de voz capturado:", err.error);
+                            hablar("Micrófono bloqueado por el teléfono. Por favor escriba su pedido.");
                         };
 
                         reconocimiento.onend = () => {
                             escuchando = false;
                             boton.classList.remove('listening');
+                            boton.textContent = "🎙️";
+                        };
+                    } catch(e) { console.log("Instancia de voz ya en uso."); }
+                } else {
+                    reconocimiento.stop();
+                }
+            });
+        }
+
+        // ACCIÓN DEL BOTÓN VERDE DE ENVÍO
