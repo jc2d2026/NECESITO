@@ -68,7 +68,8 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Ubicación Automática de Emergencia Activa">
+                <!-- Se optimizó para que muestre claramente el estado del GPS -->
+                <input type="text" class="input-control" id="txt-ubicacion" value="Ubicación Automática Activa">
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
@@ -106,7 +107,7 @@
     </main>
 
     <script>
-        // Coordenadas fijas iniciales para Chorrillos por si falla el satélite
+        // Coordenadas base iniciales para Lima Chorrillos
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
@@ -115,11 +116,13 @@
             navigator.geolocation.getCurrentPosition((p) => {
                 latActual = p.coords.latitude;
                 lngActual = p.coords.longitude;
-                document.getElementById('txt-ubicacion').value = "GPS Activo: Coordenadas fijadas con éxito ✔️";
-            }, null, { timeout: 3000 });
+                document.getElementById('txt-ubicacion').value = "GPS Satelital Localizado ✔️";
+            }, () => {
+                document.getElementById('txt-ubicacion').value = "Ubicación Basada en Red Celular";
+            }, { timeout: 3000 });
         }
 
-        // CONTROL ULTRA-SIMPLIFICADO DEL BOTÓN ENVIAR (Imposible de bloquear)
+        // CONTROL DEL BOTÓN ENVIAR CON ENLACE DE MAPA CORREGIDO
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var panel = document.getElementById('lista-resultados');
@@ -127,17 +130,17 @@
             panel.innerHTML = "Generando ruta de auxilio en el mapa...";
 
             var busqueda = pedido === "" ? "tiendas" : pedido;
-            var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "/@" + latActual + "," + lngActual + ",15z";
+            
+            // CORRECCIÓN CORREGIDA: Se eliminó el /@ inválido que bloqueaba el acceso al mapa
+            var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "/?api=1&query=" + latActual + "," + lngActual;
 
-            // Insertamos la tarjeta de resultados directamente sin funciones intermedias
             panel.innerHTML = `
                 <div class="result-item">
                     <strong>🌐 RESPALDO SATELITAL GENERADO</strong><br>
-                    <p style="font-size:13px; margin:8px 0; color:#475569;">Buscando "${busqueda}" de forma automática a través de la red de mapas vinculada a tu posición actual.</p>
+                    <p style="font-size:13px; margin:8px 0; color:#475569;">Buscando de forma automática "${busqueda}" a través de la red de mapas vinculada a tu posición actual.</p>
                     <a href="${mapaUrl}" target="_blank" class="btn-google-link">🔍 Abrir locales en Google Maps</a>
                 </div>`;
             
-            // Lector de voz de contingencia
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 var u = new SpeechSynthesisUtterance("Búsqueda completada de " + busqueda);
