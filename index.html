@@ -12,122 +12,47 @@
             --text-dark: #1e293b;
             --card-bg: #ffffff;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--bg-light); color: var(--text-dark);
         }
-
         header {
-            background-color: var(--primary-blue);
-            color: white;
-            text-align: center;
-            padding: 20px 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-color: var(--primary-blue); color: white;
+            text-align: center; padding: 20px 10px;
         }
-
-        header h1 { margin: 0; font-size: 24px; font-weight: bold; }
-        header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; }
-
         main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
-
         .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: var(--card-bg); border-radius: 16px;
+            padding: 16px; margin-bottom: 16px;
             border: 1px solid #e2e8f0;
         }
-
-        .card-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-
+        .card-title { font-size: 12px; font-weight: bold; color: #64748b; margin-bottom: 12px; text-transform: uppercase; }
         .input-group { display: flex; gap: 10px; }
-
         .input-control {
-            flex: 1;
-            padding: 14px;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-            border-radius: 12px;
-            font-size: 15px;
-            color: var(--text-dark);
-            outline: none;
+            flex: 1; padding: 14px; border: 1px solid #cbd5e1;
+            border-radius: 12px; font-size: 15px; outline: none;
         }
-
         .btn-voice {
-            background-color: #dbeafe;
-            border: 2px solid var(--primary-blue);
-            border-radius: 12px;
-            width: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
+            background-color: #dbeafe; border: 2px solid var(--primary-blue);
+            border-radius: 12px; width: 50px; font-size: 20px; cursor: pointer;
         }
-
-        select.input-control { width: 100%; font-size: 15px; height: 48px; padding: 10px; }
-
+        select.input-control { width: 100%; height: 48px; }
         .btn-submit {
-            width: 100%;
-            background-color: var(--accent-green);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 18px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            width: 100%; background-color: var(--accent-green); color: white;
+            border: none; border-radius: 12px; padding: 18px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
         }
-
         .results-section { margin-top: 20px; padding: 10px; }
-        .results-title { font-size: 13px; font-weight: bold; color: #64748b; text-transform: uppercase; }
-        
         .result-item {
-            padding: 16px;
-            background: #ffffff;
-            margin: 10px 0;
-            border-radius: 12px;
-            border-left: 6px solid var(--primary-blue);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-size: 15px;
-            line-height: 1.5;
+            padding: 16px; background: #ffffff; margin: 10px 0;
+            border-radius: 12px; border-left: 6px solid var(--primary-blue);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-size: 15px;
         }
-
-        .badge-google {
-            display: inline-block;
-            background: #fef08a;
-            color: #a16207;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
         .btn-google-link {
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-            background-color: #2563eb;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
+            display: block; text-align: center; margin-top: 10px;
+            background-color: #2563eb; color: white; padding: 12px;
+            border-radius: 8px; text-decoration: none; font-weight: bold;
         }
     </style>
 </head>
@@ -143,8 +68,8 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Rastreador Automático Activo...">
-                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Ubicación Automática de Emergencia Activa">
+                <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
 
@@ -154,7 +79,7 @@
             <select class="input-control" id="select-categoria">
                 <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
+                <option value="tecnicos"> Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
         </section>
@@ -163,96 +88,63 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, electricista o medicina">
-                <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: agua de 7 litros, alimentos">
+                <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
 
-        <!-- Botón de Envío -->
+        <!-- Botón Enviar -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
         <!-- Panel de Resultados -->
-        <section class="results-section" id="panel-resultados">
-            <div class="results-title">✨ Soluciones e Identidades Encontradas</div>
+        <section class="results-section">
+            <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
         </section>
     </main>
 
     <script>
-        // Coordenadas fijas por defecto si falla el satélite
-        let latActual = -12.1861; 
+        // Coordenadas fijas iniciales para Chorrillos por si falla el satélite
+        let latActual = -12.1861;
         let lngActual = -77.0194;
 
-        function hablar(texto) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(texto);
-                utterance.lang = 'es-PE';
-                window.speechSynthesis.speak(utterance);
-            }
+        // Intentar capturar GPS real de forma limpia
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                latActual = p.coords.latitude;
+                lngActual = p.coords.longitude;
+                document.getElementById('txt-ubicacion').value = "GPS Activo: Coordenadas fijadas con éxito ✔️";
+            }, null, { timeout: 3000 });
         }
 
-        // CONTROL DE UBICACIÓN AUTOMÁTICA PREVIO (Sincronización instantánea)
-        window.addEventListener('load', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        latActual = position.coords.latitude;
-                        lngActual = position.coords.longitude;
-                        document.getElementById('txt-ubicacion').value = "Ubicación por GPS Satelital Activa ✔️";
-                    },
-                    (error) => {
-                        // Solución al congelamiento: si el navegador bloquea el GPS, coloca el texto de inmediato
-                        document.getElementById('txt-ubicacion').value = "Ubicación Automática (Zona Chorrillos)";
-                    },
-                    { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 } // Máximo 2 segundos de espera
-                );
-            } else {
-                document.getElementById('txt-ubicacion').value = "Ubicación Automática (Zona Chorrillos)";
+        // CONTROL ULTRA-SIMPLIFICADO DEL BOTÓN ENVIAR (Imposible de bloquear)
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            var pedido = document.getElementById('txt-pedido').value.trim();
+            var panel = document.getElementById('lista-resultados');
+            
+            panel.innerHTML = "Generando ruta de auxilio en el mapa...";
+
+            var busqueda = pedido === "" ? "tiendas" : pedido;
+            var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "/@" + latActual + "," + lngActual + ",15z";
+
+            // Insertamos la tarjeta de resultados directamente sin funciones intermedias
+            panel.innerHTML = `
+                <div class="result-item">
+                    <strong>🌐 RESPALDO SATELITAL GENERADO</strong><br>
+                    <p style="font-size:13px; margin:8px 0; color:#475569;">Buscando "${busqueda}" de forma automática a través de la red de mapas vinculada a tu posición actual.</p>
+                    <a href="${mapaUrl}" target="_blank" class="btn-google-link">🔍 Abrir locales en Google Maps</a>
+                </div>`;
+            
+            // Lector de voz de contingencia
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var u = new SpeechSynthesisUtterance("Búsqueda completada de " + busqueda);
+                u.lang = 'es-PE';
+                window.speechSynthesis.speak(u);
             }
         });
-
-        // RECONOCIMIENTO DE VOZ SEGURO Y PROTEGIDO CONTRA ERRORES
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const reconocimiento = new SpeechRecognition();
-                reconocimiento.lang = 'es-PE';
-
-                document.getElementById('btn-voz-pedido').addEventListener('click', () => {
-                    try {
-                        reconocimiento.start();
-                        hablar("Escuchando su solicitud.");
-                        reconocimiento.onresult = (event) => {
-                            document.getElementById('txt-pedido').value = event.results[0][0].transcript;
-                            hablar("Registrado");
-                        };
-                    } catch(e) { 
-                        hablar("Por favor escriba su pedido usando el teclado.");
-                    }
-                });
-            }
-        } catch(e) { console.log("Lector de voz no soportado."); }
-
-        // PROCESAMIENTO GENERAL BLINDADO (El botón verde siempre funcionará obligatorio)
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const pedidoUsuario = document.getElementById('txt-pedido').value.toLowerCase().trim();
-            const listaResultados = document.getElementById('lista-resultados');
-            
-            listaResultados.innerHTML = "Sincronizando con los mapas de auxilio local...";
-
-            const terminoBusqueda = pedidoUsuario === "" ? "restaurantes" : pedidoUsuario;
-            
-            // Creamos el vínculo con Google Maps partiendo exactamente del rango donde esté la app
-            const urlGoogleMaps = `https://google.com{encodeURIComponent(terminoBusqueda)}/@${latActual},${lngActual},15z`;
-
-            let resultadosHTML = `
-                <div class="result-item" style="border-left-color: #f59e0b;">
-                    <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
-                    <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
-                    <p style="font-size:13px; margin:8px 0; color:#475569;">Estableciendo conexión automática para rastrear locales de "${terminoBusqueda}" arraigados a la posición de este celular.</p>
-                    <a href="${urlGoogleMaps}" target="_blank" class="btn-google-link">🔍 Buscar "${terminoBusqueda}" Cerca de Mí</a>
-                </div>`;
-
+    </script>
+</body>
+</html>
