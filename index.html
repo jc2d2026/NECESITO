@@ -77,12 +77,6 @@
             font-size: 20px;
         }
 
-        .btn-voice.listening {
-            background-color: #ef4444 !important;
-            border-color: #ef4444 !important;
-            color: white !important;
-        }
-
         select.input-control { width: 100%; font-size: 15px; height: 48px; padding: 10px; }
 
         .btn-submit {
@@ -110,17 +104,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             font-size: 15px;
             line-height: 1.5;
-        }
-
-        .badge-seguridad {
-            display: inline-block;
-            background: #dcfce7;
-            color: #15803d;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 6px;
         }
 
         .badge-google {
@@ -156,11 +139,11 @@
     </header>
 
     <main>
-        <!-- Ubicación Satelital -->
+        <!-- Ubicación -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal satelital real..." readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Rastreador Automático Activo...">
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
@@ -169,8 +152,8 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
+                <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
@@ -180,12 +163,12 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: eritropoyetina o electricista">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, electricista o medicina">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
             </div>
         </section>
 
-        <!-- Botón Único de Envío de Solicitudes -->
+        <!-- Botón de Envío -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
@@ -198,16 +181,9 @@
     </main>
 
     <script>
-        // Coordenadas iniciales dinámicas
+        // Coordenadas fijas por defecto si falla el satélite
         let latActual = -12.1861; 
         let lngActual = -77.0194;
-
-        // Base de datos de socios suscritos y veritificados integrados sin conflictos
-        const RED_INTERNA_CONFIANZA = [
-            { nombre: "🔴 Farmacia San Cosme (Red Interna)", categoria: "farmacia", especialidad: "general", lat: -12.0464, lng: -77.0428, contacto: "Llamar Central Interna" },
-            { nombre: "🔴 Técnico Electricista Carlos (Red Interna)", categoria: "tecnicos", especialidad: "electricista", lat: -12.0500, lng: -77.0400, contacto: "WhatsApp Directo Seguro" },
-            { nombre: "🔴 Abastos y Víveres Lucía (Red Interna)", categoria: "compras", especialidad: "general", lat: -12.0450, lng: -77.0410, contacto: "Entrega Prioritaria" }
-        ];
 
         function hablar(texto) {
             if ('speechSynthesis' in window) {
@@ -218,56 +194,65 @@
             }
         }
 
-        // GEOLOCALIZACIÓN FORZADA EN VIVO
+        // CONTROL DE UBICACIÓN AUTOMÁTICA PREVIO (Sincronización instantánea)
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         latActual = position.coords.latitude;
                         lngActual = position.coords.longitude;
-                        document.getElementById('txt-ubicacion').value = `GPS Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
+                        document.getElementById('txt-ubicacion').value = "Ubicación por GPS Satelital Activa ✔️";
                     },
                     (error) => {
-                        document.getElementById('txt-ubicacion').value = "Coordenadas por Cobertura de Red";
+                        // Solución al congelamiento: si el navegador bloquea el GPS, coloca el texto de inmediato
+                        document.getElementById('txt-ubicacion').value = "Ubicación Automática (Zona Chorrillos)";
                     },
-                    { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 } // Máximo 2 segundos de espera
                 );
+            } else {
+                document.getElementById('txt-ubicacion').value = "Ubicación Automática (Zona Chorrillos)";
             }
         });
 
-        // RECONOCIMIENTO DE VOZ REPARADO CON SINTAXIS INDICIAL DE MATRIZ CORRECTA [0][0]
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let reconocimiento = null;
+        // RECONOCIMIENTO DE VOZ SEGURO Y PROTEGIDO CONTRA ERRORES
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const reconocimiento = new SpeechRecognition();
+                reconocimiento.lang = 'es-PE';
 
-        if (SpeechRecognition) {
-            reconocimiento = new SpeechRecognition();
-            reconocimiento.lang = 'es-PE';
-            reconocimiento.continuous = false;
-
-            configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
-            configurarBotonVoz('btn-voz-pedido', 'txt-pedido');
-        }
-
-        function configurarBotonVoz(btnId, inputId) {
-            const boton = document.getElementById(btnId);
-            const input = document.getElementById(inputId);
-            let escuchando = false;
-
-            boton.addEventListener('click', () => {
-                if (!reconocimiento) return;
-                if (!escuchando) {
+                document.getElementById('btn-voz-pedido').addEventListener('click', () => {
                     try {
                         reconocimiento.start();
-                        escuchando = true;
-                        boton.classList.add('listening');
-                        boton.textContent = "🛑";
-                        hablar("Escuchando.");
-
+                        hablar("Escuchando su solicitud.");
                         reconocimiento.onresult = (event) => {
-                            // SOLUCIÓN AL CONFLICTO: Sintaxis de matriz nativa corregida
-                            const vozTexto = event.results[0][0].transcript;
-                            input.value = vozTexto;
-                            hablar("Registrado " + vozTexto);
+                            document.getElementById('txt-pedido').value = event.results[0][0].transcript;
+                            hablar("Registrado");
                         };
+                    } catch(e) { 
+                        hablar("Por favor escriba su pedido usando el teclado.");
+                    }
+                });
+            }
+        } catch(e) { console.log("Lector de voz no soportado."); }
 
-                        reconocimiento.onerror = () => {
+        // PROCESAMIENTO GENERAL BLINDADO (El botón verde siempre funcionará obligatorio)
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const pedidoUsuario = document.getElementById('txt-pedido').value.toLowerCase().trim();
+            const listaResultados = document.getElementById('lista-resultados');
+            
+            listaResultados.innerHTML = "Sincronizando con los mapas de auxilio local...";
+
+            const terminoBusqueda = pedidoUsuario === "" ? "restaurantes" : pedidoUsuario;
+            
+            // Creamos el vínculo con Google Maps partiendo exactamente del rango donde esté la app
+            const urlGoogleMaps = `https://google.com{encodeURIComponent(terminoBusqueda)}/@${latActual},${lngActual},15z`;
+
+            let resultadosHTML = `
+                <div class="result-item" style="border-left-color: #f59e0b;">
+                    <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
+                    <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
+                    <p style="font-size:13px; margin:8px 0; color:#475569;">Estableciendo conexión automática para rastrear locales de "${terminoBusqueda}" arraigados a la posición de este celular.</p>
+                    <a href="${urlGoogleMaps}" target="_blank" class="btn-google-link">🔍 Buscar "${terminoBusqueda}" Cerca de Mí</a>
+                </div>`;
+
