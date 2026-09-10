@@ -83,12 +83,7 @@
             color: white !important;
         }
 
-        select.input-control { 
-            width: 100%; 
-            font-size: 15px; 
-            height: 48px;
-            padding: 10px;
-        }
+        select.input-control { width: 100%; font-size: 15px; height: 48px; padding: 10px; }
 
         .btn-submit {
             width: 100%;
@@ -117,6 +112,17 @@
             line-height: 1.5;
         }
 
+        .badge-seguridad {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
         .badge-google {
             display: inline-block;
             background: #fef08a;
@@ -140,17 +146,6 @@
             font-weight: bold;
             font-size: 14px;
         }
-        
-        .medicamento-tag {
-            display: inline-block;
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
     </style>
 </head>
 <body>
@@ -161,11 +156,11 @@
     </header>
 
     <main>
-        <!-- Ubicación de los Celulares sin direcciones fijas de casa -->
+        <!-- Ubicación Satelital -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="📍 Ubicación detectada por el celular" readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal satelital real..." readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar ubicación">🎙️</button>
             </div>
         </section>
@@ -190,7 +185,7 @@
             </div>
         </section>
 
-        <!-- Botón de Envío con el texto exacto solicitado -->
+        <!-- Botón Único de Envío de Solicitudes -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
@@ -203,9 +198,16 @@
     </main>
 
     <script>
-        // Coordenadas base iniciales (Se actualizan en vivo según el GPS de cada amigo)
+        // Coordenadas iniciales dinámicas
         let latActual = -12.1861; 
         let lngActual = -77.0194;
+
+        // Base de datos de socios suscritos y veritificados integrados sin conflictos
+        const RED_INTERNA_CONFIANZA = [
+            { nombre: "🔴 Farmacia San Cosme (Red Interna)", categoria: "farmacia", especialidad: "general", lat: -12.0464, lng: -77.0428, contacto: "Llamar Central Interna" },
+            { nombre: "🔴 Técnico Electricista Carlos (Red Interna)", categoria: "tecnicos", especialidad: "electricista", lat: -12.0500, lng: -77.0400, contacto: "WhatsApp Directo Seguro" },
+            { nombre: "🔴 Abastos y Víveres Lucía (Red Interna)", categoria: "compras", especialidad: "general", lat: -12.0450, lng: -77.0410, contacto: "Entrega Prioritaria" }
+        ];
 
         function hablar(texto) {
             if ('speechSynthesis' in window) {
@@ -216,24 +218,24 @@
             }
         }
 
-        // CAPTURA DEL GPS REAL EN CADA DISPOSITIVO DISTINTO
+        // GEOLOCALIZACIÓN FORZADA EN VIVO
         window.addEventListener('load', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         latActual = position.coords.latitude;
                         lngActual = position.coords.longitude;
-                        document.getElementById('txt-ubicacion').value = "GPS Activo: Coordenadas del Celular ✔️";
+                        document.getElementById('txt-ubicacion').value = `GPS Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
                     },
                     (error) => {
-                        document.getElementById('txt-ubicacion').value = "Ubicación Basada en Cobertura Red";
+                        document.getElementById('txt-ubicacion').value = "Coordenadas por Cobertura de Red";
                     },
                     { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 }
                 );
             }
         });
 
-        // RECONOCIMIENTO DE VOZ REPARADO
+        // RECONOCIMIENTO DE VOZ REPARADO CON SINTAXIS INDICIAL DE MATRIZ CORRECTA [0][0]
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let reconocimiento = null;
 
@@ -242,34 +244,31 @@
             reconocimiento.lang = 'es-PE';
             reconocimiento.continuous = false;
 
-            document.getElementById('btn-voz-pedido').addEventListener('click', () => {
-                try {
-                    reconocimiento.start();
-                    hablar("Escuchando tu requerimiento.");
-                    reconocimiento.onresult = (event) => {
-                        const vozTexto = event.results[0][0].transcript;
-                        document.getElementById('txt-pedido').value = vozTexto;
-                        hablar("Registrado: " + vozTexto);
-                    };
-                } catch(e) {
-                    console.log("Instancia ocupada o bloqueada sin HTTPS.");
-                }
-            });
+            configurarBotonVoz('btn-voz-ubicacion', 'txt-ubicacion');
+            configurarBotonVoz('btn-voz-pedido', 'txt-pedido');
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR SIN DIRECCIONES CONGELADAS
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const pedidoUsuario = document.getElementById('txt-pedido').value.toLowerCase().trim();
-            const listaResultados = document.getElementById('lista-resultados');
-            
-            listaResultados.innerHTML = "Rastreando el cuadrante donde se encuentra este celular...";
+        function configurarBotonVoz(btnId, inputId) {
+            const boton = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            let escuchando = false;
 
-            const terminoBusqueda = pedidoUsuario === "" ? "tiendas" : pedidoUsuario;
-            
-            // Genera la búsqueda satelital partiendo de la posición real del teléfono de tu amigo
-            const urlGoogleMaps = `https://google.com{encodeURIComponent(terminoBusqueda)}/@${latActual},${lngActual},15z`;
+            boton.addEventListener('click', () => {
+                if (!reconocimiento) return;
+                if (!escuchando) {
+                    try {
+                        reconocimiento.start();
+                        escuchando = true;
+                        boton.classList.add('listening');
+                        boton.textContent = "🛑";
+                        hablar("Escuchando.");
 
-            let resultadosHTML = `
-                <div class="result-item" style="border-left-color: #f59e0b;">
-                    <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
-                    <span class="badge-google">CONEXIÓN CON MAPAS GENERADA</span><br>
+                        reconocimiento.onresult = (event) => {
+                            // SOLUCIÓN AL CONFLICTO: Sintaxis de matriz nativa corregida
+                            const vozTexto = event.results[0][0].transcript;
+                            input.value = vozTexto;
+                            hablar("Registrado " + vozTexto);
+                        };
+
+                        reconocimiento.onerror = () => {
+
