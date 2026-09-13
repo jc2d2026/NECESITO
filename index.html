@@ -119,7 +119,6 @@
     </main>
 
     <script>
-        // Coordenadas fijas por defecto centradas en Chorrillos Lima
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
@@ -142,7 +141,7 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ PLANO (Sin funciones que bloqueen el botón Enviar)
+        // LÓGICA DE VOZ OPTIMIZADA PARA GITHUB PAGES
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -165,7 +164,7 @@
             }
         } catch(e) { console.log("Lector de voz no disponible."); }
 
-        // ACCIÓN FORZADA DEL BOTÓN ENVIAR (Siempre mostrará las 5 opciones)
+        // ACCIÓN DEL BOTÓN ENVIAR CON ENLACE DE MAPAS REPARADO
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -185,7 +184,7 @@
                     <div class="local-info">🛒 <strong>Comercios en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes operando.</div>
                     <div class="local-info">🏪 <strong>Establecimientos en Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento comercial activo.</div>
                     <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y zonas aledañas</strong><br>📍 Tu sector • Atención vecinal directa.</div>
-                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega a domicilio.</div>
+                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega rápida.</div>
                 `;
                 vozTexto = "Mostrando las cinco opciones de abastecimiento en el mapa.";
             } else if (categoria === "farmacia") {
@@ -206,3 +205,5 @@
                     <div class="result-item">
                         <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
                         <span class="badge-google">CONEXIÓN CON GOOGLE ACTIVADA</span><br>
+                        <p style="font-size:13px; margin:8px 0; color:#475569;">Rastreador enlazado para ubicar "${busqueda}" alrededor de las coordenadas de este celular.</p>
+                        ${detallesLocalesHTML}
