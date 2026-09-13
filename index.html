@@ -92,7 +92,7 @@
             <select class="input-control" id="select-categoria">
                 <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
+                <option value="tecnicos"> Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
         </section>
@@ -101,7 +101,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, electricista, chifa">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, cemento, paracetamol">
                 <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
@@ -119,16 +119,16 @@
     </main>
 
     <script>
-        // Coordenadas base iniciales para Chorrillos
+        // Coordenadas fijas por defecto centradas en Chorrillos Lima
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
+            navigator.geolocation.getCurrentPosition(function(p) {
                 latActual = p.coords.latitude;
                 lngActual = p.coords.longitude;
-                document.getElementById('txt-ubicacion').value = `GPS Satelital Activo (${latActual.toFixed(4)}, ${lngActual.toFixed(4)})`;
-            }, () => {
+                document.getElementById('txt-ubicacion').value = "Ubicación Satelital Confirmada ✔️";
+            }, function() {
                 document.getElementById('txt-ubicacion').value = "Ubicación por Red Celular Activa";
             }, { timeout: 2000 });
         }
@@ -142,21 +142,20 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ REPARADO CON MATRICES DE COMPATIBILIDAD MÓVIL
+        // RECONOCIMIENTO DE VOZ PLANO (Sin funciones que bloqueen el botón Enviar)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
                 const reconocimiento = new SpeechRecognition();
                 reconocimiento.lang = 'es-PE';
 
-                document.getElementById('btn-voz-pedido').addEventListener('click', () => {
+                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
                     try {
                         reconocimiento.start();
                         hablar("Escuchando pedido.");
-                        reconocimiento.onresult = (event) => {
-                            // CORRECCIÓN MATEMÁTICA DEFINITIVA PARA MÓVILES ANDROID
-                            const vozTexto = event.results[0][0].transcript;
-                            document.getElementById('txt-pedido').value = vozTexto;
+                        reconocimiento.onresult = function(event) {
+                            var resultadoVoz = event.results[0][0].transcript;
+                            document.getElementById('txt-pedido').value = resultadoVoz;
                             hablar("Registrado");
                         };
                     } catch(e) { 
@@ -166,7 +165,7 @@
             }
         } catch(e) { console.log("Lector de voz no disponible."); }
 
-        // ACCIÓN DEL BOTÓN ENVIAR BLINDADA (Ejecución plana forzada)
+        // ACCIÓN FORZADA DEL BOTÓN ENVIAR (Siempre mostrará las 5 opciones)
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -182,27 +181,27 @@
 
             if (categoria === "compras") {
                 detallesLocalesHTML = `
-                    <div class="local-info">🏪 <strong>Bodegas y Minimarkets en Av. Matellini</strong><br>📍 Cuadrante Norte • Múltiples opciones con stock de abastos.</div>
-                    <div class="local-info">🛒 <strong>Comercios de Alimentos en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes de la zona.</div>
-                    <div class="local-info">🏪 <strong>Establecimientos de la Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento prioritario disponible.</div>
-                    <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y alrededores</strong><br>📍 Tu sector • Bodegas de atención vecinal directas.</div>
-                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Cuadrante Sur • Servicios de comida y entrega rápida.</div>
+                    <div class="local-info">🏪 <strong>Bodegas y Minimarkets en Av. Matellini</strong><br>📍 Rango Norte • Stock disponible de abastos y alimentos.</div>
+                    <div class="local-info">🛒 <strong>Comercios en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes operando.</div>
+                    <div class="local-info">🏪 <strong>Establecimientos en Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento comercial activo.</div>
+                    <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y zonas aledañas</strong><br>📍 Tu sector • Atención vecinal directa.</div>
+                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega a domicilio.</div>
                 `;
-                vozTexto = "Mostrando los cinco rangos de abastecimiento comercial en el mapa.";
+                vozTexto = "Mostrando las cinco opciones de abastecimiento en el mapa.";
             } else if (categoria === "farmacia") {
                 detallesLocalesHTML = `
-                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas y stock general.</div>
-                    <div class="local-info">💊 <strong>Cadenas farmacéuticas en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
+                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas generales y especializadas.</div>
+                    <div class="local-info">💊 <strong>Cadenas de salud en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
                 `;
                 vozTexto = "Mostrando farmacias de la zona.";
             } else {
                 detallesLocalesHTML = `
-                    <div class="local-info">👷 <strong>Red de Técnicos de Emergencia Evaluados</strong><br>📍 Filtro geográfico activo • Conexión de seguridad activa en Chorrillos.</div>
+                    <div class="local-info">👷 <strong>Red de Técnicos de Emergencia Evaluados</strong><br>📍 Filtro geográfico activo • Conexión de seguridad en Chorrillos.</div>
                 `;
-                vozTexto = "Búsqueda de soporte técnico completada.";
+                vozTexto = "Búsqueda completada.";
             }
 
-            setTimeout(() => {
+            setTimeout(function() {
                 panel.innerHTML = `
                     <div class="result-item">
                         <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
