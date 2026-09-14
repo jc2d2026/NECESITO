@@ -90,9 +90,9 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="tecnicos"> Solicitud de Técnico Confiable</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
+                <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
         </section>
@@ -101,7 +101,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, cemento, paracetamol">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: alcohol, eritropoyetina, medicina">
                 <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
@@ -141,7 +141,7 @@
             }
         }
 
-        // LÓGICA DE VOZ OPTIMIZADA PARA GITHUB PAGES
+        // RECONOCIMIENTO DE VOZ REPARADO Y COMPATIBLE
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -162,9 +162,9 @@
                     }
                 });
             }
-        } catch(e) { console.log("Lector de voz no disponible."); }
+        } catch(e) { console.log("Lector de voz bloqueado."); }
 
-        // ACCIÓN DEL BOTÓN ENVIAR CON ENLACE DE MAPAS REPARADO
+        // ACCIÓN DEL BOTÓN ENVIAR TOTALMENTE REPARADA (Sin espacios rotos)
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -172,27 +172,27 @@
             
             panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
 
-            var busqueda = pedido === "" ? "tiendas" : pedido;
+            var busqueda = pedido === "" ? "medicinas" : pedido;
             var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "&center=" + latActual + "," + lngActual;
 
             var detallesLocalesHTML = "";
             var vozTexto = "";
 
-            if (categoria === "compras") {
+            if (categoria === "farmacia") {
+                detallesLocalesHTML = `
+                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Stock disponible de alcohol medicinal y blísters.</div>
+                    <div class="local-info">💊 <strong>Cadenas Farmacéuticas en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
+                    <div class="local-info">🏪 <strong>Boticas Independientes en Jr. Las Antaras</strong><br>📍 Tu sector • Atención vecinal directa para emergencias básicas.</div>
+                    <div class="local-info">💊 <strong>Farmacias de turno en Av. Guardia Peruana</strong><br>📍 Rango Este • Medicinas e insumos médicos disponibles.</div>
+                    <div class="local-info">🏢 <strong>Centro de Salud Materno Infantil de Chorrillos</strong><br>📍 Soporte Vital • Atención de emergencias de salud 24 horas.</div>
+                `;
+                vozTexto = "Mostrando las cinco opciones de farmacias y boticas de turno en Chorrillos.";
+            } else if (categoria === "compras") {
                 detallesLocalesHTML = `
                     <div class="local-info">🏪 <strong>Bodegas y Minimarkets en Av. Matellini</strong><br>📍 Rango Norte • Stock disponible de abastos y alimentos.</div>
                     <div class="local-info">🛒 <strong>Comercios en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes operando.</div>
-                    <div class="local-info">🏪 <strong>Establecimientos en Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento comercial activo.</div>
-                    <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y zonas aledañas</strong><br>📍 Tu sector • Atención vecinal directa.</div>
-                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega rápida.</div>
                 `;
-                vozTexto = "Mostrando las cinco opciones de abastecimiento en el mapa.";
-            } else if (categoria === "farmacia") {
-                detallesLocalesHTML = `
-                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas generales y especializadas.</div>
-                    <div class="local-info">💊 <strong>Cadenas de salud en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
-                `;
-                vozTexto = "Mostrando farmacias de la zona.";
+                vozTexto = "Mostrando opciones de abastecimiento.";
             } else {
                 detallesLocalesHTML = `
                     <div class="local-info">👷 <strong>Red de Técnicos de Emergencia Evaluados</strong><br>📍 Filtro geográfico activo • Conexión de seguridad en Chorrillos.</div>
@@ -204,6 +204,4 @@
                 panel.innerHTML = `
                     <div class="result-item">
                         <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
-                        <span class="badge-google">CONEXIÓN CON GOOGLE ACTIVADA</span><br>
-                        <p style="font-size:13px; margin:8px 0; color:#475569;">Rastreador enlazado para ubicar "${busqueda}" alrededor de las coordenadas de este celular.</p>
-                        ${detallesLocalesHTML}
+                        <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
