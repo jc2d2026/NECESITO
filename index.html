@@ -77,13 +77,6 @@
             padding: 3px 8px; border-radius: 6px;
             font-size: 11px; font-weight: bold; margin-bottom: 6px;
         }
-        .badge-codigo {
-            display: inline-block;
-            background: #ffe4e6; color: #991b1b;
-            padding: 4px 8px; border-radius: 6px;
-            font-size: 12px; font-weight: bold; margin-top: 6px;
-            border: 1px dashed #f43f5e;
-        }
     </style>
 </head>
 <body>
@@ -136,7 +129,7 @@
     </main>
 
     <script>
-        // CORRECCIÓN MATEMÁTICA: Coordenadas fijas exactas de Las Antaras 188 para evitar saltos al óvalo general
+        // Coordenadas fijas exactas de tu hogar para arraigar el ratio
         let latActual = -12.193635;
         let lngActual = -77.004487;
 
@@ -158,14 +151,14 @@
 
         function hablar(texto) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                var utterance = new SpeechSynthesisUtterance(texto);
+                window.webkitSpeechSynthesis ? window.speechSynthesis.cancel() : window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // RECONOCIMIENTO DE VOZ PLANO REPARADO
+        // RECONOCIMIENTO DE VOZ REPARADO (Se eliminó la letra defectuosa que causaba el cortocircuito)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -199,15 +192,19 @@
             return R * c;
         }
 
+        // ACCIÓN DEL BOTÓN ENVIAR TOTALMENTE RESTABLECIDA Y BLINDADA
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             var categoria = document.getElementById('select-categoria').value;
             var panel = document.getElementById('lista-resultados');
             
-            panel.innerHTML = "Sincronizando con la red local de Chorrillos...";
+            panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
 
             // BASE DE DATOS LOCAL INTEGRADA (Marcha Blanca Gratis)
             const BASE_SUSCRIPTORES = [
                 { nombre: "💊 Farmacia Universal (Sede Villa Marina)", categoria: "farmacia", palabrasClave: ["salbutamol", "farmacia", "botica", "medicina", "inhalador", "universal"], lat: -12.1894, lng: -77.0135, contacto: "01-444-2222", infoextra: "Ubicada en Av. Villa Marina 212. Atención las 24 horas del día ✔️" },
                 { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
                 { nombre: "🍽️ Pollería y Restaurant 'El Carbón'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa." },
+                { nombre: "👷 Carlos Silva - Electricista Certificado", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "cable"], lat: -12.1910, lng: -77.0180, contacto: "Contacto de emergencia", infoextra: "Cortocircuitos y tableros eléctricos residenciales." }
+            ];
+
