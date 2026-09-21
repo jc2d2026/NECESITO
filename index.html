@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
+    <!-- CONEXIÓN OBLIGATORIA CON EL MANIFIESTO PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     <style>
@@ -122,18 +123,15 @@
     </main>
 
     <script>
-        // Coordenadas base iniciales para Chorrillos
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
-        // ACTIVACIÓN DEL SERVICE WORKER (PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log(e); });
             });
         }
 
-        // CAPTURA DE GPS RÁPIDA
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(p) {
                 latActual = p.coords.latitude;
@@ -151,7 +149,6 @@
             }
         }
 
-        // ACCIÓN TOTALMENTE PLANA Y BLINDADA DEL BOTÓN ENVIAR
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -161,7 +158,7 @@
 
             var terminoBusqueda = pedido === "" ? "farmacias" : pedido;
             
-            // Enlace de búsqueda directa corregido sin variables cruzadas
+            // CORRECCIÓN CLAVE: Enlace directo nativo sin target="_blank" para evitar el bloqueo del móvil
             var mapaUrl = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&center=" + latActual + "," + lngActual;
 
             var detallesLocalesHTML = "";
@@ -185,7 +182,6 @@
                 vozTexto = "Búsqueda de asistencia completada.";
             }
 
-            // Insertamos los resultados de forma forzada
             setTimeout(function() {
                 panel.innerHTML = `
                     <div class="result-item">
@@ -193,7 +189,7 @@
                         <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
                         <p style="font-size:13px; margin:8px 0; color:#475569;">Rastreador enlazado para ubicar "${terminoBusqueda}" alrededor de las coordenadas de este celular.</p>
                         ${detallesLocalesHTML}
-                        <a href="${mapaUrl}" target="_blank" class="btn-google-link">🔍 Abrir los Locales Reales en Google Maps</a>
+                        <a href="${mapaUrl}" class="btn-google-link">🔍 Abrir los Locales Reales en Google Maps</a>
                     </div>`;
                 hablar(vozTexto);
             }, 200);
