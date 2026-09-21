@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
+    <!-- CONEXIÓN OBLIGATORIA CON EL MANIFIESTO PWA -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#2563eb">
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -67,6 +70,13 @@
             padding: 3px 8px; border-radius: 6px;
             font-size: 11px; font-weight: bold; margin-bottom: 6px;
         }
+        .badge-codigo {
+            display: inline-block;
+            background: #ffe4e6; color: #991b1b;
+            padding: 4px 8px; border-radius: 6px;
+            font-size: 12px; font-weight: bold; margin-top: 6px;
+            border: 1px dashed #f43f5e;
+        }
     </style>
 </head>
 <body>
@@ -90,8 +100,8 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
+                <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
             </select>
@@ -101,7 +111,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: alcohol, eritropoyetina, medicina">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, electricista, alcohol">
                 <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
@@ -122,6 +132,15 @@
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
+        // ACTIVACIÓN AUTOMÁTICA DEL SERVICE WORKER (PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA lista e instalable', reg))
+                    .catch(err => console.log('Error PWA', err));
+            });
+        }
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(p) {
                 latActual = p.coords.latitude;
@@ -135,13 +154,13 @@
         function hablar(texto) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(texto);
+                var utterance = new SpeechSynthesisUtterance(texto);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // RECONOCIMIENTO DE VOZ REPARADO Y COMPATIBLE
+        // RECONOCIMIENTO DE VOZ PLANO
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -162,9 +181,9 @@
                     }
                 });
             }
-        } catch(e) { console.log("Lector de voz bloqueado."); }
+        } catch(e) { console.log("Lector de voz no disponible."); }
 
-        // ACCIÓN DEL BOTÓN ENVIAR TOTALMENTE REPARADA (Sin espacios rotos)
+        // BOTÓN ENVIAR CON ANILLOS DE SEGURIDAD CONTRA FRAUDES
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -172,36 +191,25 @@
             
             panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
 
-            var busqueda = pedido === "" ? "medicinas" : pedido;
+            var busqueda = pedido === "" ? "tiendas" : pedido;
             var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "&center=" + latActual + "," + lngActual;
 
             var detallesLocalesHTML = "";
             var vozTexto = "";
 
-            if (categoria === "farmacia") {
-                detallesLocalesHTML = `
-                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Stock disponible de alcohol medicinal y blísters.</div>
-                    <div class="local-info">💊 <strong>Cadenas Farmacéuticas en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
-                    <div class="local-info">🏪 <strong>Boticas Independientes en Jr. Las Antaras</strong><br>📍 Tu sector • Atención vecinal directa para emergencias básicas.</div>
-                    <div class="local-info">💊 <strong>Farmacias de turno en Av. Guardia Peruana</strong><br>📍 Rango Este • Medicinas e insumos médicos disponibles.</div>
-                    <div class="local-info">🏢 <strong>Centro de Salud Materno Infantil de Chorrillos</strong><br>📍 Soporte Vital • Atención de emergencias de salud 24 horas.</div>
-                `;
-                vozTexto = "Mostrando las cinco opciones de farmacias y boticas de turno en Chorrillos.";
-            } else if (categoria === "compras") {
+            // Generación automática de código secreto de identidad
+            var codigoSecreto = Math.floor(1000 + Math.random() * 9000);
+
+            if (categoria === "compras") {
                 detallesLocalesHTML = `
                     <div class="local-info">🏪 <strong>Bodegas y Minimarkets en Av. Matellini</strong><br>📍 Rango Norte • Stock disponible de abastos y alimentos.</div>
                     <div class="local-info">🛒 <strong>Comercios en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes operando.</div>
+                    <div class="local-info">🏪 <strong>Establecimientos en Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento comercial activo.</div>
+                    <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y zonas aledañas</strong><br>📍 Tu sector • Atención vecinal directa.</div>
+                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega rápida.</div>
                 `;
-                vozTexto = "Mostrando opciones de abastecimiento.";
-            } else {
+                vozTexto = "Mostrando las cinco opciones de abastecimiento en el mapa.";
+            } else if (categoria === "farmacia") {
                 detallesLocalesHTML = `
-                    <div class="local-info">👷 <strong>Red de Técnicos de Emergencia Evaluados</strong><br>📍 Filtro geográfico activo • Conexión de seguridad en Chorrillos.</div>
-                `;
-                vozTexto = "Búsqueda completada.";
-            }
-
-            setTimeout(function() {
-                panel.innerHTML = `
-                    <div class="result-item">
-                        <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
-                        <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
+                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas generales y especializadas.</div>
+                    <div class="local-info">💊 <strong>Cadenas de salud en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
