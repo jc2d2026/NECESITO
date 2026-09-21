@@ -58,11 +58,18 @@
             display: block; text-align: center; margin-top: 12px;
             background-color: #2563eb; color: white; padding: 12px;
             border-radius: 8px; text-decoration: none; font-weight: bold;
+            font-size: 14px;
         }
         .local-info {
             background-color: #f1f5f9; padding: 12px; border-radius: 8px;
             margin-top: 8px; font-size: 13px; color: #334155;
             border-left: 3px solid #10b981;
+        }
+        .badge-suscrito {
+            display: inline-block;
+            background: #dcfce7; color: #15803d;
+            padding: 3px 8px; border-radius: 6px;
+            font-size: 11px; font-weight: bold; margin-bottom: 4px;
         }
         .badge-google {
             display: inline-block;
@@ -96,14 +103,14 @@
             </div>
         </section>
 
-        <!-- Categoría -->
+        <!-- Categoría de Negocio -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="compras">🛒 Compra / Abastecimiento (Alimentos, Tienda)</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida, Ferretería)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="tecnicos">👷 Solicitud de Técnico Confiable</option>
-                <option value="vital">🧑‍⚕️ Emergencia Vital / Médico Suscrito</option>
+                <option value="tecnicos">👷 Técnicos y Profesionales de Confianza</option>
+                <option value="vital">🧑‍⚕️ Emergencia Vital, Cuidado y Salud</option>
             </select>
         </section>
 
@@ -111,7 +118,7 @@
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, electricista, alcohol">
+                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: pollo a la brasa, electricista, paracetamol">
                 <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
@@ -129,14 +136,15 @@
     </main>
 
     <script>
+        // Coordenadas base iniciales para Chorrillos (Las Antaras 186)
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
-        // ACTIVACIÓN AUTOMÁTICA DEL SERVICE WORKER (PWA)
+        // ACTIVACIÓN AUTOMÁTICA DEL SERVICE WORKER (PWA INSTALABLE)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA lista e instalable', reg))
+                    .then(reg => console.log('PWA Lista', reg))
                     .catch(err => console.log('Error PWA', err));
             });
         }
@@ -160,56 +168,19 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ PLANO
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const reconocimiento = new SpeechRecognition();
-                reconocimiento.lang = 'es-PE';
+        // BASE DE DATOS MAESTRA DE SUSCRIPTORES MENSUALES (Monetización y Seguridad)
+        const BASE_SUSCRIPTORES = [
+            // CATEGORÍA: COMPRAS / ABASTECIMIENTO
+            { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
+            { nombre: "🍽️ Pollería y Restaurant 'El Carbón de Chorrillos'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant", "chifa"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa y platos criollos." },
+            { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", categoria: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
+            { nombre: "🔨 Ferretería El Progreso de Matellini", categoria: "compras", palabrasClave: ["ferreteria", "cemento", "herramientas", "tubo"], lat: -12.1810, lng: -77.0140, contacto: "999 777 888", infoextra: "Insumos, herramientas y bolsas de cemento." },
 
-                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
-                    try {
-                        reconocimiento.start();
-                        hablar("Escuchando pedido.");
-                        reconocimiento.onresult = function(event) {
-                            var resultadoVoz = event.results[0][0].transcript;
-                            document.getElementById('txt-pedido').value = resultadoVoz;
-                            hablar("Registrado");
-                        };
-                    } catch(e) { 
-                        hablar("Por favor use el teclado.");
-                    }
-                });
-            }
-        } catch(e) { console.log("Lector de voz no disponible."); }
+            // CATEGORÍA: FARMACIAS
+            { nombre: "💊 Farmacia y Botica 'San Cosme Sede Sur'", categoria: "farmacia", palabrasClave: ["paracetamol", "farmacia", "botica", "medicina", "alcohol"], lat: -12.1855, lng: -77.0215, contacto: "01-444-5555", infoextra: "Stock completo de medicinas de turno y alcohol medicinal." },
+            { nombre: "🧬 Distribuidora Médica 'Vital Especiales'", categoria: "farmacia", palabrasClave: ["eritropoyetina", "inyectable", "insulina", "especiales"], lat: -12.1825, lng: -77.0160, contacto: "999 888 777", infoextra: "Fórmulas complejas. Eritropoyetina 4000 UI y 10000 UI disponible." },
 
-        // BOTÓN ENVIAR CON ANILLOS DE SEGURIDAD CONTRA FRAUDES
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            var pedido = document.getElementById('txt-pedido').value.trim();
-            var categoria = document.getElementById('select-categoria').value;
-            var panel = document.getElementById('lista-resultados');
-            
-            panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
-
-            var busqueda = pedido === "" ? "tiendas" : pedido;
-            var mapaUrl = "https://google.com" + encodeURIComponent(busqueda) + "&center=" + latActual + "," + lngActual;
-
-            var detallesLocalesHTML = "";
-            var vozTexto = "";
-
-            // Generación automática de código secreto de identidad
-            var codigoSecreto = Math.floor(1000 + Math.random() * 9000);
-
-            if (categoria === "compras") {
-                detallesLocalesHTML = `
-                    <div class="local-info">🏪 <strong>Bodegas y Minimarkets en Av. Matellini</strong><br>📍 Rango Norte • Stock disponible de abastos y alimentos.</div>
-                    <div class="local-info">🛒 <strong>Comercios en Av. Prolongación Ariosto</strong><br>📍 Rango cercano • Tiendas de abarrotes operando.</div>
-                    <div class="local-info">🏪 <strong>Establecimientos en Av. Guardia Peruana</strong><br>📍 Filtro local • Abastecimiento comercial activo.</div>
-                    <div class="local-info">🛒 <strong>Locales en Jr. Las Antaras y zonas aledañas</strong><br>📍 Tu sector • Atención vecinal directa.</div>
-                    <div class="local-info">🍽️ <strong>Restaurantes y Pollerías en Av. El Sol</strong><br>📍 Rango Sur • Preparación y entrega rápida.</div>
-                `;
-                vozTexto = "Mostrando las cinco opciones de abastecimiento en el mapa.";
-            } else if (categoria === "farmacia") {
-                detallesLocalesHTML = `
-                    <div class="local-info">💊 <strong>Farmacias y Boticas en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas generales y especializadas.</div>
-                    <div class="local-info">💊 <strong>Cadenas de salud en Av. Matellini</strong><br>📍 Rango cercano • Fórmulas médicas y atención prioritaria.</div>
+            // CATEGORÍA: TÉCNICOS Y PROFESIONALES
+            { nombre: "👷 Carlos Silva - Electricista Profesional Certificado", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "cable"], lat: -12.1910, lng: -77.0180, contacto: "988 123 456", infoextra: "Especialista en cortocircuitos y tableros eléctricos residenciales." },
+            { nombre: "👷 Juan Mendoza - Gasfitero e Hidráulico de Emergencia", categoria: "tecnicos", palabrasClave: ["gasfitero", "tubo", "agua", "desague", "fuga"], lat: -12.1840, lng: -77.0230, contacto: "977 456 789", infoextra: "Detección de fugas ocultas y reparación de tuberías colapsadas." },
+            { nombre: "👷 Pedro Rojas - Carpintero y Ebanista", categoria: "tecnicos", palabrasClave: ["carpintero", "puerta", "mueble", "madera"], lat: -12.1875, lng: -77.0115, contacto: "966 789 123", infoextra: "Reparación de cerraduras, marcos de puertas y reposteros." },
