@@ -136,16 +136,15 @@
     </main>
 
     <script>
-        // Coordenadas base iniciales para Chorrillos (Las Antaras 186)
         let latActual = -12.1861;
         let lngActual = -77.0194;
 
         // ACTIVACIÓN AUTOMÁTICA DEL SERVICE WORKER (PWA INSTALABLE)
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+            window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA Lista', reg))
-                    .catch(err => console.log('Error PWA', err));
+                    .then(function(reg) { console.log('PWA Lista'); })
+                    .catch(function(err) { console.log('Error PWA'); });
             });
         }
 
@@ -168,19 +167,21 @@
             }
         }
 
-        // BASE DE DATOS MAESTRA DE SUSCRIPTORES MENSUALES (Monetización y Seguridad)
+        // BASE DE DATOS MAESTRA DE SUSCRIPTORES MENSUALES
         const BASE_SUSCRIPTORES = [
-            // CATEGORÍA: COMPRAS / ABASTECIMIENTO
             { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
             { nombre: "🍽️ Pollería y Restaurant 'El Carbón de Chorrillos'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant", "chifa"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa y platos criollos." },
             { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", categoria: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
             { nombre: "🔨 Ferretería El Progreso de Matellini", categoria: "compras", palabrasClave: ["ferreteria", "cemento", "herramientas", "tubo"], lat: -12.1810, lng: -77.0140, contacto: "999 777 888", infoextra: "Insumos, herramientas y bolsas de cemento." },
+            { nombre: "💊 Farmacia y Botica 'San Cosme Sur'", categoria: "farmacia", palabrasClave: ["paracetamol", "farmacia", "botica", "medicina", "alcohol"], lat: -12.1855, lng: -77.0215, contacto: "01-444-5555", infoextra: "Stock de medicinas de turno y alcohol medicinal." },
+            { nombre: "🧬 Distribuidora Médica 'Vital Especiales'", categoria: "farmacia", palabrasClave: ["eritropoyetina", "inyectable", "insulina", "especiales"], lat: -12.1825, lng: -77.0160, contacto: "999 888 777", infoextra: "Eritropoyetina 4000 UI y 10000 UI disponible." },
+            { nombre: "👷 Carlos Silva - Electricista Certificado", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "cable"], lat: -12.1910, lng: -77.0180, contacto: "Contacto de emergencia", infoextra: "Cortocircuitos y tableros eléctricos residenciales." },
+            { nombre: "👷 Juan Mendoza - Gasfitero de Emergencia", categoria: "tecnicos", palabrasClave: ["gasfitero", "tubo", "agua", "fuga"], lat: -12.1840, lng: -77.0230, contacto: "Contacto de emergencia", infoextra: "Fugas ocultas y reparación de tuberías colapsadas." },
+            { nombre: "👨‍⚕️ Dr. Manuel Silva - Médico de Cabecera", categoria: "vital", palabrasClave: ["medico", "doctor", "consulta", "salud"], lat: -12.1870, lng: -77.0200, contacto: "01-555-3333", infoextra: "Evaluaciones geriátricas y chequeos a domicilio." },
+            { nombre: "🩺 Lic. Elena Torres - Enfermera Especialista", categoria: "vital", palabrasClave: ["enfermera", "enfermero", "tecnico", "inyectable", "suero"], lat: -12.1845, lng: -77.0175, contacto: "Contacto de emergencia", infoextra: "Sondas, inyectables, sueros y funciones vitales." }
+        ];
 
-            // CATEGORÍA: FARMACIAS
-            { nombre: "💊 Farmacia y Botica 'San Cosme Sede Sur'", categoria: "farmacia", palabrasClave: ["paracetamol", "farmacia", "botica", "medicina", "alcohol"], lat: -12.1855, lng: -77.0215, contacto: "01-444-5555", infoextra: "Stock completo de medicinas de turno y alcohol medicinal." },
-            { nombre: "🧬 Distribuidora Médica 'Vital Especiales'", categoria: "farmacia", palabrasClave: ["eritropoyetina", "inyectable", "insulina", "especiales"], lat: -12.1825, lng: -77.0160, contacto: "999 888 777", infoextra: "Fórmulas complejas. Eritropoyetina 4000 UI y 10000 UI disponible." },
-
-            // CATEGORÍA: TÉCNICOS Y PROFESIONALES
-            { nombre: "👷 Carlos Silva - Electricista Profesional Certificado", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "cable"], lat: -12.1910, lng: -77.0180, contacto: "988 123 456", infoextra: "Especialista en cortocircuitos y tableros eléctricos residenciales." },
-            { nombre: "👷 Juan Mendoza - Gasfitero e Hidráulico de Emergencia", categoria: "tecnicos", palabrasClave: ["gasfitero", "tubo", "agua", "desague", "fuga"], lat: -12.1840, lng: -77.0230, contacto: "977 456 789", infoextra: "Detección de fugas ocultas y reparación de tuberías colapsadas." },
-            { nombre: "👷 Pedro Rojas - Carpintero y Ebanista", categoria: "tecnicos", palabrasClave: ["carpintero", "puerta", "mueble", "madera"], lat: -12.1875, lng: -77.0115, contacto: "966 789 123", infoextra: "Reparación de cerraduras, marcos de puertas y reposteros." },
+        // RECONOCIMIENTO DE VOZ PLANO REPARADO SIN ERRORES DE SINTAXIS
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
