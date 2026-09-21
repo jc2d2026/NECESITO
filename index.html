@@ -179,7 +179,7 @@
                         reconocimiento.start();
                         hablar("Escuchando su solicitud.");
                         reconocimiento.onresult = function(event) {
-                            var resultadoVoz = event.results[0][0].transcript;
+                            var resultadoVoz = event.results.transcript;
                             document.getElementById('txt-pedido').value = resultadoVoz;
                             hablar("Registrado " + resultadoVoz);
                         };
@@ -201,7 +201,7 @@
             return R * c;
         }
 
-        // ACCIÓN TOTALMENTE DIRECTA Y REPARADA DEL BOTÓN ENVIAR
+        // ACCIÓN TOTALMENTE DIRECTA Y REPARADA DEL BOTÓN ENVIAR (Sin etiquetas rotas)
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             var categoria = document.getElementById('select-categoria').value;
