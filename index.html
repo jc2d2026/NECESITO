@@ -65,11 +65,24 @@
             margin-top: 8px; font-size: 13px; color: #334155;
             border-left: 3px solid #10b981;
         }
+        .badge-suscrito {
+            display: inline-block;
+            background: #dcfce7; color: #15803d;
+            padding: 3px 8px; border-radius: 6px;
+            font-size: 11px; font-weight: bold; margin-bottom: 4px;
+        }
         .badge-google {
             display: inline-block;
             background: #fef08a; color: #a16207;
             padding: 3px 8px; border-radius: 6px;
             font-size: 11px; font-weight: bold; margin-bottom: 6px;
+        }
+        .badge-codigo {
+            display: inline-block;
+            background: #ffe4e6; color: #991b1b;
+            padding: 4px 8px; border-radius: 6px;
+            font-size: 12px; font-weight: bold; margin-top: 6px;
+            border: 1px dashed #f43f5e;
         }
     </style>
 </head>
@@ -85,12 +98,12 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Ubicación por Red Celular Activa" readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
 
-        <!-- Categoría -->
+        <!-- Categoría de Negocio -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
@@ -123,8 +136,9 @@
     </main>
 
     <script>
-        let latActual = -12.1861;
-        let lngActual = -77.0194;
+        // CORRECCIÓN MATEMÁTICA: Coordenadas fijas exactas de Las Antaras 188 para evitar saltos al óvalo general
+        let latActual = -12.193635;
+        let lngActual = -77.004487;
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
@@ -137,7 +151,9 @@
                 latActual = p.coords.latitude;
                 lngActual = p.coords.longitude;
                 document.getElementById('txt-ubicacion').value = "Ubicación Satelital Confirmada ✔️";
-            }, null, { timeout: 2000 });
+            }, function() {
+                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Fijado)";
+            }, { timeout: 2000 });
         }
 
         function hablar(texto) {
@@ -149,51 +165,49 @@
             }
         }
 
+        // RECONOCIMIENTO DE VOZ PLANO REPARADO
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const reconocimiento = new SpeechRecognition();
+                reconocimiento.lang = 'es-PE';
+
+                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                    try {
+                        reconocimiento.start();
+                        hablar("Escuchando su solicitud.");
+                        reconocimiento.onresult = function(event) {
+                            var resultadoVoz = event.results[0][0].transcript;
+                            document.getElementById('txt-pedido').value = resultadoVoz;
+                            hablar("Registrado " + resultadoVoz);
+                        };
+                    } catch(e) { 
+                        hablar("Por favor use el teclado.");
+                    }
+                });
+            }
+        } catch(e) { console.log("Lector inactivo."); }
+
+        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
         document.getElementById('btn-enviar').addEventListener('click', function() {
-            var pedido = document.getElementById('txt-pedido').value.trim();
+            var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             var categoria = document.getElementById('select-categoria').value;
             var panel = document.getElementById('lista-resultados');
             
-            panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
+            panel.innerHTML = "Sincronizando con la red local de Chorrillos...";
 
-            var terminoBusqueda = pedido === "" ? "farmacias" : pedido;
-            
-            // CORRECCIÓN CLAVE: Enlace directo nativo sin target="_blank" para evitar el bloqueo del móvil
-            var mapaUrl = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&center=" + latActual + "," + lngActual;
-
-            var detallesLocalesHTML = "";
-            var vozTexto = "";
-
-            if (categoria === "farmacia") {
-                detallesLocalesHTML = `
-                    <div class="local-info">💊 <strong>Establecimientos farmacéuticos en Av. Matellini</strong><br>📍 Rango cercano • Consultando stock de "${terminoBusqueda}" en tu cuadrante.</div>
-                    <div class="local-info">💊 <strong>Boticas de turno en Av. Defensores del Morro (Huaylas)</strong><br>📍 Eje Principal • Medicinas generales e insumos de salud.</div>
-                `;
-                vozTexto = "Abriendo el cuadrante de farmacias locales vinculadas a tu rango celular.";
-            } else if (categoria === "compras") {
-                detallesLocalesHTML = `
-                    <div class="local-info">🏪 <strong>Bodegas y Minimarkets cercanos</strong><br>📍 Cobertura de red • Mapeando tiendas de abastecimiento de barrio.</div>
-                `;
-                vozTexto = "Búsqueda de comercios establecida.";
-            } else {
-                detallesLocalesHTML = `
-                    <div class="local-info">👷 <strong>Asistencia y Soporte de Emergencia Técnico Vecinal</strong><br>📍 Filtro local activo • Red de seguridad en Chorrillos.</div>
-                `;
-                vozTexto = "Búsqueda de asistencia completada.";
-            }
-
-            setTimeout(function() {
-                panel.innerHTML = `
-                    <div class="result-item">
-                        <strong>🌐 RESPALDO SATELITAL DE ASISTENCIA</strong><br>
-                        <span class="badge-google">CONEXIÓN VINCULADA CON GOOGLE</span><br>
-                        <p style="font-size:13px; margin:8px 0; color:#475569;">Rastreador enlazado para ubicar "${terminoBusqueda}" alrededor de las coordenadas de este celular.</p>
-                        ${detallesLocalesHTML}
-                        <a href="${mapaUrl}" class="btn-google-link">🔍 Abrir los Locales Reales en Google Maps</a>
-                    </div>`;
-                hablar(vozTexto);
-            }, 200);
-        });
-    </script>
-</body>
-</html>
+            // BASE DE DATOS LOCAL INTEGRADA (Marcha Blanca Gratis)
+            const BASE_SUSCRIPTORES = [
+                { nombre: "💊 Farmacia Universal (Sede Villa Marina)", categoria: "farmacia", palabrasClave: ["salbutamol", "farmacia", "botica", "medicina", "inhalador", "universal"], lat: -12.1894, lng: -77.0135, contacto: "01-444-2222", infoextra: "Ubicada en Av. Villa Marina 212. Atención las 24 horas del día ✔️" },
+                { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
+                { nombre: "🍽️ Pollería y Restaurant 'El Carbón'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa." },
