@@ -167,21 +167,50 @@
             }
         }
 
-        // BASE DE DATOS MAESTRA DE SUSCRIPTORES MENSUALES
-        const BASE_SUSCRIPTORES = [
-            { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
-            { nombre: "🍽️ Pollería y Restaurant 'El Carbón de Chorrillos'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant", "chifa"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa y platos criollos." },
-            { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", categoria: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
-            { nombre: "🔨 Ferretería El Progreso de Matellini", categoria: "compras", palabrasClave: ["ferreteria", "cemento", "herramientas", "tubo"], lat: -12.1810, lng: -77.0140, contacto: "999 777 888", infoextra: "Insumos, herramientas y bolsas de cemento." },
-            { nombre: "💊 Farmacia y Botica 'San Cosme Sur'", categoria: "farmacia", palabrasClave: ["paracetamol", "farmacia", "botica", "medicina", "alcohol"], lat: -12.1855, lng: -77.0215, contacto: "01-444-5555", infoextra: "Stock de medicinas de turno y alcohol medicinal." },
-            { nombre: "🧬 Distribuidora Médica 'Vital Especiales'", categoria: "farmacia", palabrasClave: ["eritropoyetina", "inyectable", "insulina", "especiales"], lat: -12.1825, lng: -77.0160, contacto: "999 888 777", infoextra: "Eritropoyetina 4000 UI y 10000 UI disponible." },
-            { nombre: "👷 Carlos Silva - Electricista Certificado", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "cable"], lat: -12.1910, lng: -77.0180, contacto: "Contacto de emergencia", infoextra: "Cortocircuitos y tableros eléctricos residenciales." },
-            { nombre: "👷 Juan Mendoza - Gasfitero de Emergencia", categoria: "tecnicos", palabrasClave: ["gasfitero", "tubo", "agua", "fuga"], lat: -12.1840, lng: -77.0230, contacto: "Contacto de emergencia", infoextra: "Fugas ocultas y reparación de tuberías colapsadas." },
-            { nombre: "👨‍⚕️ Dr. Manuel Silva - Médico de Cabecera", categoria: "vital", palabrasClave: ["medico", "doctor", "consulta", "salud"], lat: -12.1870, lng: -77.0200, contacto: "01-555-3333", infoextra: "Evaluaciones geriátricas y chequeos a domicilio." },
-            { nombre: "🩺 Lic. Elena Torres - Enfermera Especialista", categoria: "vital", palabrasClave: ["enfermera", "enfermero", "tecnico", "inyectable", "suero"], lat: -12.1845, lng: -77.0175, contacto: "Contacto de emergencia", infoextra: "Sondas, inyectables, sueros y funciones vitales." }
-        ];
-
-        // RECONOCIMIENTO DE VOZ PLANO REPARADO SIN ERRORES DE SINTAXIS
+        // RECONOCIMIENTO DE VOZ PLANO REPARADO
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
+                const reconocimiento = new SpeechRecognition();
+                reconocimiento.lang = 'es-PE';
+
+                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                    try {
+                        reconocimiento.start();
+                        hablar("Escuchando su solicitud.");
+                        reconocimiento.onresult = function(event) {
+                            var resultadoVoz = event.results[0][0].transcript;
+                            document.getElementById('txt-pedido').value = resultadoVoz;
+                            hablar("Registrado " + resultadoVoz);
+                        };
+                    } catch(e) { 
+                        hablar("Por favor use el teclado.");
+                    }
+                });
+            }
+        } catch(e) { console.log("Lector inactivo."); }
+
+        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // ACCIÓN TOTALMENTE DIRECTA Y REPARADA DEL BOTÓN ENVIAR
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
+            var categoria = document.getElementById('select-categoria').value;
+            var panel = document.getElementById('lista-resultados');
+            
+            panel.innerHTML = "Analizando red de suscriptores autorizados...";
+
+            // BASE DE DATOS INTERNA DE SOCIOS SUSCRITOS
+            const BASE_SUSCRIPTORES = [
+                { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
+                { nombre: "🍽️ Pollería y Restaurant 'El Carbón de Chorrillos'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant", "chifa"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa y platos criollos." },
+                { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", categoria: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
