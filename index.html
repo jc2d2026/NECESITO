@@ -107,8 +107,8 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida, Ferretería)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida, Ferretería)</option>
                 <option value="tecnicos">👷 Técnicos y Profesionales de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital, Cuidado y Salud</option>
             </select>
@@ -167,7 +167,7 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ PLANO REPARADO
+        // RECONOCIMIENTO DE VOZ PLANO COMPLETAMENTE REPARADO
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -179,7 +179,7 @@
                         reconocimiento.start();
                         hablar("Escuchando su solicitud.");
                         reconocimiento.onresult = function(event) {
-                            var resultadoVoz = event.results.transcript;
+                            var resultadoVoz = event.results[0][0].transcript;
                             document.getElementById('txt-pedido').value = resultadoVoz;
                             hablar("Registrado " + resultadoVoz);
                         };
@@ -201,7 +201,7 @@
             return R * c;
         }
 
-        // ACCIÓN TOTALMENTE DIRECTA Y REPARADA DEL BOTÓN ENVIAR (Sin etiquetas rotas)
+        // ACCIÓN DEL BOTÓN ENVIAR REPARADA DE NIVEL PROFESIONAL
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             var categoria = document.getElementById('select-categoria').value;
@@ -213,4 +213,4 @@
             const BASE_SUSCRIPTORES = [
                 { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua embotellada de 7L." },
                 { nombre: "🍽️ Pollería y Restaurant 'El Carbón de Chorrillos'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant", "chifa"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Especialistas en Pollo a la Brasa y platos criollos." },
-                { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", categoria: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
+                { nombre: "🍕 Pizzería 'Bella Vista Domicilios'", font_size: "compras", palabrasClave: ["pizza", "pizeria", "comida"], lat: -12.1830, lng: -77.0150, contacto: "999 555 666", infoextra: "Pizzas familiares calientes con entrega prioritaria." },
