@@ -129,16 +129,19 @@
     </main>
 
     <script>
+          <script>
         // Arraigo de geolocalización exacto de Las Antaras 188
         let latActual = -12.193635;
         let lngActual = -77.004487;
 
+        // Registro del Service Worker para la PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log(e); });
             });
         }
 
+        // Obtener ubicación real del usuario
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(p) {
                 latActual = p.coords.latitude;
@@ -182,27 +185,18 @@
             }
         } catch(e) { console.log("Canal de audio inactivo."); }
 
+        // FUNCIÓN PARA CALCULAR LA DISTANCIA ENTRE DOS PUNTOS (Fórmula Haversine)
         function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
+            const R = 6371; // Radio de la Tierra en Km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
+            return R * c; // Retorna la distancia en kilómetros
         }
+    </script>
+</body>
+</html>
 
-        // ACCIÓN TOTALMENTE DIRECTA DEL BOTÓN ENVIAR (Indestructible)
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            var pedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
-            var categoria = document.getElementById('select-categoria').value;
-            var panel = document.getElementById('lista-resultados');
-            
-            panel.innerHTML = "Sincronizando con los mapas de auxilio local...";
-
-            // BASE DE DATOS LOCAL INTEGRADA (Marcha Blanca con la Farmacia Universal real en Av. Villa Marina 212)
-            const BASE_SUSCRIPTORES = [
-                { nombre: "💊 Farmacia Universal (Sede Villa Marina)", categoria: "farmacia", palabrasClave: ["salbutamol", "farmacia", "botica", "medicina", "inhalador", "universal"], lat: -12.1894, lng: -77.0135, contacto: "01-444-2222", infoextra: "Ubicada en Av. Villa Marina 212. Atención las 24 horas del día ✔️" },
-                { nombre: "🏪 Bodega y Minimarket 'Don Lorenzo'", categoria: "compras", palabrasClave: ["bodega", "tienda", "arroz", "abarrotes", "agua"], lat: -12.1850, lng: -77.0180, contacto: "999 111 222", infoextra: "Delivery de abastos y agua de 7L." },
-                { nombre: "🍽️ Pollería y Restaurant 'El Carbón'", categoria: "compras", palabrasClave: ["pollo", "almuerzo", "comida", "restaurant"], lat: -12.1890, lng: -77.0220, contacto: "999 333 444", infoextra: "Pollo a la Brasa y platos criollos." },
