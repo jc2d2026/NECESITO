@@ -129,10 +129,17 @@
     </main>
 
     <script>
-          <script>
         // Arraigo de geolocalización exacto de Las Antaras 188
         let latActual = -12.193635;
         let lngActual = -77.004487;
+
+        // Base de Datos Local Simulada (Chorrillos)
+        const comerciosBD = [
+            { nombre: "Farmacia San Pedro", categoria: "farmacia", lat: -12.192500, lng: -77.003500, tipo: "suscrito", info: "Atención 24 horas. Delivery disponible." },
+            { nombre: "Bodega Don Lucho", categoria: "compras", lat: -12.195100, lng: -77.006200, tipo: "suscrito", info: "Abarrotes en general, verduras frescas y ferretería básica." },
+            { nombre: "Servicios Eléctricos Chorrillos", categoria: "tecnicos", lat: -12.191200, lng: -77.002100, tipo: "suscrito", info: "Técnico certificado. Emergencias eléctricas del hogar." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", lat: -12.196500, lng: -77.001200, tipo: "google", info: "Centro médico asistencial con guardias nocturnas." }
+        ];
 
         // Registro del Service Worker para la PWA
         if ('serviceWorker' in navigator) {
@@ -191,12 +198,19 @@
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      document.getElementById('txt-ubicacion').value && 
                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return R * c; // Retorna la distancia en kilómetros
         }
-    </script>
-</body>
-</html>
 
+        // ACCIÓN PRINCIPAL: PROCESAR BÚSQUEDA Y MOSTRAR RESULTADOS
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const pedidoTexto = document.getElementById('txt-pedido').value.trim();
+            const contenedorLista = document.getElementById('lista-resultados');
+            
+            contenedorLista.innerHTML = ""; // Limpiar pantalla anterior
+            
+            // Filtrar comercios por la categoría seleccionada
