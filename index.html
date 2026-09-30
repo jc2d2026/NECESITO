@@ -140,7 +140,7 @@
             }
         }
 
-        // Activación de voz inclusiva obligatoria vinculada al primer toque de pantalla
+        // Sistema de audio activado mediante el primer clic en la pantalla
         let vozInicialActivada = false;
         document.body.addEventListener('click', function() {
             if (!vozInicialActivada) {
@@ -149,12 +149,11 @@
             }
         });
 
-        // RECONOCIMIENTO DE VOZ CORREGIDO CON LOS ÍNDICES CORRECTOS DE LA MATRIZ [0][0]
+        // AISLAMIENTO TOTAL DE LOS MICRÓFONOS CONTRA PERMISOS BLOQUEADOS DEL TELÉFONO
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
 
-                // Micrófono 1: Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
                 recUbicacion.continuous = false;
@@ -162,18 +161,18 @@
                 
                 document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
                     e.stopPropagation();
-                    recUbicacion.start();
-                    hablarTexto("Diga su dirección actual.");
+                    try {
+                        recUbicacion.start();
+                        hablarTexto("Diga su dirección.");
+                    } catch(err) { console.log("Error al iniciar micrófono de ubicación", err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // CORRECCIÓN CLAVE: Acceso correcto indexado a la matriz bidimensional
-                    const textoDictado = event.results[0][0].transcript;
+                    const textoDictado = event.results[0][0].transcript; // ESTRUCTURA MATRIZ ARREGLADA
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
                 };
 
-                // Micrófono 2: Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
                 recPedido.continuous = false;
@@ -181,13 +180,14 @@
                 
                 document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
                     e.stopPropagation();
-                    recPedido.start();
-                    hablarTexto("Diga su pedido.");
+                    try {
+                        recPedido.start();
+                        hablarTexto("Diga su pedido.");
+                    } catch(err) { console.log("Error al iniciar micrófono de pedido", err); }
                 });
                 
                 recPedido.onresult = function(event) {
-                    // CORRECCIÓN CLAVE: Acceso correcto indexado a la matriz bidimensional
-                    const textoDictado = event.results[0][0].transcript;
+                    const textoDictado = event.results[0][0].transcript; // ESTRUCTURA MATRIZ ARREGLADA
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
@@ -196,7 +196,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR: Renderiza de inmediato las tarjetas de ayuda locales
+        // ACCIÓN CONTROLADA DEL BOTÓN ENVIAR: Siempre responde y nunca se congela
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
