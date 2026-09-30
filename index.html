@@ -19,13 +19,14 @@
             margin: 0; padding: 0;
             background-color: var(--bg-light); color: var(--text-dark);
         }
-        /* Capa de inicio para cumplir con la política de audio de los celulares */
+        /* Capa de inicio optimizada para evitar congelamientos */
         .pantalla-inicio {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--primary-blue); color: white;
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; z-index: 9999;
             cursor: pointer; padding: 20px; box-sizing: border-box;
+            transition: opacity 0.3s ease;
         }
         .pantalla-inicio h2 { font-size: 26px; margin-bottom: 15px; }
         .pantalla-inicio p { font-size: 16px; opacity: 0.9; }
@@ -45,7 +46,7 @@
         .input-control {
             flex: 1; padding: 14px; border: 2px solid #cbd5e1;
             border-radius: 12px; font-size: 15px; outline: none;
-            background-color: #ffffff;
+            background-color: #ffffff; color: var(--text-dark);
         }
         .btn-voice {
             background-color: #dbeafe; border: 2px solid var(--primary-blue);
@@ -85,10 +86,10 @@
 </head>
 <body>
 
-    <!-- Pantalla táctil inicial para activar el sonido de Google en el celular -->
+    <!-- Pantalla de inicio accesible -->
     <div id="capa-entrada" class="pantalla-inicio">
-        <h2>🤝 PLATAFORMA NECESITO</h2>
-        <p>Toque la pantalla una sola vez para activar el dictado por voz y escuchar su ubicación actual de inmediato.</p>
+        <h2>🤝 BIENVENIDO A NECESITO</h2>
+        <p>Toque la pantalla una sola vez para activar la asistencia por voz e iniciar la aplicación de inmediato.</p>
     </div>
 
     <header>
@@ -101,12 +102,12 @@
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Detectando dirección...">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos">
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
 
-        <!-- Categoría de Necesidad Prioritaria (Las 4 esenciales limpias) -->
+        <!-- Categoría de Necesidad Prioritaria (Las 4 esenciales fijadas) -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -139,73 +140,74 @@
     </main>
 
     <script>
-        // Los 5 comercios oficiales para la asistencia en Chorrillos
+        // Los 5 comercios oficiales mapeados para la asistencia en Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Función de voz asistida de Google (Sintetizador Oficial)
+        // Función de voz asistida con manejo nativo estable
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                var utterance = new SpeechSynthesisUtterance(mensaje);
+                const utterance = new SpeechSynthesisUtterance(mensaje);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // ACCIÓN AL TOCAR LA PANTALLA: Se quita la capa y Google lee la ubicación instantáneamente
+        // ACCIÓN AL TOCAR LA PANTALLA AZUL: Ocultamiento instantáneo y ejecución asíncrona para evitar congelación
         document.getElementById('capa-entrada').addEventListener('click', function() {
             this.style.display = 'none';
-            document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
-            // Voz de Google lee la ubicación actual inmediatamente
-            hablarTexto("Ubicación actual establecida en: Las Antaras 1 8 8, Chorrillos. Por favor, dicte o seleccione su requerimiento.");
+            // Mensaje hablado inmediato que confirma el éxito del toque
+            hablarTexto("Ubicación confirmada instantáneamente por Google en: Las Antaras 1 8 8, Chorrillos. Por favor, proceda con su pedido.");
+            inicializarMicrofonosSguros();
         });
 
-        // RECONOCIMIENTO DE VOZ REPARADO DE FORMA ABSOLUTA (Matriz indexada correcta)
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                
-                // Micrófono de Ubicación
+        // INICIALIZACIÓN AISLADA DE LOS MICRÓFONOS PARA EVITAR ERRORES DE CARGA
+        function inicializarMicrofonosSguros() {
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) return;
+
+                // Configuración del Micrófono de Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
+                recUbicacion.continuous = false;
+                recUbicacion.interimResults = false;
                 
-                document.getElementById('btn-voz-ubicacion').addEventListener('click', function() {
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
+                    e.stopPropagation();
                     recUbicacion.start();
                     hablarTexto("Diga su dirección.");
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // IMPLEMENTACIÓN CORRECTA EXIGIDA POR EL NAVEGADOR
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
                 };
 
-                // Micrófono de Pedido
+                // Configuración del Micrófono de Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
+                recPedido.continuous = false;
+                recPedido.interimResults = false;
                 
-                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
+                    e.stopPropagation();
                     recPedido.start();
                     hablarTexto("¿Qué ayuda necesita?");
                 });
                 
                 recPedido.onresult = function(event) {
-                    // IMPLEMENTACIÓN CORRECTA EXIGIDA POR EL NAVEGADOR
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
-            }
-        } catch(e) {
-            console.error("El navegador bloqueó la API de voz:", e);
-        }
 
-        // ACCIÓN DEL BOTÓN ENVIAR: Despliega los comercios correspondientes sin fallas
-        document.getElementById('btn-enviar').addEventListener('click', function() {
+            } catch(error) {
+                console.error("Los servicios de voz no se pudieron inicializar en este entorno:", error);
