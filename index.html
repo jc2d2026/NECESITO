@@ -81,7 +81,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Actual -->
+        <!-- Ubicación Fija Protegida -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -90,7 +90,7 @@
             </div>
         </section>
 
-        <!-- Categorías Prioritarias -->
+        <!-- Categorías -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -140,7 +140,7 @@
             }
         }
 
-        // Sistema de audio activado mediante el primer clic en la pantalla
+        // Activación de voz al primer toque en la pantalla
         let vozInicialActivada = false;
         document.body.addEventListener('click', function() {
             if (!vozInicialActivada) {
@@ -149,7 +149,7 @@
             }
         });
 
-        // AISLAMIENTO TOTAL DE LOS MICRÓFONOS CONTRA PERMISOS BLOQUEADOS DEL TELÉFONO
+        // RECONOCIMIENTO DE VOZ REPARADO CON ÍNDICES DE MATRIZ CORRECTOS
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -163,12 +163,12 @@
                     e.stopPropagation();
                     try {
                         recUbicacion.start();
-                        hablarTexto("Diga su dirección.");
-                    } catch(err) { console.log("Error al iniciar micrófono de ubicación", err); }
+                        hablarTexto("Diga su dirección actual.");
+                    } catch(err) { console.log(err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    const textoDictado = event.results[0][0].transcript; // ESTRUCTURA MATRIZ ARREGLADA
+                    const textoDictado = event.results[0][0].transcript; // ÍNDICES CORRECTOS APLICADOS
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
                 };
@@ -183,11 +183,11 @@
                     try {
                         recPedido.start();
                         hablarTexto("Diga su pedido.");
-                    } catch(err) { console.log("Error al iniciar micrófono de pedido", err); }
+                    } catch(err) { console.log(err); }
                 });
                 
                 recPedido.onresult = function(event) {
-                    const textoDictado = event.results[0][0].transcript; // ESTRUCTURA MATRIZ ARREGLADA
+                    const textoDictado = event.results[0][0].transcript; // ÍNDICES CORRECTOS APLICADOS
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
@@ -196,7 +196,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN CONTROLADA DEL BOTÓN ENVIAR: Siempre responde y nunca se congela
+        // CONTROLADOR DEL BOTÓN ENVIAR AUTÓNOMO (Inmune a fallos de GPS externo)
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -211,3 +211,6 @@
             }
 
             filtrados.forEach(comercio => {
+                const item = document.createElement('div');
+                item.className = "result-item";
+                
