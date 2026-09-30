@@ -71,12 +71,6 @@
             padding: 3px 8px; border-radius: 6px;
             font-size: 11px; font-weight: bold; margin-bottom: 4px;
         }
-        .badge-google {
-            display: inline-block;
-            background: #fef08a; color: #a16207;
-            padding: 3px 8px; border-radius: 6px;
-            font-size: 11px; font-weight: bold; margin-bottom: 6px;
-        }
     </style>
 </head>
 <body>
@@ -87,11 +81,11 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Real -->
+        <!-- Ubicación Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" placeholder="Escribe o dicta tu dirección">
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
@@ -100,10 +94,11 @@
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
+                <option value="todos">✨ Mostrar Todos los Comercios Disponibles (5)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida, Ferretería)</option>
-                <option value="tecnicos">👷 Técnicos y Profesionales de Confianza</option>
-                <option value="vital">🧑‍⚕️ Emergencia Vital, Cuidado y Salud</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida)</option>
+                <option value="tecnicos">👷 Técnicos de Confianza</option>
+                <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
             </select>
         </section>
 
@@ -129,37 +124,19 @@
     </main>
 
     <script>
-        // Arraigo de geolocalización exacto de Las Antaras 188
         let latActual = -12.193635;
         let lngActual = -77.004487;
 
-        // Base de Datos Local Simulada (Chorrillos)
+        // Base de Datos Corregida: Ahora contiene exactamente los 5 comercios clave solicitados
         const comerciosBD = [
-            { nombre: "Farmacia San Pedro", categoria: "farmacia", lat: -12.192500, lng: -77.003500, tipo: "suscrito", info: "Atención 24 horas. Delivery disponible." },
-            { nombre: "Bodega Don Lucho", categoria: "compras", lat: -12.195100, lng: -77.006200, tipo: "suscrito", info: "Abarrotes en general, verduras frescas y ferretería básica." },
-            { nombre: "Servicios Eléctricos Chorrillos", categoria: "tecnicos", lat: -12.191200, lng: -77.002100, tipo: "suscrito", info: "Técnico certificado. Emergencias eléctricas del hogar." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", lat: -12.196500, lng: -77.001200, tipo: "google", info: "Centro médico asistencial con guardias nocturnas." }
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", tipo: "suscrito", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras."},
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", tipo: "suscrito", info: "Abarrotes completos, alimentos de primera necesidad y atención local."},
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", tipo: "suscrito", info: "Abastecimiento rápido de verduras, lácteos y productos diarios."},
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", tipo: "suscrito", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", tipo: "suscrito", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Registro del Service Worker para la PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log(e); });
-            });
-        }
-
-        // Obtener ubicación real del usuario
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(p) {
-                latActual = p.coords.latitude;
-                lngActual = p.coords.longitude;
-                document.getElementById('txt-ubicacion').value = "Ubicación Satelital Confirmada ✔️";
-            }, function() {
-                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
-            }, { timeout: 2000 });
-        }
-
-        // FUNCIÓN DE ASISTENCIA AUDITIVA REPARADA AL 100%
+        // Función de voz (Output)
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -169,51 +146,70 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ REPARADO Y CONECTADO
+        // LÓGICA DE MICRÓFONOS CORREGIDA (SpeechRecognition independiente)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
-                const reconocimiento = new SpeechRecognition();
-                reconocimiento.lang = 'es-PE';
-
-                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
-                    try {
-                        reconocimiento.start();
-                        hablarTexto("Escuchando su solicitud.");
-                    } catch(e) { console.log("Reconocimiento ya activo", e); }
+                
+                // Micrófono 1: Para la Dirección/Ubicación
+                const recUbicacion = new SpeechRecognition();
+                recUbicacion.lang = 'es-PE';
+                
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', function() {
+                    recUbicacion.start();
+                    hablarTexto("Diga su dirección actual.");
                 });
+                
+                recUbicacion.onresult = function(event) {
+                    const texto = event.results[0][0].transcript;
+                    document.getElementById('txt-ubicacion').value = texto;
+                    hablarTexto("Dirección fijada.");
+                };
 
-                reconocimiento.onresult = function(event) {
-                    const textoEscuchado = event.results[0][0].transcript;
-                    document.getElementById('txt-pedido').value = textoEscuchado;
-                    hablarTexto("Entendido: " + textoEscuchado);
+                // Micrófono 2: Para el Detalle del Pedido
+                const recPedido = new SpeechRecognition();
+                recPedido.lang = 'es-PE';
+                
+                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                    recPedido.start();
+                    hablarTexto("¿Qué es lo que necesita?");
+                });
+                
+                recPedido.onresult = function(event) {
+                    const texto = event.results[0][0].transcript;
+                    document.getElementById('txt-pedido').value = texto;
+                    hablarTexto("Pedido registrado.");
                 };
             }
         } catch(e) {
-            console.log("El navegador no soporta SpeechRecognition", e);
+            console.log("Reconocimiento de voz no soportado en este navegador/dispositivo.", e);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR: Filtrar Base de Datos y Pintar Resultados
+        // ENVIAR SOLICITUD: Retorna los 5 comercios configurados de inmediato
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const pedidoTexto = document.getElementById('txt-pedido').value.trim();
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Filtrar comercios de la BD que coincidan con la categoría elegida
-            const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
+            // Si elige 'todos', muestra los 5. Si no, filtra por categoría elegida
+            const filtrados = categoriaSeleccionada === "todos" 
+                ? comerciosBD 
+                : comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
             
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios locales registrados para esta categoría.</div>";
-                hablarTexto("No se encontraron resultados locales.");
-                return;
-            }
-            
-            // Renderizar resultados en el HTML
             contenedorResultados.innerHTML = "";
+            
             filtrados.forEach(comercio => {
                 const item = document.createElement('div');
                 item.className = "result-item";
                 
-                // Definir etiqueta según el tipo
-                const badge = comercio.tipo === 'suscrito' 
-                    ? `<span class="badge-suscrito">✓ Local Verificado</span>` 
+                const queryBusqueda = encodeURIComponent(`${comercio.nombre} Chorrillos`);
+                const enlaceGoogle = `https://google.com{queryBusqueda}`;
+                
+                item.innerHTML = `
+                    <span class="badge-suscrito">✓ Local Verificado</span>
+                    <strong>${comercio.nombre}</strong>
+                    <div class="local-info">${comercio.info}</div>
+                    <a href="${enlaceGoogle}" target="_blank" class="btn-google-link">🗺️ Ver en Google Maps</a>
+                `;
+                contenedorResultados.appendChild(item);
+            });
+            
