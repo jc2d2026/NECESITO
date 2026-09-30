@@ -80,7 +80,7 @@
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
-    <main>
+    <main id="contenedor-principal">
         <!-- Ubicación Fija Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
@@ -128,7 +128,7 @@
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
@@ -142,74 +142,67 @@
             }
         }
 
-        // VOZ DE UBICACIÓN AL PRIMER TOQUE (Salto de la restricción del celular)
+        // CONTROLADOR DE AUDIO SEGURO AL PRIMER TOQUE
+        // Cuando el usuario presiona cualquier parte de la pantalla, la app se activa y le habla
         let vozInicialActivada = false;
         document.body.addEventListener('click', function() {
             if (!vozInicialActivada) {
-                hablarTexto("Aplicación Necesito activa. Su ubicación actual está fijada en: Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito activa. Su ubicación actual está establecida en Las Antaras 1 8 8, Chorrillos.");
                 vozInicialActivada = true;
             }
         });
 
-        // LÓGICA DE MICRÓFONOS DEFINITIVA (Sintaxis indexada oficial reparada)
+        // LÓGICA DE MICRÓFONOS CORREGIDA (Uso de índices oficiales [0][0] exigidos por JavaScript)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
 
-                // Micrófono 1: Ubicación
+                // Configuración Micrófono de Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
                 recUbicacion.continuous = false;
                 recUbicacion.interimResults = false;
                 
                 document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Evita conflictos con el toque de la pantalla completa
                     recUbicacion.start();
-                    hablarTexto("Diga su dirección actual.");
+                    hablarTexto("Escuchando su nueva dirección.");
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // SINTAXIS OFICIAL REPARADA
+                    // CORRECCIÓN ABSOLUTA CON ÍNDICES DE MATRIZ [0][0]
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
-                    hablarTexto("Dirección cambiada a " + textoDictado);
+                    hablarTexto("Dirección cambiada.");
                 };
 
-                // Micrófono 2: Pedido
+                // Configuración Micrófono de Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
                 recPedido.continuous = false;
                 recPedido.interimResults = false;
                 
                 document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Evita conflictos con el toque de la pantalla completa
                     recPedido.start();
-                    hablarTexto("¿Qué ayuda necesita?");
+                    hablarTexto("Diga su pedido.");
                 });
                 
                 recPedido.onresult = function(event) {
-                    // SINTAXIS OFICIAL REPARADA
+                    // CORRECCIÓN ABSOLUTA CON ÍNDICES DE MATRIZ [0][0]
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
-                    hablarTexto("Entendido: " + textoDictado);
+                    hablarTexto("Pedido anotado.");
                 };
             }
         } catch(error) {
-            console.error("Los servicios de voz no se pudieron inicializar:", error);
+            console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // CONTROLADOR DEL BOTÓN ENVIAR: Despliega las tarjetas sin colapsar el hilo
+        // CONTROLADOR DEL BOTÓN ENVIAR: Despliega las tarjetas de Chorrillos limpiamente
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Filtrar comercios locales
+            // Filtrar los comercios del arreglo según el menú desplegable
             const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
-            contenedorResultados.innerHTML = "";
-            
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta categoría.</div>";
-                hablarTexto("No hay locales registrados para esta necesidad.");
-                return;
-            }
-
