@@ -87,7 +87,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Real para asegurar el ratio de Chorrillos -->
+        <!-- Ubicación Fija Real -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -169,7 +169,7 @@
             }
         }
 
-        // RECONOCIMIENTO DE VOZ REPARADO PLANO
+        // RECONOCIMIENTO DE VOZ REPARADO Y CONECTADO
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -180,37 +180,40 @@
                     try {
                         reconocimiento.start();
                         hablarTexto("Escuchando su solicitud.");
-                        reconocimiento.onresult = function(event) {
-                            var resultadoVoz = event.results[0][0].transcript;
-                            document.getElementById('txt-pedido').value = resultadoVoz;
-                            hablarTexto("Registrado " + resultadoVoz);
-                        };
-                    } catch(e) { 
-                        hablarTexto("Por favor use el teclado.");
-                    }
+                    } catch(e) { console.log("Reconocimiento ya activo", e); }
                 });
-            }
-        } catch(e) { console.log("Canal de audio inactivo."); }
 
-        // FUNCIÓN PARA CALCULAR LA DISTANCIA ENTRE DOS PUNTOS (Fórmula Haversine)
-        function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radio de la Tierra en Km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      document.getElementById('txt-ubicacion').value && 
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Retorna la distancia en kilómetros
+                reconocimiento.onresult = function(event) {
+                    const textoEscuchado = event.results[0][0].transcript;
+                    document.getElementById('txt-pedido').value = textoEscuchado;
+                    hablarTexto("Entendido: " + textoEscuchado);
+                };
+            }
+        } catch(e) {
+            console.log("El navegador no soporta SpeechRecognition", e);
         }
 
-        // ACCIÓN PRINCIPAL: PROCESAR BÚSQUEDA Y MOSTRAR RESULTADOS
+        // ACCIÓN DEL BOTÓN ENVIAR: Filtrar Base de Datos y Pintar Resultados
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const pedidoTexto = document.getElementById('txt-pedido').value.trim();
-            const contenedorLista = document.getElementById('lista-resultados');
+            const contenedorResultados = document.getElementById('lista-resultados');
             
-            contenedorLista.innerHTML = ""; // Limpiar pantalla anterior
+            // Filtrar comercios de la BD que coincidan con la categoría elegida
+            const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
             
-            // Filtrar comercios por la categoría seleccionada
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios locales registrados para esta categoría.</div>";
+                hablarTexto("No se encontraron resultados locales.");
+                return;
+            }
+            
+            // Renderizar resultados en el HTML
+            contenedorResultados.innerHTML = "";
+            filtrados.forEach(comercio => {
+                const item = document.createElement('div');
+                item.className = "result-item";
+                
+                // Definir etiqueta según el tipo
+                const badge = comercio.tipo === 'suscrito' 
+                    ? `<span class="badge-suscrito">✓ Local Verificado</span>` 
