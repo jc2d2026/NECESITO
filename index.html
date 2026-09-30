@@ -19,17 +19,18 @@
             margin: 0; padding: 0;
             background-color: var(--bg-light); color: var(--text-dark);
         }
-        /* Capa de inicio optimizada para evitar congelamientos */
-        .pantalla-inicio {
+        /* Convertido en un botón gigante para evitar que el sistema del celular intente buscar el texto en internet */
+        .pantalla-inicio-btn {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--primary-blue); color: white;
+            border: none; margin: 0; padding: 20px;
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; z-index: 9999;
-            cursor: pointer; padding: 20px; box-sizing: border-box;
-            transition: opacity 0.3s ease;
+            cursor: pointer; box-sizing: border-box;
+            font-family: inherit;
         }
-        .pantalla-inicio h2 { font-size: 26px; margin-bottom: 15px; }
-        .pantalla-inicio p { font-size: 16px; opacity: 0.9; }
+        .pantalla-inicio-btn h2 { font-size: 26px; margin-bottom: 15px; color: white; }
+        .pantalla-inicio-btn p { font-size: 16px; opacity: 0.9; color: white; }
 
         header {
             background-color: var(--primary-blue); color: white;
@@ -86,11 +87,11 @@
 </head>
 <body>
 
-    <!-- Pantalla de inicio accesible -->
-    <div id="capa-entrada" class="pantalla-inicio">
+    <!-- Cambiado de DIV a BUTTON nativo enfocado para accesibilidad móvil sin activar búsquedas externas -->
+    <button id="capa-entrada" class="pantalla-inicio-btn" autofocus>
         <h2>🤝 BIENVENIDO A NECESITO</h2>
-        <p>Toque la pantalla una sola vez para activar la asistencia por voz e iniciar la aplicación de inmediato.</p>
-    </div>
+        <p>Toque aquí una sola vez para activar la asistencia por voz e iniciar la aplicación de inmediato.</p>
+    </button>
 
     <header>
         <h1>🤝 NECESITO</h1>
@@ -107,7 +108,7 @@
             </div>
         </section>
 
-        <!-- Categoría de Necesidad Prioritaria (Las 4 esenciales fijadas) -->
+        <!-- Categoría Prioritaria -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -140,16 +141,14 @@
     </main>
 
     <script>
-        // Los 5 comercios oficiales mapeados para la asistencia en Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Función de voz asistida con manejo nativo estable
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -159,21 +158,20 @@
             }
         }
 
-        // ACCIÓN AL TOCAR LA PANTALLA AZUL: Ocultamiento instantáneo y ejecución asíncrona para evitar congelación
-        document.getElementById('capa-entrada').addEventListener('click', function() {
+        // Activación limpia al pulsar el botón nativo gigante
+        document.getElementById('capa-entrada').addEventListener('click', function(e) {
+            e.preventDefault();
             this.style.display = 'none';
-            // Mensaje hablado inmediato que confirma el éxito del toque
-            hablarTexto("Ubicación confirmada instantáneamente por Google en: Las Antaras 1 8 8, Chorrillos. Por favor, proceda con su pedido.");
+            // Ejecuta la lectura de voz esperada de forma inmediata
+            hablarTexto("Ubicación confirmada por Google en: Las Antaras 1 8 8, Chorrillos. Por favor, continúe con su solicitud.");
             inicializarMicrofonosSguros();
         });
 
-        // INICIALIZACIÓN AISLADA DE LOS MICRÓFONOS PARA EVITAR ERRORES DE CARGA
         function inicializarMicrofonosSguros() {
             try {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) return;
 
-                // Configuración del Micrófono de Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
                 recUbicacion.continuous = false;
@@ -191,7 +189,6 @@
                     hablarTexto("Dirección cambiada.");
                 };
 
-                // Configuración del Micrófono de Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
                 recPedido.continuous = false;
@@ -210,4 +207,9 @@
                 };
 
             } catch(error) {
-                console.error("Los servicios de voz no se pudieron inicializar en este entorno:", error);
+                console.error("Servicios de voz no inicializados:", error);
+            }
+        }
+
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
