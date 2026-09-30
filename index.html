@@ -36,7 +36,6 @@
             border-radius: 12px; font-size: 16px; outline: none;
             background-color: #ffffff; color: var(--text-dark);
         }
-        /* Botones de micrófono grandes y accesibles */
         .btn-voice {
             background-color: #dbeafe; border: 2px solid var(--primary-blue);
             border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer;
@@ -76,14 +75,13 @@
 </head>
 <body>
 
-    <!-- Encabezado con el nombre corregido e inclusivo solicitado -->
     <header>
         <h1>🤝 INGRESAR A LA APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <main>
-        <!-- Ubicación Fija Inmediata de Chorrillos -->
+        <!-- Ubicación Fija Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -92,7 +90,7 @@
             </div>
         </section>
 
-        <!-- Las 4 Categorías Esenciales Obligatorias -->
+        <!-- Categorías Prioritarias -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -117,7 +115,7 @@
             🚀 ENVIAR SOLICITUD
         </button>
 
-        <!-- Panel de Resultados de Auxilio -->
+        <!-- Panel de Resultados -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -125,12 +123,12 @@
     </main>
 
     <script>
-        // Los 5 comercios oficiales asignados estratégicamente a Chorrillos
+        // Base de datos oficial de los comercios para Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
@@ -144,7 +142,16 @@
             }
         }
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA AL 100% (Extracción indexada oficial para Android Chrome)
+        // VOZ DE UBICACIÓN AL PRIMER TOQUE (Salto de la restricción del celular)
+        let vozInicialActivada = false;
+        document.body.addEventListener('click', function() {
+            if (!vozInicialActivada) {
+                hablarTexto("Aplicación Necesito activa. Su ubicación actual está fijada en: Las Antaras 1 8 8, Chorrillos.");
+                vozInicialActivada = true;
+            }
+        });
+
+        // LÓGICA DE MICRÓFONOS DEFINITIVA (Sintaxis indexada oficial reparada)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -155,15 +162,17 @@
                 recUbicacion.continuous = false;
                 recUbicacion.interimResults = false;
                 
-                document.getElementById('btn-voz-ubicacion').addEventListener('click', function() {
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
+                    e.stopPropagation();
                     recUbicacion.start();
                     hablarTexto("Diga su dirección actual.");
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    const textoDictado = event.results[0][0].transcript; // SINTAXIS INDICE REPARADA PARA MÓVILES
+                    // SINTAXIS OFICIAL REPARADA
+                    const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
-                    hablarTexto("Dirección actualizada.");
+                    hablarTexto("Dirección cambiada a " + textoDictado);
                 };
 
                 // Micrófono 2: Pedido
@@ -172,38 +181,35 @@
                 recPedido.continuous = false;
                 recPedido.interimResults = false;
                 
-                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
+                    e.stopPropagation();
                     recPedido.start();
                     hablarTexto("¿Qué ayuda necesita?");
                 });
                 
                 recPedido.onresult = function(event) {
-                    const textoDictado = event.results[0][0].transcript; // SINTAXIS INDICE REPARADA PARA MÓVILES
+                    // SINTAXIS OFICIAL REPARADA
+                    const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
-                    hablarTexto("Pedido anotado.");
+                    hablarTexto("Entendido: " + textoDictado);
                 };
             }
         } catch(error) {
-            console.error("Los servicios de voz no se pudieron inicializar de manera automática:", error);
+            console.error("Los servicios de voz no se pudieron inicializar:", error);
         }
 
-        // CONTROLADOR DEL BOTÓN ENVIAR: Filtra y renderiza los comercios de inmediato
+        // CONTROLADOR DEL BOTÓN ENVIAR: Despliega las tarjetas sin colapsar el hilo
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
+            // Filtrar comercios locales
             const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
             contenedorResultados.innerHTML = "";
             
             if (filtrados.length === 0) {
                 contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta categoría.</div>";
-                hablarTexto("No hay locales para esta necesidad.");
+                hablarTexto("No hay locales registrados para esta necesidad.");
                 return;
             }
 
-            filtrados.forEach(comercio => {
-                const item = document.createElement('div');
-                item.className = "result-item";
-                
-                const queryBusqueda = encodeURIComponent(`${comercio.nombre} Chorrillos`);
-                const enlaceGoogle = `https://google.com{queryBusqueda}`;
