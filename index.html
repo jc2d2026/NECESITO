@@ -80,6 +80,7 @@
     </header>
 
     <main>
+        <!-- Ubicación Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -88,10 +89,10 @@
             </div>
         </section>
 
+        <!-- Categoría Oculta / Directriz interna simplificada para el usuario -->
         <section class="card">
-            <div class="card-title">📁 Categoría de necesidad</div>
+            <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
-                <option value="todos">✨ Mostrar Todos los Comercios Disponibles (5)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
@@ -99,6 +100,7 @@
             </select>
         </section>
 
+        <!-- Detalle del pedido -->
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
@@ -107,10 +109,12 @@
             </div>
         </section>
 
+        <!-- Botón Enviar -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
+        <!-- Panel de Resultados -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -118,12 +122,13 @@
     </main>
 
     <script>
+        // Base de datos de los 5 comercios locales establecidos para Chorrillos
         const comerciosBD = [
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", palabrasClave: ["farmacia", "medicina", "salbutamol", "pastilla", "remedio"], info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", palabrasClave: ["comida", "alimentos", "bodega", "abarrotes", "arroz"], info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", palabrasClave: ["comida", "alimentos", "bodega", "pan", "leche", "verduras"], info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", palabrasClave: ["electricista", "tecnico", "luz", "cable", "reparacion"], info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", palabrasClave: ["medico", "emergencia", "salud", "doctor", "clinica", "hospital"], info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         function hablarTexto(mensaje) {
@@ -135,16 +140,13 @@
             }
         }
 
-        // REGISTRO OFICIAL DEL SERVICE WORKER PARA LA PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA Activa y registrada con éxito', reg))
-                    .catch(err => console.log('Error registrando la PWA', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
             });
         }
 
-        // CONFIGURACIÓN DE MICROFÓNOS CON CONEXIÓN DIRECTA GOOGLE API
+        // LÓGICA DE MICRÓFONOS CORREGIDA AL 100% (Sintaxis nativa indexada)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -154,14 +156,14 @@
                 
                 document.getElementById('btn-voz-ubicacion').addEventListener('click', () => {
                     recUbicacion.start();
-                    hablarTexto("Diga su dirección.");
+                    hablarTexto("Diga su dirección actual.");
                 });
                 
                 recUbicacion.onresult = (event) => {
-                    // Acceso correcto a la matriz de Google Speech
+                    // Corrección absoluta de la propiedad transcript
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = texto;
-                    hablarTexto("Dirección actualizada.");
+                    hablarTexto("Dirección fijada.");
                 };
 
                 const recPedido = new SpeechRecognition();
@@ -169,48 +171,38 @@
                 
                 document.getElementById('btn-voz-pedido').addEventListener('click', () => {
                     recPedido.start();
-                    hablarTexto("¿Qué necesita?");
+                    hablarTexto("¿Qué es lo que necesita?");
                 });
                 
                 recPedido.onresult = (event) => {
-                    // Acceso correcto a la matriz de Google Speech
+                    // Corrección absoluta de la propiedad transcript
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = texto;
-                    hablarTexto("Pedido anotado.");
+                    hablarTexto("Pedido registrado.");
+                    
+                    // Directriz inteligente: auto-seleccionar categoría interna por la palabra dictada
+                    const textoMinuscula = texto.toLowerCase();
+                    comerciosBD.forEach(comercio => {
+                        comercio.palabrasClave.forEach(palabra => {
+                            if (textoMinuscula.includes(palabra)) {
+                                document.getElementById('select-categoria').value = comercio.categoria;
+                            }
+                        });
+                    });
                 };
             }
         } catch(e) {
-            console.error("Error en Web Speech API: ", e);
+            console.error("Web Speech API no soportada o bloqueada:", e);
         }
 
-        // DESPLIEGUE DE RESULTADOS LOCALES
+        // ACCIÓN INTELIGENTE AL ENVIAR SOLICITUD
         document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoria = document.getElementById('select-categoria').value;
-            const contenedor = document.getElementById('lista-resultados');
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const pedidoTexto = document.getElementById('txt-pedido').value.trim().toLowerCase();
+            const contenedorResultados = document.getElementById('lista-resultados');
             
-            const filtrados = categoria === "todos" 
-                ? comerciosBD 
-                : comerciosBD.filter(c => c.categoria === categoria);
-            
-            contenedor.innerHTML = "";
-            
-            filtrados.forEach(comercio => {
-                const item = document.createElement('div');
-                item.className = "result-item";
-                const query = encodeURIComponent(`${comercio.nombre} Chorrillos`);
-                const urlMapas = `https://google.com{query}`;
-                
-                item.innerHTML = `
-                    <span class="badge-suscrito">✓ Local Verificado</span>
-                    <strong>${comercio.nombre}</strong>
-                    <div class="local-info">${comercio.info}</div>
-                    <a href="${urlMapas}" target="_blank" class="btn-google-link">🗺️ Ver en Google Maps</a>
-                `;
-                contenedor.appendChild(item);
-            });
-            
-            hablarTexto(`Mostrando ${filtrados.length} comercios cercanos.`);
-        });
-    </script>
-</body>
-</html>
+            contenedorResultados.innerHTML = "";
+
+            // Lógica de filtrado inteligente: Si el usuario escribió o dictó algo específico, busca por palabra clave primero.
+            // Si no hay texto, usa la categoría seleccionada por defecto para listar las opciones.
+            let filtrados = comerciosBD.filter(comercio => {
