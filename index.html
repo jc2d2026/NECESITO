@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
-    <!-- CONEXIÓN OBLIGATORIA CON EL MANIFIESTO PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     <style>
@@ -81,16 +80,14 @@
     </header>
 
     <main>
-        <!-- Ubicación Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" placeholder="Escribe o dicta tu dirección">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos">
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
         </section>
 
-        <!-- Categoría de Negocio -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad</div>
             <select class="input-control" id="select-categoria">
@@ -102,7 +99,6 @@
             </select>
         </section>
 
-        <!-- Detalle del pedido -->
         <section class="card">
             <div class="card-title">📝 Detalle de tu pedido</div>
             <div class="input-group">
@@ -111,12 +107,10 @@
             </div>
         </section>
 
-        <!-- Botón Enviar -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
-        <!-- Panel de Resultados -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -124,7 +118,6 @@
     </main>
 
     <script>
-        // Base de Datos Estructurada: Contiene exactamente los 5 comercios para Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
@@ -133,7 +126,6 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Función de salida de Voz Asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -143,73 +135,82 @@
             }
         }
 
-        // LÓGICA DE MICRÓFONOS REPARADA CON LA SINTAXIS CORRECTA ([0][0].transcript)
+        // REGISTRO OFICIAL DEL SERVICE WORKER PARA LA PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA Activa y registrada con éxito', reg))
+                    .catch(err => console.log('Error registrando la PWA', err));
+            });
+        }
+
+        // CONFIGURACIÓN DE MICROFÓNOS CON CONEXIÓN DIRECTA GOOGLE API
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
                 
-                // Configuración Micrófono 1: Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
-                recUbicacion.interimResults = false;
                 
-                document.getElementById('btn-voz-ubicacion').addEventListener('click', function() {
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', () => {
                     recUbicacion.start();
-                    hablarTexto("Diga su dirección actual.");
+                    hablarTexto("Diga su dirección.");
                 });
                 
-                recUbicacion.onresult = function(event) {
-                    // CORRECCIÓN CLAVE DE MATRIZ
+                recUbicacion.onresult = (event) => {
+                    // Acceso correcto a la matriz de Google Speech
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = texto;
-                    hablarTexto("Dirección fijada.");
+                    hablarTexto("Dirección actualizada.");
                 };
 
-                // Configuración Micrófono 2: Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
-                recPedido.interimResults = false;
                 
-                document.getElementById('btn-voz-pedido').addEventListener('click', function() {
+                document.getElementById('btn-voz-pedido').addEventListener('click', () => {
                     recPedido.start();
-                    hablarTexto("¿Qué es lo que necesita?");
+                    hablarTexto("¿Qué necesita?");
                 });
                 
-                recPedido.onresult = function(event) {
-                    // CORRECCIÓN CLAVE DE MATRIZ
+                recPedido.onresult = (event) => {
+                    // Acceso correcto a la matriz de Google Speech
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = texto;
-                    hablarTexto("Pedido registrado.");
+                    hablarTexto("Pedido anotado.");
                 };
             }
         } catch(e) {
-            console.error("El navegador bloqueó o no soporta Web Speech API:", e);
+            console.error("Error en Web Speech API: ", e);
         }
 
-        // CONTROLADOR DEL BOTÓN ENVIAR: Despliega la lista de los 5 comercios sin fallos
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const contenedorResultados = document.getElementById('lista-resultados');
+        // DESPLIEGUE DE RESULTADOS LOCALES
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const categoria = document.getElementById('select-categoria').value;
+            const contenedor = document.getElementById('lista-resultados');
             
-            // Filtrar los 5 comercios según selección o listarlos todos por defecto
-            const filtrados = categoriaSeleccionada === "todos" 
+            const filtrados = categoria === "todos" 
                 ? comerciosBD 
-                : comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
+                : comerciosBD.filter(c => c.categoria === categoria);
             
-            contenedorResultados.innerHTML = "";
+            contenedor.innerHTML = "";
             
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No hay comercios disponibles para esta categoría específica.</div>";
-                hablarTexto("Sin resultados.");
-                return;
-            }
-
             filtrados.forEach(comercio => {
                 const item = document.createElement('div');
                 item.className = "result-item";
-                
-                const queryBusqueda = encodeURIComponent(`${comercio.nombre} Chorrillos`);
-                const enlaceGoogle = `https://google.com{queryBusqueda}`;
+                const query = encodeURIComponent(`${comercio.nombre} Chorrillos`);
+                const urlMapas = `https://google.com{query}`;
                 
                 item.innerHTML = `
                     <span class="badge-suscrito">✓ Local Verificado</span>
+                    <strong>${comercio.nombre}</strong>
+                    <div class="local-info">${comercio.info}</div>
+                    <a href="${urlMapas}" target="_blank" class="btn-google-link">🗺️ Ver en Google Maps</a>
+                `;
+                contenedor.appendChild(item);
+            });
+            
+            hablarTexto(`Mostrando ${filtrados.length} comercios cercanos.`);
+        });
+    </script>
+</body>
+</html>
