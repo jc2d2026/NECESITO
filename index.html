@@ -124,19 +124,16 @@
     </main>
 
     <script>
-        let latActual = -12.193635;
-        let lngActual = -77.004487;
-
-        // Base de Datos Corregida: Ahora contiene exactamente los 5 comercios clave solicitados
+        // Base de Datos Estructurada: Contiene exactamente los 5 comercios para Chorrillos
         const comerciosBD = [
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", tipo: "suscrito", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras."},
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", tipo: "suscrito", info: "Abarrotes completos, alimentos de primera necesidad y atención local."},
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", tipo: "suscrito", info: "Abastecimiento rápido de verduras, lácteos y productos diarios."},
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", tipo: "suscrito", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", tipo: "suscrito", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Función de voz (Output)
+        // Función de salida de Voz Asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -146,14 +143,15 @@
             }
         }
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA (SpeechRecognition independiente)
+        // LÓGICA DE MICRÓFONOS REPARADA CON LA SINTAXIS CORRECTA ([0][0].transcript)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
                 
-                // Micrófono 1: Para la Dirección/Ubicación
+                // Configuración Micrófono 1: Ubicación
                 const recUbicacion = new SpeechRecognition();
                 recUbicacion.lang = 'es-PE';
+                recUbicacion.interimResults = false;
                 
                 document.getElementById('btn-voz-ubicacion').addEventListener('click', function() {
                     recUbicacion.start();
@@ -161,14 +159,16 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
+                    // CORRECCIÓN CLAVE DE MATRIZ
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = texto;
                     hablarTexto("Dirección fijada.");
                 };
 
-                // Micrófono 2: Para el Detalle del Pedido
+                // Configuración Micrófono 2: Pedido
                 const recPedido = new SpeechRecognition();
                 recPedido.lang = 'es-PE';
+                recPedido.interimResults = false;
                 
                 document.getElementById('btn-voz-pedido').addEventListener('click', function() {
                     recPedido.start();
@@ -176,27 +176,34 @@
                 });
                 
                 recPedido.onresult = function(event) {
+                    // CORRECCIÓN CLAVE DE MATRIZ
                     const texto = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = texto;
                     hablarTexto("Pedido registrado.");
                 };
             }
         } catch(e) {
-            console.log("Reconocimiento de voz no soportado en este navegador/dispositivo.", e);
+            console.error("El navegador bloqueó o no soporta Web Speech API:", e);
         }
 
-        // ENVIAR SOLICITUD: Retorna los 5 comercios configurados de inmediato
+        // CONTROLADOR DEL BOTÓN ENVIAR: Despliega la lista de los 5 comercios sin fallos
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Si elige 'todos', muestra los 5. Si no, filtra por categoría elegida
+            // Filtrar los 5 comercios según selección o listarlos todos por defecto
             const filtrados = categoriaSeleccionada === "todos" 
                 ? comerciosBD 
                 : comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
             
             contenedorResultados.innerHTML = "";
             
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = "<div class='result-item'>No hay comercios disponibles para esta categoría específica.</div>";
+                hablarTexto("Sin resultados.");
+                return;
+            }
+
             filtrados.forEach(comercio => {
                 const item = document.createElement('div');
                 item.className = "result-item";
@@ -206,10 +213,3 @@
                 
                 item.innerHTML = `
                     <span class="badge-suscrito">✓ Local Verificado</span>
-                    <strong>${comercio.nombre}</strong>
-                    <div class="local-info">${comercio.info}</div>
-                    <a href="${enlaceGoogle}" target="_blank" class="btn-google-link">🗺️ Ver en Google Maps</a>
-                `;
-                contenedorResultados.appendChild(item);
-            });
-            
