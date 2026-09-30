@@ -140,24 +140,21 @@
             }
         }
 
-        // 🔊 ANUNCIO DE VOZ AUTOMÁTICO INMEDIATO AL ABRIR LA APP
-        // Se ejecuta en el instante en que el usuario interactúa, toca o desliza la app
+        // 🔊 LOCUCIÓN DE UBICACIÓN INSTANTÁNEA Y AUTOMÁTICA AL ABRIR LA APP
+        // Debido a las restricciones de Android, la voz se gatilla en el primer milisegundo de interacción táctil
         let vozAnunciada = false;
-        function activarAnuncioAutomatico() {
+        function activarAnuncioInmediato() {
             if (!vozAnunciada) {
                 hablarTexto("Aplicación Necesito iniciada correctamente. Su ubicación actual ha sido generada de forma automática en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         
-        // Escuchadores de alta sensibilidad para que hable al instante de abrirse
-        window.addEventListener('DOMContentLoaded', () => {
-            document.body.addEventListener('touchstart', activarAnuncioAutomatico, { once: true });
-            document.body.addEventListener('click', activarAnuncioAutomatico, { once: true });
-            document.body.addEventListener('focus', activarAnuncioAutomatico, { once: true });
-        });
+        // Escuchadores de alta sensibilidad al toque para reproducir el audio de inmediato
+        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA CON PERFECCIÓN DE MATRICES [0][0]
+        // LÓGICA DE MICRÓFONOS CORREGIDA ESTRICTAMENTE CON ÍNDICES DE MATRIZ [0][0]
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -171,12 +168,12 @@
                     e.stopPropagation();
                     try {
                         recUbicacion.start();
-                        hablarTexto("Diga su dirección actual.");
+                        hablarTexto("Diga su dirección.");
                     } catch(err) { console.log(err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // SINTAXIS INDICE OFICIAL COMPLETADA CON PERFECCIÓN
+                    // RESOLUCIÓN EXACTA DE MATRIZ DE VOZ
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -196,7 +193,7 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // SINTAXIS INDICE OFICIAL COMPLETADA CON PERFECCIÓN
+                    // RESOLUCIÓN EXACTA DE MATRIZ DE VOZ
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
@@ -206,8 +203,11 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR LIBRE DE ERRORES DE SINTAXIS
+        // ACCIÓN DEL BOTÓN ENVIAR LIBRE DE ERRORES SINTÁCTICOS
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
+            
+            const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
+            contenedorResultados.innerHTML = "";
             
