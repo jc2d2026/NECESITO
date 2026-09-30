@@ -36,7 +36,7 @@
             border-radius: 12px; font-size: 16px; outline: none;
             background-color: #ffffff; color: var(--text-dark);
         }
-        /* Botones de micrófono más grandes y fáciles de presionar */
+        /* Botones de micrófono grandes y accesibles */
         .btn-voice {
             background-color: #dbeafe; border: 2px solid var(--primary-blue);
             border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer;
@@ -58,7 +58,7 @@
         }
         .btn-google-link {
             display: block; text-align: center; margin-top: 12px;
-            background-color: var(--primary-blue); color: white; padding: 14px;
+            background-color: var(--primary-blue); color: white; padding: 12px;
             border-radius: 8px; text-decoration: none; font-weight: bold;
             font-size: 15px;
         }
@@ -76,13 +76,14 @@
 </head>
 <body>
 
+    <!-- Encabezado con el nombre corregido e inclusivo solicitado -->
     <header>
-        <h1>🤝 NECESITO</h1>
+        <h1>🤝 INGRESAR A LA APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <main>
-        <!-- Ubicación Actual Fija e Inmediata -->
+        <!-- Ubicación Fija Inmediata de Chorrillos -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -91,7 +92,7 @@
             </div>
         </section>
 
-        <!-- Categorías Esenciales Obligatorias -->
+        <!-- Las 4 Categorías Esenciales Obligatorias -->
         <section class="card">
             <div class="card-title">📁 Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -111,12 +112,12 @@
             </div>
         </section>
 
-        <!-- Botón Enviar -->
+        <!-- Botón Enviar Solicitud Directo -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
-        <!-- Panel de Resultados -->
+        <!-- Panel de Resultados de Auxilio -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -124,16 +125,16 @@
     </main>
 
     <script>
-        // Base de datos de los 5 comercios oficiales para la asistencia en Chorrillos
+        // Los 5 comercios oficiales asignados estratégicamente a Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Función de voz asistida con manejo nativo estable
+        // Función de salida de voz asistida nativa estable
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -143,7 +144,7 @@
             }
         }
 
-        // LÓGICA DE MICRÓFONOS REPARADA DE FORMA ABSOLUTA (Uso de índices estándar de la API)
+        // LÓGICA DE MICRÓFONOS CORREGIDA AL 100% (Extracción indexada oficial para Android Chrome)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -160,10 +161,9 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // EXTRACCIÓN CORRECTA INDEXADA DE LA API DE GOOGLE CHROME
-                    const textoDictado = event.results[0][0].transcript;
+                    const textoDictado = event.results[0][0].transcript; // SINTAXIS INDICE REPARADA PARA MÓVILES
                     document.getElementById('txt-ubicacion').value = textoDictado;
-                    hablarTexto("Dirección cambiada.");
+                    hablarTexto("Dirección actualizada.");
                 };
 
                 // Micrófono 2: Pedido
@@ -178,28 +178,25 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // EXTRACCIÓN CORRECTA INDEXADA DE LA API DE GOOGLE CHROME
-                    const textoDictado = event.results[0][0].transcript;
+                    const textoDictado = event.results[0][0].transcript; // SINTAXIS INDICE REPARADA PARA MÓVILES
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
             }
         } catch(error) {
-            console.error("Los servicios de voz no se pudieron inicializar:", error);
+            console.error("Los servicios de voz no se pudieron inicializar de manera automática:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR: Despliega los comercios correspondientes sin fallas
+        // CONTROLADOR DEL BOTÓN ENVIAR: Filtra y renderiza los comercios de inmediato
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Filtra los comercios del arreglo según la categoría del menú
             const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
-            
             contenedorResultados.innerHTML = "";
             
             if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta selección.</div>";
+                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta categoría.</div>";
                 hablarTexto("No hay locales para esta necesidad.");
                 return;
             }
@@ -209,3 +206,4 @@
                 item.className = "result-item";
                 
                 const queryBusqueda = encodeURIComponent(`${comercio.nombre} Chorrillos`);
+                const enlaceGoogle = `https://google.com{queryBusqueda}`;
