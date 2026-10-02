@@ -81,7 +81,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Actual -->
+        <!-- Ubicación Generada de Forma Automática -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -110,12 +110,12 @@
             </div>
         </section>
 
-        <!-- Botón Enviar Solicitud -->
+        <!-- Botón Enviar Solicitud Directo -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
-        <!-- Panel de Resultados -->
+        <!-- Panel de Resultados de Auxilio -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -140,8 +140,7 @@
             }
         }
 
-        // 🔊 LOCUCIÓN DE UBICACIÓN INSTANTÁNEA Y AUTOMÁTICA AL ABRIR LA APP
-        // Debido a las restricciones de Android, la voz se gatilla en el primer milisegundo de interacción táctil
+        // 🔊 ANUNCIO DE VOZ AUTOMÁTICO AL ABRIR LA APP
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -149,12 +148,10 @@
                 vozAnunciada = true;
             }
         }
-        
-        // Escuchadores de alta sensibilidad al toque para reproducir el audio de inmediato
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA ESTRICTAMENTE CON ÍNDICES DE MATRIZ [0][0]
+        // LÓGICA DE MICRÓFONOS CON LOS ÍNDICES CORRECTOS OBLIGATORIOS [0][0]
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -173,7 +170,7 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // RESOLUCIÓN EXACTA DE MATRIZ DE VOZ
+                    // IMPLEMENTACIÓN EXACTA CON DOBLE ÍNDICE NUMÉRICO
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -193,7 +190,7 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // RESOLUCIÓN EXACTA DE MATRIZ DE VOZ
+                    // IMPLEMENTACIÓN EXACTA CON DOBLE ÍNDICE NUMÉRICO
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
@@ -203,7 +200,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR LIBRE DE ERRORES SINTÁCTICOS
+        // ACCIÓN DEL BOTÓN ENVIAR REPARADA CONTRA CONGELAMIENTOS
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -211,3 +208,5 @@
             const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
             contenedorResultados.innerHTML = "";
             
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta necesidad.</div>";
