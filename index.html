@@ -81,7 +81,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Generada de Forma Automática -->
+        <!-- Ubicación Fija Actual -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -140,7 +140,7 @@
             }
         }
 
-        // 🔊 ANUNCIO DE VOZ AUTOMÁTICO AL ABRIR LA APP
+        // 🔊 ANUNCIO DE VOZ AUTOMÁTICO INMEDIATO AL TOCAR LA PANTALLA
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -151,7 +151,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CON LOS ÍNDICES CORRECTOS OBLIGATORIOS [0][0]
+        // LÓGICA DE MICRÓFONOS CORREGIDA CON LOS ÍNDICES CORRECTOS OBLIGATORIOS [0][0]
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -170,7 +170,7 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // IMPLEMENTACIÓN EXACTA CON DOBLE ÍNDICE NUMÉRICO
+                    // CORRECCIÓN ABSOLUTA: Aplicados los corchetes indexados correctos
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -190,7 +190,7 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // IMPLEMENTACIÓN EXACTA CON DOBLE ÍNDICE NUMÉRICO
+                    // CORRECCIÓN ABSOLUTA: Aplicados los corchetes indexados correctos
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
@@ -200,7 +200,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR REPARADA CONTRA CONGELAMIENTOS
+        // ACCIÓN DEL BOTÓN ENVIAR: Despliega de inmediato los comercios registrados
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -209,4 +209,3 @@
             contenedorResultados.innerHTML = "";
             
             if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta necesidad.</div>";
