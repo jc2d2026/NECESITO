@@ -7,9 +7,9 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ SISTEMA DE MAPAS DE ALTA COMPATIBILIDAD FORZADA -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- 🗺️ IMPORTACIÓN DIRECTA Y SEGURA DE MAPAS ACCESIBLES -->
+    <link rel="stylesheet" href="https://unpkg.com" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <style>
         :root { 
@@ -54,7 +54,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
         .contenedor-mapa { 
-            width: 100%; height: 220px; border-radius: 12px; 
+            width: 100%; height: 240px; border-radius: 12px; 
             overflow: hidden; border: 2px solid #cbd5e1; 
             margin-top: 10px; background-color: #cbd5e1; 
             position: relative; z-index: 1; 
@@ -105,6 +105,7 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
+                <!-- Mantener campo bloqueado para guiar al GPS en tiempo real -->
                 <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             </div>
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
@@ -121,7 +122,7 @@
     </main>
 
     <script>
-        // Base de datos integrada de comercios locales para Chorrillos
+        // Base de datos de comercios y servicios locales
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
@@ -130,10 +131,11 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let objetoMapa = null, pinVisual = null;
-        let coordenadasLat = -12.1936699, coordenadasLng = -77.0044871;
+        let objetoMapa = null;
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
 
-        // Reproductor de voz integrado
+        // Lector por voz integrado de asistencia
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -143,25 +145,24 @@
             }
         }
 
-        // Anuncio asistido de seguridad al primer toque en la pantalla
+        // Anuncio inicial de accesibilidad al interactuar con el teléfono
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma segura. Ubicación establecida en: Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación fijada en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CONTROL DE MAPAS LIBRES FORZADOS CON RENDERIZADO GARANTIZADO
+        // 🛰️ GENERACIÓN DEL PLANO Y REDIBUJADO CONTRA EL FONDO GRIS
         function inicializarSistemaRastreo() {
             try {
                 if (objetoMapa !== null) {
                     objetoMapa.remove();
                 }
-                
-                // Creación nativa del mapa
+
                 objetoMapa = L.map('mapa-emergencia', {
                     zoomControl: false,
                     dragging: true,
@@ -173,25 +174,24 @@
                     attribution: '© OpenStreetMap'
                 }).addTo(objetoMapa);
                 
-                // Colocar el marcador físico
-                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
                     .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
                     .openPopup();
 
-                // Forzar el redibujado para eliminar el fondo gris en celulares
+                // Solución al problema de carga gris: fuerza el reajuste visual inmediato
                 setTimeout(() => {
                     objetoMapa.invalidateSize();
-                }, 500);
+                }, 400);
 
             } catch (error) {
-                console.error("Error crítico de mapas:", error);
+                console.error("Error cargando mapas geográficos:", error);
             }
         }
 
-        // Cargar mapa inmediatamente al iniciar la interfaz
+        // Cargar mapa inmediatamente
         window.addEventListener('load', inicializarSistemaRastreo);
 
-        // ACCIÓN DEL BOTÓN VERDE "ENVIAR SOLICITUD"
+        // LOGICA DE BÚSQUEDA AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -199,7 +199,7 @@
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
             if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se encontraron locales de esta categoría cerca.</div>`;
+                contenedorResultados.innerHTML = `<div class="result-item">No se encontraron locales en esta zona.</div>`;
                 hablarTexto("No se encontraron locales cercanos para tu solicitud.");
                 return;
             }
@@ -209,3 +209,4 @@
 
             filtrados.forEach(comercio => {
                 const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
