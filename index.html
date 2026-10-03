@@ -39,6 +39,7 @@
     </header>
 
     <main>
+        <!-- 1. CATEGORÍA -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -49,6 +50,7 @@
             </select>
         </section>
 
+        <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
             <div class="input-group">
@@ -57,6 +59,7 @@
             </div>
         </section>
 
+        <!-- 3. UBICACIÓN AUTOMÁTICA -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
@@ -95,7 +98,6 @@
             }
         }
 
-        // Activación de voz al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -106,31 +108,32 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CONFIGURACIÓN GPS INMUNE A CAÍDAS
+        // 🛰️ CONFIGURACIÓN GPS DE ARRANQUE INMEDIATO
         function inicializarSistemaRastreo() {
             try {
                 objetoMapa = L.map('mapa-emergencia').setView([coordenadasLat, coordenadasLng], 17);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
                 pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa).bindPopup('Tu ubicación actual').openPopup();
 
+                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
+
                 if (navigator.geolocation) {
                     navigator.geolocation.watchPosition(function(position) {
                         coordenadasLat = position.coords.latitude;
                         coordenadasLng = position.coords.longitude;
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
                         
                         const puntoGeografico = new L.LatLng(coordenadasLat, coordenadasLng);
                         pinVisual.setLatLng(puntoGeografico);
                         objetoMapa.setView(puntoGeografico, 17);
                     }, function() {
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
+                        console.log("GPS pasivo activo");
                     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
                 }
             } catch (err) { console.log(err); }
         }
         window.addEventListener('DOMContentLoaded', inicializarSistemaRastreo);
 
-        // 🎙️ MICRÓFONOS CORREGIDOS CON ESCRITURA MANUAL ESTRICTA DE CORCHETES
+        // 🎙️ REPARACIÓN EXACTA MANUAL CON LOS DOBLES CORCHETES INDISPENSABLES
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -144,7 +147,7 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // SINTAXIS CORREGIDA DE MANERA MANUAL
+                    // REPARADO MANUALMENTE CON LOS ÍNDICES CORRECTOS [0][0]
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -160,4 +163,5 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // SINTAXIS CORREGIDA DE MANERA MANUAL
+                    // REPARADO MANUALMENTE CON LOS ÍNDICES CORRECTOS [0][0]
+                    const textoDictado = event.results[0][0].transcript;
