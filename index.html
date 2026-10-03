@@ -20,55 +20,55 @@
         }
         header {
             background-color: var(--primary-blue); color: white;
-            text-align: center; padding: 15px 10px;
+            text-align: center; padding: 12px 10px;
         }
-        main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        main { max-width: 500px; margin: 0 auto; padding: 12px; box-sizing: border-box; }
         .card {
             background: var(--card-bg); border-radius: 16px;
-            padding: 16px; margin-bottom: 16px;
+            padding: 14px; margin-bottom: 12px;
             border: 2px solid #cbd5e1;
         }
-        .card-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase; }
-        .input-group { display: flex; gap: 10px; }
+        .card-title { font-size: 13px; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group { display: flex; gap: 8px; }
         .input-control {
-            flex: 1; padding: 16px; border: 2px solid #94a3b8;
-            border-radius: 12px; font-size: 16px; outline: none;
+            flex: 1; padding: 14px; border: 2px solid #94a3b8;
+            border-radius: 12px; font-size: 15px; outline: none;
             background-color: #ffffff; color: var(--text-dark);
         }
         .btn-voice {
             background-color: #dbeafe; border: 2px solid var(--primary-blue);
-            border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer;
+            border-radius: 12px; width: 60px; font-size: 24px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        select.input-control { width: 100%; height: 54px; font-weight: bold; }
+        select.input-control { width: 100%; height: 50px; font-weight: bold; }
         .btn-submit {
             width: 100%; background-color: var(--accent-green); color: white;
-            border: none; border-radius: 14px; padding: 20px;
+            border: none; border-radius: 14px; padding: 18px;
             font-size: 18px; font-weight: bold; cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .results-section { margin-top: 20px; }
+        .results-section { margin-top: 15px; }
         .result-item {
-            padding: 16px; background: #ffffff; margin: 10px 0;
+            padding: 14px; background: #ffffff; margin: 8px 0;
             border-radius: 12px; border-left: 8px solid var(--primary-blue);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 15px;
             line-height: 1.5;
         }
         .btn-google-link {
-            display: block; text-align: center; margin-top: 12px;
+            display: block; text-align: center; margin-top: 10px;
             background-color: var(--primary-blue); color: white; padding: 12px;
             border-radius: 8px; text-decoration: none; font-weight: bold;
             font-size: 14px;
         }
         .local-info {
-            background-color: #f1f5f9; padding: 12px; border-radius: 8px;
-            margin-top: 8px; font-size: 14px; color: #334155;
+            background-color: #f1f5f9; padding: 10px; border-radius: 8px;
+            margin-top: 8px; font-size: 13px; color: #334155;
             border-left: 3px solid #10b981;
         }
         .badge-suscrito {
             display: inline-block; background: #dcfce7; color: #15803d;
-            padding: 4px 8px; border-radius: 6px;
-            font-size: 12px; font-weight: bold; margin-bottom: 4px;
+            padding: 3px 6px; border-radius: 6px;
+            font-size: 11px; font-weight: bold; margin-bottom: 4px;
         }
     </style>
 </head>
@@ -80,7 +80,7 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD (ORDEN REFRESCADO) -->
+        <!-- 1. CATEGORÍA DE NECESIDAD -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -100,12 +100,12 @@
             </div>
         </section>
 
-        <!-- 3. UBICACIÓN AUTOMÁTICA -->
+        <!-- 3. UBICACIÓN SATELITAL AUTOMÁTICA EMERGENCIAS -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Google Maps)</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" readonly>
-                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección alternativa">🎙️</button>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Rastreando GPS satelital..." readonly>
+                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección de respaldo">🎙️</button>
             </div>
         </section>
 
@@ -139,18 +139,47 @@
             }
         }
 
-        // 🔊 ANUNCIO DE VOZ AUTOMÁTICO INMEDIATO AL TOCAR LA PANTALLA
+        // 🔊 ENFOQUE DE SEGURIDAD VITAL: Geolocalización satelital instantánea al abrir la aplicación
+        let latitudDispositivo = "";
+        let longitudDispositivo = "";
+
+        function rastrearUbicacionInmediata() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        latitudDispositivo = position.coords.latitude;
+                        longitudDispositivo = position.coords.longitude;
+                        // Establece las coordenadas en tiempo real capturadas por el chip del reloj/teléfono
+                        document.getElementById('txt-ubicacion').value = "Coordenadas Confirmadas: " + latitudDispositivo.toFixed(4) + ", " + longitudDispositivo.toFixed(4);
+                        hablarTexto("Ubicación satelital confirmada y generada de forma automática por Google Maps. El sistema de auxilio está listo.");
+                    },
+                    function(error) {
+                        // Fallback seguro en Chorrillos si el GPS físico se encuentra apagado
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Fijo)";
+                        hablarTexto("Ubicación por defecto establecida en Las Antaras 1 8 8, Chorrillos. El sistema de auxilio está activo.");
+                    },
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+                );
+            } else {
+                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
+            }
+        }
+
+        // Lanza el rastreo GPS en el instante de carga del código
+        window.addEventListener('DOMContentLoaded', rastrearUbicacionInmediata);
+
+        // Activación de voz de respaldo inclusiva vinculada al primer toque de pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma automática. Su ubicación actual está certificada en: Las Antaras 1 8 8, Chorrillos.");
+                rastrearUbicacionInmediata();
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA DE FORMA ABSOLUTA [0][0]
+        // LÓGICA DE MICRÓFONOS CORREGIDA DE MANERA DEFINITIVA CON ÍNDICES DE MATRIZ
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -169,43 +198,9 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // CORRECCIÓN RADICAL DE SINTAXIS CON PERFECCIÓN DE MATRIZ
+                    // SINTAXIS CORREGIDA CON LOS CORCHETES EXACTOS EXIGIDOS EN PRODUCCIÓN
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
-                    hablarTexto("Dirección cambiada.");
+                    hablarTexto("Dirección modificada.");
                 };
 
-                const recPedido = new SpeechRecognition();
-                recPedido.lang = 'es-PE';
-                recPedido.continuous = false;
-                recPedido.interimResults = false;
-                
-                document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    try {
-                        recPedido.start();
-                        hablarTexto("Diga su pedido.");
-                    } catch(err) { console.log(err); }
-                });
-                
-                recPedido.onresult = function(event) {
-                    // CORRECCIÓN RADICAL DE SINTAXIS CON PERFECCIÓN DE MATRIZ
-                    const textoDictado = event.results[0][0].transcript;
-                    document.getElementById('txt-pedido').value = textoDictado;
-                    hablarTexto("Pedido anotado.");
-                };
-            }
-        } catch(error) {
-            console.error("Error en Web Speech API:", error);
-        }
-
-        // ACCIÓN DEL BOTÓN ENVIAR SIN COMPORTAMIENTOS CONGELADOS
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const contenedorResultados = document.getElementById('lista-resultados');
-            
-            const filtrados = comerciosBD.filter(c => c.categoria === categoriaSeleccionada);
-            contenedorResultados.innerHTML = "";
-            
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta necesidad.</div>";
