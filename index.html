@@ -48,11 +48,11 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        /* 🗺️ ESTILOS DEL MAPA VISUAL INTEGRADO ESTILO WHATSAPP */
+        /* 🗺️ CONTENEDOR DEL MAPA ESTILO WHATSAPP EN TIEMPO REAL */
         .contenedor-mapa {
             width: 100%; height: 220px; border-radius: 12px;
             overflow: hidden; border: 2px solid #cbd5e1; margin-top: 10px;
-            background-color: #e5e7eb; position: relative;
+            background-color: #e5e7eb;
         }
         .contenedor-mapa iframe { width: 100%; height: 100%; border: none; }
 
@@ -109,27 +109,26 @@
             </div>
         </section>
 
-        <!-- 3. MI UBICACIÓN AUTOMÁTICA CON MAPA INTEGRADO -->
+        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Google Maps)</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Rastreando GPS satelital..." readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección de respaldo">🎙️</button>
             </div>
             
-            <!-- Vista de mapa embebido estilo WhatsApp -->
-            <div class="contenedor-mapa" id="bloque-mapa">
-                <!-- Se inicializa centrado en Chorrillos mediante las coordenadas exactas de Las Antaras -->
+            <!-- Incrustación del mapa nativo de calles para Chorrillos -->
+            <div class="contenedor-mapa">
                 <iframe id="iframe-mapa" src="https://google.com"></iframe>
             </div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
+        <!-- Botón Enviar Solicitud -->
         <button class="btn-submit" id="btn-enviar">
             🚀 ENVIAR SOLICITUD
         </button>
 
-        <!-- Panel de Resultados de Auxilio -->
+        <!-- Panel de Resultados -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -154,42 +153,7 @@
             }
         }
 
-        // RASTREO SATELITAL AUTOMÁTICO EN TIEMPO REAL COORDENADAS WHATSAPP
-        let latitudDispositivo = -12.1936699;
-        let longitudDispositivo = -77.0044871;
-
-        function rastrearUbicacionInmediata() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        latitudDispositivo = position.coords.latitude;
-                        longitudDispositivo = position.coords.longitude;
-                        
-                        // Actualiza el cuadro de texto técnico
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
-                        
-                        // Actualiza dinámicamente el mapa visual de calles en pantalla
-                        const iframe = document.getElementById('iframe-mapa');
-                        iframe.src = `https://google.com{latitudDispositivo},${longitudDispositivo}&z=17&output=embed&hl=es`;
-                        
-                        hablarTexto("Ubicación por satélite mapeada de forma correcta.");
-                    },
-                    function(error) {
-                        // Respaldo de contingencia si el chip GPS del reloj está apagado
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
-                        const iframe = document.getElementById('iframe-mapa');
-                        iframe.src = "https://google.com";
-                        hablarTexto("Ubicación fija establecida en Las Antaras, Chorrillos.");
-                    },
-                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
-                );
-            }
-        }
-
-        // Inicializa el rastreo satelital inmediatamente al cargar el software
-        window.addEventListener('DOMContentLoaded', rastrearUbicacionInmediata);
-
-        // Activación del lector por voz al interactuar con el dispositivo
+        // Voz asistida automática al primer toque del usuario en la pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -200,5 +164,48 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA DE MANERA ABSOLUTA CON ARREGLOS INDEXADOS COMPATIBLES
+        // LÓGICA DE MICRÓFONOS CORREGIDA CON ÍNDICES DE MATRIZ EXÁCTOS EN JAVASCRIPT
         try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+
+                const recUbicacion = new SpeechRecognition();
+                recUbicacion.lang = 'es-PE';
+                recUbicacion.continuous = false;
+                recUbicacion.interimResults = false;
+                
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    try {
+                        recUbicacion.start();
+                        hablarTexto("Diga su dirección.");
+                    } catch(err) { console.log(err); }
+                });
+                
+                recUbicacion.onresult = function(event) {
+                    // SINTAXIS REPARADA MANUALMENTE CON ÍNDICES OBLIGATORIOS
+                    const textoDictado = event.results[0][0].transcript;
+                    document.getElementById('txt-ubicacion').value = textoDictado;
+                    
+                    const iframe = document.getElementById('iframe-mapa');
+                    iframe.src = `https://google.com{encodeURIComponent(textoDictado)}&z=17&output=embed&hl=es`;
+                    hablarTexto("Dirección cambiada.");
+                };
+
+                const recPedido = new SpeechRecognition();
+                recPedido.lang = 'es-PE';
+                recPedido.continuous = false;
+                recPedido.interimResults = false;
+                
+                document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    try {
+                        recPedido.start();
+                        hablarTexto("Diga su pedido.");
+                    } catch(err) { console.log(err); }
+                });
+                
+                recPedido.onresult = function(event) {
+                    // SINTAXIS REPARADA MANUALMENTE CON ÍNDICES OBLIGATORIOS
+                    const textoDictado = event.results[0][0].transcript;
+                    document.getElementById('txt-pedido').value = textoDictado;
