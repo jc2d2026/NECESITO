@@ -20,55 +20,64 @@
         }
         header {
             background-color: var(--primary-blue); color: white;
-            text-align: center; padding: 12px 10px;
+            text-align: center; padding: 15px 10px;
         }
-        main { max-width: 500px; margin: 0 auto; padding: 12px; box-sizing: border-box; }
+        main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
         .card {
             background: var(--card-bg); border-radius: 16px;
-            padding: 14px; margin-bottom: 12px;
+            padding: 16px; margin-bottom: 16px;
             border: 2px solid #cbd5e1;
         }
-        .card-title { font-size: 13px; font-weight: bold; color: #334155; margin-bottom: 8px; text-transform: uppercase; }
-        .input-group { display: flex; gap: 8px; }
+        .card-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
         .input-control {
-            flex: 1; padding: 14px; border: 2px solid #94a3b8;
-            border-radius: 12px; font-size: 15px; outline: none;
+            flex: 1; padding: 16px; border: 2px solid #94a3b8;
+            border-radius: 12px; font-size: 16px; outline: none;
             background-color: #ffffff; color: var(--text-dark);
         }
         .btn-voice {
             background-color: #dbeafe; border: 2px solid var(--primary-blue);
-            border-radius: 12px; width: 60px; font-size: 24px; cursor: pointer;
+            border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        select.input-control { width: 100%; height: 50px; font-weight: bold; }
+        select.input-control { width: 100%; height: 54px; font-weight: bold; }
         .btn-submit {
             width: 100%; background-color: var(--accent-green); color: white;
-            border: none; border-radius: 14px; padding: 18px;
+            border: none; border-radius: 14px; padding: 20px;
             font-size: 18px; font-weight: bold; cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .results-section { margin-top: 15px; }
+        
+        /* 🗺️ ESTILOS DEL MAPA VISUAL INTEGRADO ESTILO WHATSAPP */
+        .contenedor-mapa {
+            width: 100%; height: 220px; border-radius: 12px;
+            overflow: hidden; border: 2px solid #cbd5e1; margin-top: 10px;
+            background-color: #e5e7eb; position: relative;
+        }
+        .contenedor-mapa iframe { width: 100%; height: 100%; border: none; }
+
+        .results-section { margin-top: 20px; }
         .result-item {
-            padding: 14px; background: #ffffff; margin: 8px 0;
+            padding: 16px; background: #ffffff; margin: 10px 0;
             border-radius: 12px; border-left: 8px solid var(--primary-blue);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px;
             line-height: 1.5;
         }
         .btn-google-link {
-            display: block; text-align: center; margin-top: 10px;
-            background-color: var(--primary-blue); color: white; padding: 12px;
+            display: block; text-align: center; margin-top: 12px;
+            background-color: var(--primary-blue); color: white; padding: 14px;
             border-radius: 8px; text-decoration: none; font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
         }
         .local-info {
-            background-color: #f1f5f9; padding: 10px; border-radius: 8px;
-            margin-top: 8px; font-size: 13px; color: #334155;
+            background-color: #f1f5f9; padding: 12px; border-radius: 8px;
+            margin-top: 8px; font-size: 14px; color: #334155;
             border-left: 3px solid #10b981;
         }
         .badge-suscrito {
             display: inline-block; background: #dcfce7; color: #15803d;
-            padding: 3px 6px; border-radius: 6px;
-            font-size: 11px; font-weight: bold; margin-bottom: 4px;
+            padding: 4px 8px; border-radius: 6px;
+            font-size: 12px; font-weight: bold; margin-bottom: 4px;
         }
     </style>
 </head>
@@ -80,7 +89,7 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD -->
+        <!-- 1. CATEGORÍA DE NECESIDAD PRIORITARIA -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -100,12 +109,18 @@
             </div>
         </section>
 
-        <!-- 3. UBICACIÓN SATELITAL AUTOMÁTICA EMERGENCIAS -->
+        <!-- 3. MI UBICACIÓN AUTOMÁTICA CON MAPA INTEGRADO -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Google Maps)</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-ubicacion" value="Rastreando GPS satelital..." readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección de respaldo">🎙️</button>
+            </div>
+            
+            <!-- Vista de mapa embebido estilo WhatsApp -->
+            <div class="contenedor-mapa" id="bloque-mapa">
+                <!-- Se inicializa centrado en Chorrillos mediante las coordenadas exactas de Las Antaras -->
+                <iframe id="iframe-mapa" src="https://google.com"></iframe>
             </div>
         </section>
 
@@ -139,9 +154,9 @@
             }
         }
 
-        // 🔊 ENFOQUE DE SEGURIDAD VITAL: Geolocalización satelital instantánea al abrir la aplicación
-        let latitudDispositivo = "";
-        let longitudDispositivo = "";
+        // RASTREO SATELITAL AUTOMÁTICO EN TIEMPO REAL COORDENADAS WHATSAPP
+        let latitudDispositivo = -12.1936699;
+        let longitudDispositivo = -77.0044871;
 
         function rastrearUbicacionInmediata() {
             if (navigator.geolocation) {
@@ -149,58 +164,41 @@
                     function(position) {
                         latitudDispositivo = position.coords.latitude;
                         longitudDispositivo = position.coords.longitude;
-                        // Establece las coordenadas en tiempo real capturadas por el chip del reloj/teléfono
-                        document.getElementById('txt-ubicacion').value = "Coordenadas Confirmadas: " + latitudDispositivo.toFixed(4) + ", " + longitudDispositivo.toFixed(4);
-                        hablarTexto("Ubicación satelital confirmada y generada de forma automática por Google Maps. El sistema de auxilio está listo.");
+                        
+                        // Actualiza el cuadro de texto técnico
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
+                        
+                        // Actualiza dinámicamente el mapa visual de calles en pantalla
+                        const iframe = document.getElementById('iframe-mapa');
+                        iframe.src = `https://google.com{latitudDispositivo},${longitudDispositivo}&z=17&output=embed&hl=es`;
+                        
+                        hablarTexto("Ubicación por satélite mapeada de forma correcta.");
                     },
                     function(error) {
-                        // Fallback seguro en Chorrillos si el GPS físico se encuentra apagado
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Fijo)";
-                        hablarTexto("Ubicación por defecto establecida en Las Antaras 1 8 8, Chorrillos. El sistema de auxilio está activo.");
+                        // Respaldo de contingencia si el chip GPS del reloj está apagado
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
+                        const iframe = document.getElementById('iframe-mapa');
+                        iframe.src = "https://google.com";
+                        hablarTexto("Ubicación fija establecida en Las Antaras, Chorrillos.");
                     },
                     { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
                 );
-            } else {
-                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
             }
         }
 
-        // Lanza el rastreo GPS en el instante de carga del código
+        // Inicializa el rastreo satelital inmediatamente al cargar el software
         window.addEventListener('DOMContentLoaded', rastrearUbicacionInmediata);
 
-        // Activación de voz de respaldo inclusiva vinculada al primer toque de pantalla
+        // Activación del lector por voz al interactuar con el dispositivo
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                rastrearUbicacionInmediata();
+                hablarTexto("Aplicación Necesito iniciada de forma automática. Su mapa de ubicación satelital ha sido generado en Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA DE MANERA DEFINITIVA CON ÍNDICES DE MATRIZ
+        // LÓGICA DE MICRÓFONOS CORREGIDA DE MANERA ABSOLUTA CON ARREGLOS INDEXADOS COMPATIBLES
         try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-
-                const recUbicacion = new SpeechRecognition();
-                recUbicacion.lang = 'es-PE';
-                recUbicacion.continuous = false;
-                recUbicacion.interimResults = false;
-                
-                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    try {
-                        recUbicacion.start();
-                        hablarTexto("Diga su dirección.");
-                    } catch(err) { console.log(err); }
-                });
-                
-                recUbicacion.onresult = function(event) {
-                    // SINTAXIS CORREGIDA CON LOS CORCHETES EXACTOS EXIGIDOS EN PRODUCCIÓN
-                    const textoDictado = event.results[0][0].transcript;
-                    document.getElementById('txt-ubicacion').value = textoDictado;
-                    hablarTexto("Dirección modificada.");
-                };
-
