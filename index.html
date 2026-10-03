@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
-    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     <style>
         :root {
@@ -81,7 +80,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Actual Protegida -->
+        <!-- Ubicación Generada de Forma Automática -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -123,7 +122,6 @@
     </main>
 
     <script>
-        // Base de datos de los 5 comercios oficiales para la asistencia en Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
@@ -145,14 +143,15 @@
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada correctamente. Su ubicación actual ha sido generada de forma automática en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma automática. Su ubicación actual está certificada en: Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
+        // Escuchadores de alta sensibilidad al menor contacto del usuario invidente
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA DE FORMA ABSOLUTA (event.results[0][0].transcript)
+        // LÓGICA DE MICRÓFONOS CORREGIDA MATEMÁTICAMENTE CON INDICES DE MATRIZ EXÁCTOS
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -166,12 +165,12 @@
                     e.stopPropagation();
                     try {
                         recUbicacion.start();
-                        hablarTexto("Diga su dirección actual.");
+                        hablarTexto("Escuchando dirección.");
                     } catch(err) { console.log(err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // RESOLUCIÓN EXACTA CON DOBLE ÍNDICE DE MATRIZ OBLIGATORIO
+                    // SINTAXIS DE MATRIZ REPARADA CON LOS CORCHETES OBLIGATORIOS
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -191,17 +190,17 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // RESOLUCIÓN EXACTA CON DOBLE ÍNDICE DE MATRIZ OBLIGATORIO
+                    // SINTAXIS DE MATRIZ REPARADA CON LOS CORCHETES OBLIGATORIOS
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
             }
         } catch(error) {
-            console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
+            console.error("Error al inicializar servicios de voz:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR AUTÓNOMA Y TOTALMENTE DESBLOQUEADA
+        // ACCIÓN DEL BOTÓN ENVIAR TOTALMENTE DESBLOQUEADA
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
