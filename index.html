@@ -58,7 +58,7 @@
             display: block; text-align: center; margin-top: 12px;
             background-color: var(--primary-blue); color: white; padding: 12px;
             border-radius: 8px; text-decoration: none; font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
         }
         .local-info {
             background-color: #f1f5f9; padding: 12px; border-radius: 8px;
@@ -80,18 +80,9 @@
     </header>
 
     <main>
-        <!-- Ubicación Generada de Forma Automática -->
+        <!-- 1. CATEGORÍA DE NECESIDAD (ORDEN REFRESCADO) -->
         <section class="card">
-            <div class="card-title">📍 Mi ubicación actual</div>
-            <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos">
-                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección">🎙️</button>
-            </div>
-        </section>
-
-        <!-- Categorías Prioritarias -->
-        <section class="card">
-            <div class="card-title">📁 Categoría de necesidad prioritaria</div>
+            <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida)</option>
@@ -100,12 +91,21 @@
             </select>
         </section>
 
-        <!-- Detalle del pedido -->
+        <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
-            <div class="card-title">📝 Detalle de tu pedido</div>
+            <div class="card-title">📝 2. Detalle de tu pedido</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, electricista, alimentos">
                 <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
+            </div>
+        </section>
+
+        <!-- 3. UBICACIÓN AUTOMÁTICA -->
+        <section class="card">
+            <div class="card-title">📍 3. Mi ubicación automática (Google Maps)</div>
+            <div class="input-group">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos" readonly>
+                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección alternativa">🎙️</button>
             </div>
         </section>
 
@@ -147,11 +147,10 @@
                 vozAnunciada = true;
             }
         }
-        // Escuchadores de alta sensibilidad al menor contacto del usuario invidente
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA MATEMÁTICAMENTE CON INDICES DE MATRIZ EXÁCTOS
+        // LÓGICA DE MICRÓFONOS CORREGIDA DE FORMA ABSOLUTA [0][0]
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -165,12 +164,12 @@
                     e.stopPropagation();
                     try {
                         recUbicacion.start();
-                        hablarTexto("Escuchando dirección.");
+                        hablarTexto("Diga su dirección.");
                     } catch(err) { console.log(err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // SINTAXIS DE MATRIZ REPARADA CON LOS CORCHETES OBLIGATORIOS
+                    // CORRECCIÓN RADICAL DE SINTAXIS CON PERFECCIÓN DE MATRIZ
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -190,17 +189,17 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // SINTAXIS DE MATRIZ REPARADA CON LOS CORCHETES OBLIGATORIOS
+                    // CORRECCIÓN RADICAL DE SINTAXIS CON PERFECCIÓN DE MATRIZ
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
                 };
             }
         } catch(error) {
-            console.error("Error al inicializar servicios de voz:", error);
+            console.error("Error en Web Speech API:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR TOTALMENTE DESBLOQUEADA
+        // ACCIÓN DEL BOTÓN ENVIAR SIN COMPORTAMIENTOS CONGELADOS
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -209,3 +208,4 @@
             contenedorResultados.innerHTML = "";
             
             if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = "<div class='result-item'>No se encontraron comercios registrados para esta necesidad.</div>";
