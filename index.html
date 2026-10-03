@@ -123,6 +123,7 @@
     </main>
 
     <script>
+        // Base de datos de los 5 comercios oficiales para la asistencia en Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
@@ -151,7 +152,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA MATEMÁTICAMENTE CON ÍNDICES DE MATRIZ [0][0]
+        // LÓGICA DE MICRÓFONOS CORREGIDA DE FORMA ABSOLUTA (event.results[0][0].transcript)
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -170,7 +171,7 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // IMPLEMENTACIÓN EXACTA Y REPARADA DE LA MATRIZ DE GOOGLE CHROME
+                    // RESOLUCIÓN EXACTA CON DOBLE ÍNDICE DE MATRIZ OBLIGATORIO
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -190,7 +191,7 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // IMPLEMENTACIÓN EXACTA Y REPARADA DE LA MATRIZ DE GOOGLE CHROME
+                    // RESOLUCIÓN EXACTA CON DOBLE ÍNDICE DE MATRIZ OBLIGATORIO
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
@@ -200,7 +201,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR DESBLOQUEADA COMPLETAMENTE
+        // ACCIÓN DEL BOTÓN ENVIAR AUTÓNOMA Y TOTALMENTE DESBLOQUEADA
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
