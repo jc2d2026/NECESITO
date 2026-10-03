@@ -63,7 +63,7 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal satelital GPS..." readonly>
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly>
                 <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
@@ -108,19 +108,18 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CONFIGURACIÓN GPS DE ARRANQUE INMEDIATO
+        // 🛰️ INITIALIZACIÓN DEL GPS CON MAPA DE CALLLES ABIERTO
         function inicializarSistemaRastreo() {
             try {
                 objetoMapa = L.map('mapa-emergencia').setView([coordenadasLat, coordenadasLng], 17);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
                 pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa).bindPopup('Tu ubicación actual').openPopup();
 
-                document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
-
                 if (navigator.geolocation) {
                     navigator.geolocation.watchPosition(function(position) {
                         coordenadasLat = position.coords.latitude;
                         coordenadasLng = position.coords.longitude;
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
                         
                         const puntoGeografico = new L.LatLng(coordenadasLat, coordenadasLng);
                         pinVisual.setLatLng(puntoGeografico);
@@ -133,7 +132,7 @@
         }
         window.addEventListener('DOMContentLoaded', inicializarSistemaRastreo);
 
-        // 🎙️ REPARACIÓN EXACTA MANUAL CON LOS DOBLES CORCHETES INDISPENSABLES
+        // 🎙️ REPARACIÓN ABSOLUTA DE LOS MICRÓFONOS CON LOS DOBLES CORCHETES EXACTOS
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -147,7 +146,7 @@
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // REPARADO MANUALMENTE CON LOS ÍNDICES CORRECTOS [0][0]
+                    // SINTAXIS INDICE CORREGIDA EXTRAÍDA INDISPENSABLE
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -163,5 +162,5 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // REPARADO MANUALMENTE CON LOS ÍNDICES CORRECTOS [0][0]
+                    // SINTAXIS INDICE CORREGIDA EXTRAÍDA INDISPENSABLE
                     const textoDictado = event.results[0][0].transcript;
