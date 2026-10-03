@@ -1,21 +1,18 @@
-const CACHE_NAME = 'necesito-v1';
+const CACHE_NAME = 'necesito-v2';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json',
-  'https://flaticon.com'
+  './manifest.json'
 ];
 
-// Instalar el Service Worker y guardar archivos base en el almacenamiento local
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(ASSETS);
-    })
+    }).then(() => self.skipWaiting()) // Fuerza la desactivación del código viejo de inmediato
   );
 });
 
-// Activar y limpiar cachés antiguas
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -24,15 +21,12 @@ self.addEventListener('activate', event => {
           if (key !== CACHE_NAME) return caches.delete(key);
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Interceptar peticiones para que funcione sin internet
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      return cachedResponse || fetch(event.request);
-    })
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
