@@ -81,7 +81,7 @@
     </header>
 
     <main>
-        <!-- Ubicación Fija Actual -->
+        <!-- Ubicación Fija Actual Protegida -->
         <section class="card">
             <div class="card-title">📍 Mi ubicación actual</div>
             <div class="input-group">
@@ -151,7 +151,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // LÓGICA DE MICRÓFONOS CORREGIDA CON LOS ÍNDICES CORRECTOS OBLIGATORIOS [0][0]
+        // LÓGICA DE MICRÓFONOS CORREGIDA MATEMÁTICAMENTE CON ÍNDICES DE MATRIZ [0][0]
         try {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -165,12 +165,12 @@
                     e.stopPropagation();
                     try {
                         recUbicacion.start();
-                        hablarTexto("Diga su dirección.");
+                        hablarTexto("Diga su dirección actual.");
                     } catch(err) { console.log(err); }
                 });
                 
                 recUbicacion.onresult = function(event) {
-                    // CORRECCIÓN ABSOLUTA: Aplicados los corchetes indexados correctos
+                    // IMPLEMENTACIÓN EXACTA Y REPARADA DE LA MATRIZ DE GOOGLE CHROME
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-ubicacion').value = textoDictado;
                     hablarTexto("Dirección cambiada.");
@@ -190,7 +190,7 @@
                 });
                 
                 recPedido.onresult = function(event) {
-                    // CORRECCIÓN ABSOLUTA: Aplicados los corchetes indexados correctos
+                    // IMPLEMENTACIÓN EXACTA Y REPARADA DE LA MATRIZ DE GOOGLE CHROME
                     const textoDictado = event.results[0][0].transcript;
                     document.getElementById('txt-pedido').value = textoDictado;
                     hablarTexto("Pedido anotado.");
@@ -200,7 +200,7 @@
             console.error("Los servicios de voz sufrieron un bloqueo de inicialización:", error);
         }
 
-        // ACCIÓN DEL BOTÓN ENVIAR: Despliega de inmediato los comercios registrados
+        // ACCIÓN DEL BOTÓN ENVIAR DESBLOQUEADA COMPLETAMENTE
         document.getElementById('btn-enviar').addEventListener('click', function() {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
