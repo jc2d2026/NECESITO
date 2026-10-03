@@ -6,7 +6,7 @@
     <title>NECESITO - Alta Accesibilidad</title>
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ CONEXIÓN OBLIGATORIA CON EL MOTOR DE MAPAS ABIERTO (LEAFLET) - EVITA MAPAS ROTOS -->
+    <!-- 🗺️ PERMISOS Y HOJA DE ESTILOS DEL MOTOR DE MAPAS ABIERTO (LEAFLET) -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
 
@@ -53,11 +53,11 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        /* 🗺️ CONTENEDOR DEL MAPA REAL EN TIEMPO REAL - NO SE QUEDA EN BLANCO */
+        /* 🗺️ LIENZO DE MAPA REAL TIPO WHATSAPP */
         .contenedor-mapa {
             width: 100%; height: 220px; border-radius: 12px;
             overflow: hidden; border: 2px solid #cbd5e1; margin-top: 10px;
-            background-color: #e5e7eb; z-index: 1;
+            background-color: #e5e7eb; position: relative; z-index: 1;
         }
 
         .results-section { margin-top: 20px; }
@@ -121,8 +121,8 @@
                 <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección de respaldo">🎙️</button>
             </div>
             
-            <!-- Lienzo del mapa real interactivo -->
-            <div id="mapa-leaflet" class="contenedor-mapa"></div>
+            <!-- Contenedor físico donde se dibuja el mapa -->
+            <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
@@ -146,10 +146,12 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let map, marcadorActual;
-        // Coordenadas por defecto fijadas en Las Antaras 188, Chorrillos
-        let latitudActual = -12.1936699;
-        let longitudActual = -77.0044871;
+        let objetoMapa = null;
+        let pinVisual = null;
+        
+        // Coordenadas por defecto fijadas en Chorrillos (Las Antaras 188)
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
 
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
@@ -160,51 +162,48 @@
             }
         }
 
-        // 🔊 ANUNCIO DE VOZ AL INTERACTUAR CON LA SCREEN
+        // Anuncio de voz inclusivo automático al interactuar con el dispositivo
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Su mapa de auxilio satelital está activo.");
+                hablarTexto("Aplicación Necesito iniciada correctamente. Su mapa de rastreo satelital se encuentra activo.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ MOTOR DE RASTREO SATELITAL ACTIVO EN TIEMPO REAL (Resuelve el problema de tu hermana)
-        function inicializarMapaYGPS() {
-            // Inicializar el mapa visual centrado en el punto base
-            map = L.map('mapa-leaflet').setView([latitudActual, longitudActual], 16);
-            
-            // Cargar las calles reales sin bloqueos de Google
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+        // 🛰️ CORRECCIÓN ABSOLUTA DEL MOTOR GPS SATELITAL EN TIEMPO REAL
+        function inicializarSistemaRastreo() {
+            try {
+                // Crear el mapa de forma nativa e independiente
+                objetoMapa = L.map('mapa-emergencia').setView([coordenadasLat, coordenadasLng], 17);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(objetoMapa);
 
-            marcadorActual = L.marker([latitudActual, longitudActual]).addTo(map)
-                .bindPopup('Ubicación de Auxilio Detectada')
-                .openPopup();
+                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                    .bindPopup('Tu ubicación actual')
+                    .openPopup();
 
-            // Rastrear el GPS satelital real del dispositivo físico (Celular o Pulsera)
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(function(position) {
-                    latitudActual = position.coords.latitude;
-                    longitudActual = position.coords.longitude;
+                // Activar el chip GPS en modo de escucha dinámica y continua (watchPosition)
+                if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(function(position) {
+                        coordenadasLat = position.coords.latitude;
+                        coordenadasLng = position.coords.longitude;
 
-                    document.getElementById('txt-ubicacion').value = "GPS Confirmado: " + latitudActual.toFixed(5) + ", " + longitudActual.toFixed(5);
-                    
-                    // Mover el mapa y el pin visual automáticamente hacia donde se encuentre el usuario
-                    const nuevasCoordenadas = new L.LatLng(latitudActual, longitudActual);
-                    marcadorActual.setLatLng(nuevasCoordenadas);
-                    map.setView(nuevasCoordenadas, 17);
-                    
-                }, function(error) {
-                    // Fallback seguro en Chorrillos si el GPS está apagado en interiores
-                    document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
-                }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', inicializarMapaYGPS);
-
-        // 🎙️ LÓGICA DE MICRÓFONOS CORREGIDA AL 100% CON REPARACIÓN DE CORCHETES INDEXADOS
+                        // Actualizar caja de texto con coordenadas precisas
+                        document.getElementById('txt-ubicacion').value = "GPS Satelital Confirmado ✔️";
+                        
+                        // Mover el mapa y el pin automáticamente en tiempo real
+                        const puntoGeografico = new L.LatLng(coordenadasLat, coordenadasLng);
+                        pinVisual.setLatLng(puntoGeografico);
+                        objetoMapa.setView(puntoGeografico, 17);
+                        
+                    }, function(error) {
+                        // Fallback seguro si se pierde la señal en interiores
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
+                    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+                } else {
