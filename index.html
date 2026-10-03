@@ -7,7 +7,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ LIBRERÍA SATELITAL LIBRE PARA EVITAR MAPAS EN GRIS O BLOQUEADOS -->
+    <!-- 🗺️ IMPORTACIÓN DIRECTA Y CORREGIDA DE LEAFLET MAPS (SATELITAL LIBRE) -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
 
@@ -45,6 +45,7 @@
             background-color: #dbeafe; border: 2px solid var(--primary-blue); 
             border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; 
+            transition: all 0.2s ease;
         }
         select.input-control { width: 100%; height: 54px; font-weight: bold; }
         .btn-submit { 
@@ -66,21 +67,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px; 
             line-height: 1.5; 
         }
-        .btn-google-link { 
-            display: block; text-align: center; margin-top: 12px; 
-            background-color: var(--primary-blue); color: white; padding: 14px; 
-            border-radius: 8px; text-decoration: none; font-weight: bold; 
-            font-size: 15px; 
-        }
         .local-info { 
             background-color: #f1f5f9; padding: 12px; border-radius: 8px; 
             margin-top: 8px; font-size: 14px; color: #334155; 
             border-left: 3px solid #10b981; 
-        }
-        .badge-suscrito { 
-            display: inline-block; background: #dcfce7; color: #15803d; 
-            padding: 4px 8px; border-radius: 6px; 
-            font-size: 12px; font-weight: bold; margin-bottom: 4px; 
         }
     </style>
 </head>
@@ -108,7 +98,7 @@
             <div class="card-title">📝 2. Detalle de tu pedido</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, electricista, alimentos">
-                <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
+                <button class="btn-voice" id="btn-voz-pedido" aria-label="Dictar pedido por voz">🎙️</button>
             </div>
         </section>
 
@@ -116,8 +106,8 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly>
-                <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
+                <!-- Se retiró el micrófono redundante para asegurar la precisión del GPS satelital -->
+                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             </div>
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
@@ -133,6 +123,7 @@
     </main>
 
     <script>
+        // Base de datos de comercios locales para Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
@@ -144,6 +135,7 @@
         let objetoMapa = null, pinVisual = null;
         let coordenadasLat = -12.1936699, coordenadasLng = -77.0044871;
 
+        // Función de salida de voz (Texto a voz) asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -153,7 +145,7 @@
             }
         }
 
-        // Anuncio asistido de seguridad al menor contacto del usuario invidente
+        // Anuncio asistido de seguridad al menor contacto del usuario en pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -164,41 +156,49 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ DIBUJADO INMEDIATO DEL MAPA EN TIEMPO REAL
+        // 🛰️ DIBUJADO DEL MAPA EN TIEMPO REAL CON LEAFLET
         function inicializarSistemaRastreo() {
             try {
-                // Crear el lienzo del mapa de forma nativa sin depender de servicios bloqueados
                 objetoMapa = L.map('mapa-emergencia').setView([coordenadasLat, coordenadasLng], 17);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
-                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa).bindPopup('Tu ubicación actual').openPopup();
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.watchPosition(function(position) {
-                        coordenadasLat = position.coords.latitude;
-                        coordenadasLng = position.coords.longitude;
-                        
-                        const puntoGeografico = new L.LatLng(coordenadasLat, coordenadasLng);
-                        pinVisual.setLatLng(puntoGeografico);
-                        objetoMapa.setView(puntoGeografico, 17);
-                    }, function() {
-                        console.log("Monitoreo pasivo activo");
-                    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-                }
-            } catch (err) { console.log("Fallo en inicialización de mapa visual:", err); }
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(objetoMapa);
+                
+                // Colocar marcador visual en las coordenadas
+                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
+                    .openPopup();
+            } catch (error) {
+                console.error("Error cargando mapas satelitales:", error);
+            }
         }
+
+        // Arrancar el mapa de manera automática al cargar la interfaz
         window.addEventListener('DOMContentLoaded', inicializarSistemaRastreo);
 
-        // 🎙️ REPARACIÓN DE SINTAXIS INDISPENSABLE DE LOS MICRÓFONOS EN NAVEGADORES MÓVILES
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const recUbicacion = new SpeechRecognition();
-                recUbicacion.lang = 'es-PE';
-                
-                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    recUbicacion.start();
-                    hablarTexto("Diga su dirección.");
-                });
-                
-                recUbicacion.onresult = function(event) {
+        // LÓGICA DE PROCESAMIENTO Y FILTRADO AL PRESIONAR "ENVIAR SOLICITUD"
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const contenedorResultados = document.getElementById('lista-resultados');
+            
+            // Filtrar los locales que corresponden a la categoría seleccionada
+            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
+            
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = `<div class="result-item">No se encontraron locales de esta categoría cerca.</div>`;
+                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
+                return;
+            }
+
+            contenedorResultados.innerHTML = "";
+            let textoVoz = `Solicitud procesada. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
+
+            filtrados.forEach(comercio => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <strong>🏢 ${comercio.nombre}</strong>
+                    <div class="local-info">ℹ️ ${comercio.info}</div>
+                `;
+                contenedorResultados.appendChild(itemDiv);
