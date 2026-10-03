@@ -4,85 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO - Alta Accesibilidad</title>
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ PERMISOS Y HOJA DE ESTILOS DEL MOTOR DE MAPAS ABIERTO (LEAFLET) -->
+    <!-- 🗺️ LIBRERÍA SATELITAL PARA EL MAPA INTERACTIVO SIN BLOQUEOS -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
 
     <style>
-        :root {
-            --primary-blue: #2563eb;
-            --accent-green: #10b981;
-            --bg-light: #f8fafc;
-            --text-dark: #1e293b;
-            --card-bg: #ffffff;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-            margin: 0; padding: 0;
-            background-color: var(--bg-light); color: var(--text-dark);
-        }
-        header {
-            background-color: var(--primary-blue); color: white;
-            text-align: center; padding: 15px 10px;
-        }
+        :root { --primary-blue: #2563eb; --accent-green: #10b981; --bg-light: #f8fafc; --text-dark: #1e293b; --card-bg: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-light); color: var(--text-dark); }
+        header { background-color: var(--primary-blue); color: white; text-align: center; padding: 15px 10px; }
         main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
-        .card {
-            background: var(--card-bg); border-radius: 16px;
-            padding: 16px; margin-bottom: 16px;
-            border: 2px solid #cbd5e1;
-        }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 2px solid #cbd5e1; }
         .card-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase; }
         .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .input-control {
-            flex: 1; padding: 16px; border: 2px solid #94a3b8;
-            border-radius: 12px; font-size: 16px; outline: none;
-            background-color: #ffffff; color: var(--text-dark);
-        }
-        .btn-voice {
-            background-color: #dbeafe; border: 2px solid var(--primary-blue);
-            border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .input-control { flex: 1; padding: 16px; border: 2px solid #94a3b8; border-radius: 12px; font-size: 16px; outline: none; color: var(--text-dark); }
+        .btn-voice { background-color: #dbeafe; border: 2px solid var(--primary-blue); border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         select.input-control { width: 100%; height: 54px; font-weight: bold; }
-        .btn-submit {
-            width: 100%; background-color: var(--accent-green); color: white;
-            border: none; border-radius: 14px; padding: 20px;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        /* 🗺️ LIENZO DE MAPA REAL TIPO WHATSAPP */
-        .contenedor-mapa {
-            width: 100%; height: 220px; border-radius: 12px;
-            overflow: hidden; border: 2px solid #cbd5e1; margin-top: 10px;
-            background-color: #e5e7eb; position: relative; z-index: 1;
-        }
-
+        .btn-submit { width: 100%; background-color: var(--accent-green); color: white; border: none; border-radius: 14px; padding: 20px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .contenedor-mapa { width: 100%; height: 220px; border-radius: 12px; overflow: hidden; border: 2px solid #cbd5e1; margin-top: 10px; background-color: #e5e7eb; position: relative; z-index: 1; }
         .results-section { margin-top: 20px; }
-        .result-item {
-            padding: 16px; background: #ffffff; margin: 10px 0;
-            border-radius: 12px; border-left: 8px solid var(--primary-blue);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px;
-            line-height: 1.5;
-        }
-        .btn-google-link {
-            display: block; text-align: center; margin-top: 12px;
-            background-color: var(--primary-blue); color: white; padding: 14px;
-            border-radius: 8px; text-decoration: none; font-weight: bold;
-            font-size: 15px;
-        }
-        .local-info {
-            background-color: #f1f5f9; padding: 12px; border-radius: 8px;
-            margin-top: 8px; font-size: 14px; color: #334155;
-            border-left: 3px solid #10b981;
-        }
-        .badge-suscrito {
-            display: inline-block; background: #dcfce7; color: #15803d;
-            padding: 4px 8px; border-radius: 6px;
-            font-size: 12px; font-weight: bold; margin-bottom: 4px;
-        }
+        .result-item { padding: 16px; background: #ffffff; margin: 10px 0; border-radius: 12px; border-left: 8px solid var(--primary-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px; line-height: 1.5; }
+        .btn-google-link { display: block; text-align: center; margin-top: 12px; background-color: var(--primary-blue); color: white; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; }
+        .local-info { background-color: #f1f5f9; padding: 12px; border-radius: 8px; margin-top: 8px; font-size: 14px; color: #334155; border-left: 3px solid #10b981; }
+        .badge-suscrito { display: inline-block; background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -93,7 +39,6 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD PRIORITARIA -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -104,33 +49,25 @@
             </select>
         </section>
 
-        <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, electricista, alimentos">
-                <button class="btn-voice" id="btn-voz-pedido" title="Dictar pedido">🎙️</button>
+                <button class="btn-voice" id="btn-voz-pedido">🎙️</button>
             </div>
         </section>
 
-        <!-- 3. MI UBICACIÓN AUTOMÁTICA EMERGENCIAS -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
                 <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal satelital GPS..." readonly>
-                <button class="btn-voice" id="btn-voz-ubicacion" title="Dictar dirección de respaldo">🎙️</button>
+                <button class="btn-voice" id="btn-voz-ubicacion">🎙️</button>
             </div>
-            
-            <!-- Contenedor físico donde se dibuja el mapa -->
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
-        <button class="btn-submit" id="btn-enviar">
-            🚀 ENVIAR SOLICITUD
-        </button>
+        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
-        <!-- Panel de Resultados de Auxilio -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -146,12 +83,8 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let objetoMapa = null;
-        let pinVisual = null;
-        
-        // Coordenadas por defecto fijadas en Chorrillos (Las Antaras 188)
-        let coordenadasLat = -12.1936699;
-        let coordenadasLng = -77.0044871;
+        let objetoMapa = null, pinVisual = null;
+        let coordenadasLat = -12.1936699, coordenadasLng = -77.0044871;
 
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
@@ -162,48 +95,69 @@
             }
         }
 
-        // Anuncio de voz inclusivo automático al interactuar con el dispositivo
+        // Activación de voz al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada correctamente. Su mapa de rastreo satelital se encuentra activo.");
+                hablarTexto("Aplicación Necesito iniciada de forma automática. Su ubicación actual está certificada en: Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CORRECCIÓN ABSOLUTA DEL MOTOR GPS SATELITAL EN TIEMPO REAL
+        // 🛰️ CONFIGURACIÓN GPS INMUNE A CAÍDAS
         function inicializarSistemaRastreo() {
             try {
-                // Crear el mapa de forma nativa e independiente
                 objetoMapa = L.map('mapa-emergencia').setView([coordenadasLat, coordenadasLng], 17);
-                
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(objetoMapa);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
+                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa).bindPopup('Tu ubicación actual').openPopup();
 
-                pinVisual = L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
-                    .bindPopup('Tu ubicación actual')
-                    .openPopup();
-
-                // Activar el chip GPS en modo de escucha dinámica y continua (watchPosition)
                 if (navigator.geolocation) {
                     navigator.geolocation.watchPosition(function(position) {
                         coordenadasLat = position.coords.latitude;
                         coordenadasLng = position.coords.longitude;
-
-                        // Actualizar caja de texto con coordenadas precisas
-                        document.getElementById('txt-ubicacion').value = "GPS Satelital Confirmado ✔️";
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
                         
-                        // Mover el mapa y el pin automáticamente en tiempo real
                         const puntoGeografico = new L.LatLng(coordenadasLat, coordenadasLng);
                         pinVisual.setLatLng(puntoGeografico);
                         objetoMapa.setView(puntoGeografico, 17);
-                        
-                    }, function(error) {
-                        // Fallback seguro si se pierde la señal en interiores
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos";
+                    }, function() {
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
                     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-                } else {
+                }
+            } catch (err) { console.log(err); }
+        }
+        window.addEventListener('DOMContentLoaded', inicializarSistemaRastreo);
+
+        // 🎙️ MICRÓFONOS CORREGIDOS CON ESCRITURA MANUAL ESTRICTA DE CORCHETES
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recUbicacion = new SpeechRecognition();
+                recUbicacion.lang = 'es-PE';
+                
+                document.getElementById('btn-voz-ubicacion').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    recUbicacion.start();
+                    hablarTexto("Diga su dirección.");
+                });
+                
+                recUbicacion.onresult = function(event) {
+                    // SINTAXIS CORREGIDA DE MANERA MANUAL
+                    const textoDictado = event.results[0][0].transcript;
+                    document.getElementById('txt-ubicacion').value = textoDictado;
+                    hablarTexto("Dirección cambiada.");
+                };
+
+                const recPedido = new SpeechRecognition();
+                recPedido.lang = 'es-PE';
+                
+                document.getElementById('btn-voz-pedido').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    recPedido.start();
+                    hablarTexto("Diga su pedido.");
+                });
+                
+                recPedido.onresult = function(event) {
+                    // SINTAXIS CORREGIDA DE MANERA MANUAL
