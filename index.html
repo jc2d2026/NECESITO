@@ -7,7 +7,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ IMPORTACIÓN DIRECTA Y SEGURA DE MAPAS ACCESIBLES -->
+    <!-- 🗺️ ENLACES GEOGRÁFICOS DE MÁXIMA COMPATIBILIDAD CON SEGURIDAD (HTTPS) -->
     <link rel="stylesheet" href="https://unpkg.com" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
@@ -105,8 +105,7 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
-                <!-- Mantener campo bloqueado para guiar al GPS en tiempo real -->
-                <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando tu ubicación real..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             </div>
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
@@ -122,20 +121,18 @@
     </main>
 
     <script>
-        // Base de datos de comercios y servicios locales
+        // Base de datos de prueba
         const comerciosBD = [
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. Cerca de Chorrillos." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos y alimentos de primera necesidad." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico y emergencias eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         let objetoMapa = null;
-        let coordenadasLat = -12.1936699;
-        let coordenadasLng = -77.0044871;
+        let pinVisual = null;
 
-        // Lector por voz integrado de asistencia
+        // Reproductor de voz integrado
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -145,68 +142,61 @@
             }
         }
 
-        // Anuncio inicial de accesibilidad al interactuar con el teléfono
+        // Anuncio inicial de bienvenida al tocar la pantalla
         let vozAnunciada = false;
-        function activarAnuncioInmediato() {
+        document.body.addEventListener('click', () => {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación fijada en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada. Buscando tu señal satelital actual.");
                 vozAnunciada = true;
             }
-        }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
-        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
+        });
 
-        // 🛰️ GENERACIÓN DEL PLANO Y REDIBUJADO CONTRA EL FONDO GRIS
-        function inicializarSistemaRastreo() {
-            try {
-                if (objetoMapa !== null) {
-                    objetoMapa.remove();
-                }
+        // 🛰️ CORRECCIÓN CLAVE: SISTEMA DE GPS DINÁMICO REAL Y RENDERS DE MAPA
+        function obtenerUbicacionReal() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
 
-                objetoMapa = L.map('mapa-emergencia', {
-                    zoomControl: false,
-                    dragging: true,
-                    touchZoom: true
-                }).setView([coordenadasLat, coordenadasLng], 17);
+                        // Actualiza el texto de ubicación con coordenadas reales reales
+                        document.getElementById('txt-ubicacion').value = `Ubicación Certificada GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)} ✔️`;
+                        hablarTexto("Ubicación satelital encontrada y certificada con éxito.");
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(objetoMapa);
-                
-                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
-                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
-                    .openPopup();
+                        // Dibujar el plano cartográfico real sin recuadros grises
+                        if (objetoMapa === null) {
+                            objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([lat, lng], 16);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
+                            pinVisual = L.marker([lat, lng]).addTo(objetoMapa).bindPopup('<b>Estás aquí</b>').openPopup();
+                        } else {
+                            objetoMapa.setView([lat, lng], 16);
+                            pinVisual.setLatLng([lat, lng]);
+                        }
 
-                // Solución al problema de carga gris: fuerza el reajuste visual inmediato
-                setTimeout(() => {
-                    objetoMapa.invalidateSize();
-                }, 400);
-
-            } catch (error) {
-                console.error("Error cargando mapas geográficos:", error);
+                        // Forzar el redibujado de Leaflet para destruir el recuadro gris
+                        setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
+                    },
+                    (error) => {
+                        console.error(error);
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Señal Base) ✔️";
+                        hablarTexto("No se pudo obtener el GPS exacto. Usando dirección base de contingencia.");
+                        // Mapa por defecto si el GPS está apagado en el teléfono
+                        if (objetoMapa === null) {
+                            objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([-12.1936, -77.0044], 16);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(objetoMapa);
+                            L.marker([-12.1936, -77.0044]).addTo(objetoMapa);
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
             }
         }
 
-        // Cargar mapa inmediatamente
-        window.addEventListener('load', inicializarSistemaRastreo);
+        window.addEventListener('load', obtenerUbicacionReal);
 
-        // LOGICA DE BÚSQUEDA AL PRESIONAR "ENVIAR SOLICITUD"
+        // BOTÓN VERDE "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
-            
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se encontraron locales en esta zona.</div>`;
-                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
-                return;
-            }
-
-            contenedorResultados.innerHTML = "";
-            let textoVoz = `Solicitud procesada. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
-
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
