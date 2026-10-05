@@ -7,7 +7,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ LIBRERÍAS DE MAPAS CON PROTOCOLO SEGURO INTEGRADO -->
+    <!-- 🗺️ ENLACES DIRECTOS PARA EL MAPA COMPLETO A COLOR -->
     <link rel="stylesheet" href="https://jsdelivr.net" />
     <script src="https://jsdelivr.net"></script>
 
@@ -35,18 +35,12 @@
             border: 2px solid #cbd5e1; 
         }
         .card-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
         .input-control { 
-            flex: 1; padding: 16px; border: 2px solid #94a3b8; 
+            width: 100%; padding: 16px; border: 2px solid #94a3b8; 
             border-radius: 12px; font-size: 16px; outline: none; 
-            color: var(--text-dark); 
+            color: var(--text-dark); box-sizing: border-box;
         }
-        .btn-voice { 
-            background-color: #dbeafe; border: 2px solid var(--primary-blue); 
-            border-radius: 12px; width: 65px; font-size: 26px; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-        }
-        select.input-control { width: 100%; height: 54px; font-weight: bold; }
+        select.input-control { height: 54px; font-weight: bold; }
         .btn-submit { 
             width: 100%; background-color: var(--accent-green); color: white; 
             border: none; border-radius: 14px; padding: 20px; 
@@ -81,9 +75,9 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA -->
+        <!-- 1. CATEGORÍA DE NECESIDAD -->
         <section class="card">
-            <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
+            <div class="card-title">📁 1. Categoría de necesidad prioritária</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
                 <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida)</option>
@@ -92,28 +86,24 @@
             </select>
         </section>
 
-        <!-- 2. DETALLE -->
+        <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <div class="input-group">
-                <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, electricista, alimentos">
-                <button class="btn-voice" id="btn-voz-pedido" aria-label="Dictar pedido por voz">🎙️</button>
-            </div>
+            <!-- Se removió por completo el botón de micrófono para evitar bloqueos del sistema -->
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, salbutamol, alimentos">
         </section>
 
-        <!-- 3. UBICACIÓN AUTOMÁTICA -->
+        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
-            <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Detectando coordenadas..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
-            </div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
         <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
-        <!-- Panel de Resultados -->
+        <!-- Panel de Resultados de Auxilio -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -121,21 +111,21 @@
     </main>
 
     <script>
-        // Base de datos de comercios y servicios locales para Chorrillos
+        // Base de datos local e inmediata de comercios en Chorrillos
         const comerciosBD = [
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         let objetoMapa = null;
-        let pinVisual = null;
-        let defaultLat = -12.1936699;
-        let defaultLng = -77.0044871;
+        // Coordenadas fijas de Las Antaras 188, Chorrillos para carga inmediata sin satélite
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
 
-        // Reproductor de voz para asistencia de lectura
+        // Reproductor de audio asistido
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -145,62 +135,73 @@
             }
         }
 
-        // Anuncio inicial de accesibilidad al primer toque en la pantalla
+        // Anuncio asistido por voz inmediato al tocar la interfaz
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Conectando con los sensores de tu dispositivo.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // DIBUJAR MAPA SIN RIESGO DE CONGELAMIENTO
-        function renderizarMapa(lat, lng, esReal) {
+        // 🛰️ CARGA INMEDIATA DEL MAPA DE ALTA COMPATIBILIDAD A COLOR
+        function inicializarSistemaMapa() {
             try {
-                if (objetoMapa !== null) { objetoMapa.remove(); }
-
-                document.getElementById('txt-ubicacion').value = esReal ? "Ubicación Certificada por Satélite ✔️" : "Las Antaras 188, Chorrillos (Señal Base) ✔️";
-
-                objetoMapa = L.map('mapa-emergencia', { zoomControl: false, dragging: true, touchZoom: true }).setView([lat, lng], 16);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
+                // Crear el plano directamente en las coordenadas base para que pinte las calles al instante
+                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
                 
-                pinVisual = L.marker([lat, lng]).addTo(objetoMapa).bindPopup(esReal ? '<b>Estás aquí</b>' : '<b>Ubicación Asistida</b>').openPopup();
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+                    maxZoom: 19 
+                }).addTo(objetoMapa);
+                
+                // Añadir el marcador de posición
+                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
+                    .openPopup();
 
-                // Forzar refresco visual para eliminar recuadros grises
-                setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
-            } catch (err) {
-                console.error("Error al pintar el plano de calles:", err);
+                // Forzar el redibujado instantáneo para quitar la pantalla gris
+                setTimeout(() => { objetoMapa.invalidateSize(); }, 200);
+            } catch (error) {
+                console.error("Error al cargar la interfaz del plano de calles:", error);
             }
         }
 
-        // Sistema inteligente de tiempo límite para el GPS (Evita pantallas colgadas)
-        function iniciarGeolocalizacion() {
-            if (navigator.geolocation) {
-                // Si el GPS del celular no responde en 3 segundos, usa los datos de contingencia
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        renderizarMapa(position.coords.latitude, position.coords.longitude, true);
-                        hablarTexto("Ubicación satelital establecida con éxito.");
-                    },
-                    (error) => {
-                        renderizarMapa(defaultLat, defaultLng, false);
-                    },
-                    { enableHighAccuracy: true, timeout: 3000 }
-                );
-            } else {
-                renderizarMapa(defaultLat, defaultLng, false);
-            }
-        }
+        // Cargar mapa inmediatamente al abrir el archivo
+        window.addEventListener('load', inicializarSistemaMapa);
 
-        window.addEventListener('load', iniciarGeolocalizacion);
-
-        // ACCIÓN DEL BOTÓN VERDE "ENVIAR SOLICITUD"
+        // PROCESAMIENTO INTERACTIVO AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
+            
+            // Buscar coincidencias directas en la base de datos
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
             if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
+                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales en este rango.</div>`;
+                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
+                return;
+            }
+
+            contenedorResultados.innerHTML = "";
+            let textoVoz = `Solicitud procesada con éxito. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
+
+            filtrados.forEach(comercio => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <strong>🏢 ${comercio.nombre}</strong>
+                    <div class="local-info">ℹ️ ${comercio.info}</div>
+                `;
+                contenedorResultados.appendChild(itemDiv);
+                textoVoz += `Establecimiento: ${comercio.nombre}. ${comercio.info} `;
+            });
+
+            // Dictar resultados de comercios por los parlantes del teléfono
+            hablarTexto(textoVoz);
+        });
+    </script>
+</body>
+</html>
