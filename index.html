@@ -110,12 +110,12 @@
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS LOCAL INMEDIATA (INCLUYE POLLERÍAS Y FARMACIAS)
+        // 🏢 BASE DE DATOS LOCAL INMEDIATA
         const comerciosBD = [
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
             { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
             { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", info: "Especialidad en pollos a la brasa tradicionales." },
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales and stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
@@ -136,18 +136,29 @@
             }
         }
 
-        // Anuncio de voz asistida al tocar la pantalla
+        // 🌟 FUNCIÓN REFRESCAR MAPA: Obliga al navegador a pintar los colores de las calles
+        function forzarRefrescoMapa() {
+            if (objetoMapa !== null) {
+                setTimeout(() => {
+                    objetoMapa.invalidateSize(true);
+                }, 100);
+            }
+        }
+
+        // Anuncio de voz asistida e instrucciones al tocar la pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
                 hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
+            // Cada vez que el usuario toque la pantalla, forzamos el redibujado de las calles
+            forzarRefrescoMapa();
         }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
-        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('touchstart', activarAnuncioInmediato);
+        document.body.addEventListener('click', activarAnuncioInmediato);
 
-        // 🛰️ CARGA EN SEGUNDO PLANO DEL PLANO DE CALLES
+        // 🛰️ CARGA DEL PLANO DE CALLES
         function inicializarSistemaMapa() {
             try {
                 if (objetoMapa !== null) { objetoMapa.remove(); }
@@ -162,8 +173,8 @@
                     .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
                     .openPopup();
 
-                // Forzar refresco visual rápido
-                setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
+                // Primer intento de refresco al cargar
+                setTimeout(forzarRefrescoMapa, 500);
             } catch (error) {
                 console.error("Error al cargar la interfaz gráfica:", error);
             }
@@ -176,7 +187,6 @@
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Filtrar los locales que corresponden a la opción elegida del menú
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
             if (filtrados.length === 0) {
@@ -196,12 +206,3 @@
                     <div class="local-info">ℹ️ ${comercio.info}</div>
                 `;
                 contenedorResultados.appendChild(itemDiv);
-                textoVoz += `Establecimiento: ${comercio.nombre}. ${comercio.info} `;
-            });
-
-            // Dictar resultados de comercios inmediatamente por los parlantes del teléfono
-            hablarTexto(textoVoz);
-        });
-    </script>
-</body>
-</html>
