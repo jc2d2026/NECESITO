@@ -7,7 +7,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ ENLACES DIRECTOS PARA EL MAPA COMPLETO A COLOR -->
+    <!-- 🗺️ LIBRERÍAS GEOGRÁFICAS ACTUALIZADAS PARA EVITAR CUADROS GRISES -->
     <link rel="stylesheet" href="https://jsdelivr.net" />
     <script src="https://jsdelivr.net"></script>
 
@@ -77,10 +77,10 @@
     <main>
         <!-- 1. CATEGORÍA DE NECESIDAD -->
         <section class="card">
-            <div class="card-title">📁 1. Categoría de necesidad prioritária</div>
+            <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Comida)</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Pollerías)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
             </select>
@@ -89,7 +89,6 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <!-- Se removió por completo el botón de micrófono para evitar bloqueos del sistema -->
             <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, salbutamol, alimentos">
         </section>
 
@@ -111,21 +110,22 @@
     </main>
 
     <script>
-        // Base de datos local e inmediata de comercios en Chorrillos
+        // 🏢 BASE DE DATOS AMPLIADA CON POLLERÍAS RECONOCIDAS Y FARMACIAS
         const comerciosBD = [
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
+            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", palabrasClave: ["pollo", "polleria", "brasa", "rokys", "norkys"], info: "Pollo a la brasa caliente y combos familiares. Delivery cercano a Las Antaras." },
+            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", palabrasClave: ["pollo", "polleria", "brasa", "norkys"], info: "Atención rápida en platos a la brasa y parrillas locales." },
+            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", palabrasClave: ["pollo", "polleria", "canastas"], info: "Especialidad en pollos a la brasa y cortes tradicionales." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", palabrasClave: ["salbutamol", "medicina", "farmacia", "pastillas", "jarabe"], info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", palabrasClave: ["abarrotes", "bodega", "comida", "alimentos", "leche", "arroz"], info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", palabrasClave: ["verduras", "bodega", "abarrotes", "comida"], info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "tecnico"], info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", palabrasClave: ["medico", "doctor", "emergencia", "salud", "clinica"], info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         let objetoMapa = null;
-        // Coordenadas fijas de Las Antaras 188, Chorrillos para carga inmediata sin satélite
         let coordenadasLat = -12.1936699;
         let coordenadasLng = -77.0044871;
 
-        // Reproductor de audio asistido
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -135,73 +135,60 @@
             }
         }
 
-        // Anuncio asistido por voz inmediato al tocar la interfaz
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada. Ubicación establecida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CARGA INMEDIATA DEL MAPA DE ALTA COMPATIBILIDAD A COLOR
+        // 🛰️ CARGA FORZADA E INMEDIATA DEL MAPA URBANO A COLOR
         function inicializarSistemaMapa() {
             try {
-                // Crear el plano directamente en las coordenadas base para que pinte las calles al instante
-                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
+                // Forzar limpieza si existía un lienzo previo
+                if (objetoMapa !== null) { objetoMapa.remove(); }
+
+                objetoMapa = L.map('mapa-emergencia', { 
+                    zoomControl: false,
+                    fadeAnimation: false,
+                    markerZoomAnimation: false
+                }).setView([coordenadasLat, coordenadasLng], 17);
                 
+                // Capa directa de OpenStreetMap sin bloqueos de seguridad
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                    maxZoom: 19 
+                    maxZoom: 19,
+                    updateWhenIdle: false,
+                    updateWhenZooming: true
                 }).addTo(objetoMapa);
                 
-                // Añadir el marcador de posición
+                // Agregar el pin rojo de localización
                 L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
                     .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
                     .openPopup();
 
-                // Forzar el redibujado instantáneo para quitar la pantalla gris
-                setTimeout(() => { objetoMapa.invalidateSize(); }, 200);
+                // 🌟 REFRESCO CLAVE: Rompe la pantalla gris forzando al navegador a pintar los colores
+                setTimeout(() => { 
+                    objetoMapa.invalidateSize(true); 
+                }, 400);
+
             } catch (error) {
-                console.error("Error al cargar la interfaz del plano de calles:", error);
+                console.error("Error cargando plano de calles:", error);
             }
         }
 
-        // Cargar mapa inmediatamente al abrir el archivo
         window.addEventListener('load', inicializarSistemaMapa);
 
-        // PROCESAMIENTO INTERACTIVO AL PRESIONAR "ENVIAR SOLICITUD"
+        // 🚀 FILTRO INTELIGENTE AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const textoPedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Buscar coincidencias directas en la base de datos
-            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
-            
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales en este rango.</div>`;
-                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
-                return;
-            }
+            let filtrados = [];
 
-            contenedorResultados.innerHTML = "";
-            let textoVoz = `Solicitud procesada con éxito. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
-
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                itemDiv.innerHTML = `
-                    <strong>🏢 ${comercio.nombre}</strong>
-                    <div class="local-info">ℹ️ ${comercio.info}</div>
-                `;
-                contenedorResultados.appendChild(itemDiv);
-                textoVoz += `Establecimiento: ${comercio.nombre}. ${comercio.info} `;
-            });
-
-            // Dictar resultados de comercios por los parlantes del teléfono
-            hablarTexto(textoVoz);
-        });
-    </script>
-</body>
-</html>
+            // Si el usuario escribió un texto, buscamos por palabra clave (Ej: "pollo" o "salbutamol")
+            if (textoPedido !== "") {
+                filtrados = comerciosBD.filter(comercio => {
