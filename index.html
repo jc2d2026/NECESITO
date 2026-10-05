@@ -56,7 +56,7 @@
         .contenedor-mapa { 
             width: 100%; height: 240px; border-radius: 12px; 
             overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #e2e8f0; 
+            margin-top: 10px; background-color: #cbd5e1; 
             position: relative; z-index: 1; 
         }
         .results-section { margin-top: 20px; }
@@ -126,16 +126,16 @@
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencias eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         let objetoMapa = null;
         let pinVisual = null;
-        // Coordenadas base por si el satélite falla
         let defaultLat = -12.1936699;
         let defaultLng = -77.0044871;
 
+        // Reproductor de voz para asistencia de lectura
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -145,7 +145,18 @@
             }
         }
 
-        // Forzar arranque visual del mapa con o sin permisos satelitales
+        // Anuncio inicial de accesibilidad al primer toque en la pantalla
+        let vozAnunciada = false;
+        function activarAnuncioInmediato() {
+            if (!vozAnunciada) {
+                hablarTexto("Aplicación Necesito iniciada. Conectando con los sensores de tu dispositivo.");
+                vozAnunciada = true;
+            }
+        }
+        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
+
+        // DIBUJAR MAPA SIN RIESGO DE CONGELAMIENTO
         function renderizarMapa(lat, lng, esReal) {
             try {
                 if (objetoMapa !== null) { objetoMapa.remove(); }
@@ -157,26 +168,26 @@
                 
                 pinVisual = L.marker([lat, lng]).addTo(objetoMapa).bindPopup(esReal ? '<b>Estás aquí</b>' : '<b>Ubicación Asistida</b>').openPopup();
 
+                // Forzar refresco visual para eliminar recuadros grises
                 setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
             } catch (err) {
-                console.error("Fallo gráfico al renderizar el mapa:", err);
+                console.error("Error al pintar el plano de calles:", err);
             }
         }
 
-        // Sistema dinámico que no se cuelga
+        // Sistema inteligente de tiempo límite para el GPS (Evita pantallas colgadas)
         function iniciarGeolocalizacion() {
             if (navigator.geolocation) {
-                // Configura un tiempo límite estricto de 4 segundos para el GPS
+                // Si el GPS del celular no responde en 3 segundos, usa los datos de contingencia
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         renderizarMapa(position.coords.latitude, position.coords.longitude, true);
                         hablarTexto("Ubicación satelital establecida con éxito.");
                     },
                     (error) => {
-                        // Si falla o está bloqueado, pinta el mapa inmediatamente usando los datos base
                         renderizarMapa(defaultLat, defaultLng, false);
                     },
-                    { enableHighAccuracy: true, timeout: 4000 }
+                    { enableHighAccuracy: true, timeout: 3000 }
                 );
             } else {
                 renderizarMapa(defaultLat, defaultLng, false);
@@ -185,7 +196,7 @@
 
         window.addEventListener('load', iniciarGeolocalizacion);
 
-        // LÓGICA DEL BOTÓN VERDE "ENVIAR SOLICITUD"
+        // ACCIÓN DEL BOTÓN VERDE "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
@@ -193,14 +204,3 @@
             
             if (filtrados.length === 0) {
                 contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
-                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
-                return;
-            }
-
-            contenedorResultados.innerHTML = "";
-            let textoVoz = `Solicitud procesada. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
-
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                itemDiv.innerHTML = `<strong>🏢 ${comercio.nombre}</strong><div class="local-info">ℹ️ ${comercio.info}</div>`;
