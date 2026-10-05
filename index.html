@@ -6,10 +6,6 @@
     <title>NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
-    
-    <!-- 🗺️ IMPORTACIÓN COMPATIBLE DE MAPAS ACCESIBLES -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <script src="https://unpkg.com"></script>
 
     <style>
         :root { 
@@ -50,8 +46,10 @@
         .contenedor-mapa { 
             width: 100%; height: 240px; border-radius: 12px; 
             overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #cbd5e1; 
-            position: relative; z-index: 1; 
+            margin-top: 10px; background-color: #e2e8f0; 
+        }
+        .mapa-iframe {
+            width: 100%; height: 100%; border: none;
         }
         .results-section { margin-top: 20px; }
         .result-item { 
@@ -80,7 +78,7 @@
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Pollerías)</option>
+                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Pizzerías)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
             </select>
@@ -89,14 +87,18 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pollo a la brasa, salbutamol, alimentos">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pizza hawaiana familiar, salbutamol, alimentos">
         </section>
 
         <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
-            <div id="mapa-emergencia" class="contenedor-mapa"></div>
+            
+            <!-- 🌟 MAPA DIRECTO ESTILO WAZE / GOOGLE MAPS SIN ERRORES -->
+            <div id="mapa-emergencia" class="contenedor-mapa">
+                <iframe class="mapa-iframe" src="https://google.com"></iframe>
+            </div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
@@ -110,23 +112,17 @@
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS LOCAL TOTALMENTE CORREGIDA EN ESPAÑOL
+        // 🏢 BASE DE DATOS LOCAL AMPLIADA (INCLUYE PIZZERÍAS)
         const comerciosBD = [
-            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
-            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
-            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", info: "Especialidad en pollos a la brasa tradicionales." },
+            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
+            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "compras", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let objetoMapa = null;
-        let coordenadasLat = -12.1936699;
-        let coordenadasLng = -77.0044871;
-
-        // Sistema de locución de voz asistida
+        // Lector de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -136,56 +132,22 @@
             }
         }
 
-        // Función para reajustar los gráficos del mapa y romper la pantalla gris
-        function forzarRefrescoMapa() {
-            if (objetoMapa !== null) {
-                setTimeout(() => {
-                    objetoMapa.invalidateSize(true);
-                }, 100);
-            }
-        }
-
-        // Anuncio de voz asistida e instrucciones al tocar la pantalla
+        // Activar voz asistida al tocar la pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada correctamente. Ubicación establecida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
-            forzarRefrescoMapa();
         }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato);
-        document.body.addEventListener('click', activarAnuncioInmediato);
-
-        // 🛰️ INITIALIZACIÓN ESTRUCTURAL DEL PLANO DE LAS CALLES
-        function inicializarSistemaMapa() {
-            try {
-                if (objetoMapa !== null) { objetoMapa.remove(); }
-
-                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
-                
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                    maxZoom: 19 
-                }).addTo(objetoMapa);
-                
-                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
-                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
-                    .openPopup();
-
-                setTimeout(forzarRefrescoMapa, 500);
-            } catch (error) {
-                console.error("Error al cargar la interfaz gráfica:", error);
-            }
-        }
-
-        window.addEventListener('load', inicializarSistemaMapa);
+        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
         // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            // Filtrado inmediato por categorías
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
             if (filtrados.length === 0) {
@@ -208,3 +170,9 @@
                 textoVoz += `Establecimiento: ${comercio.nombre}. `;
             });
 
+            // Dictar respuestas encontradas
+            hablarTexto(textoVoz);
+        });
+    </script>
+</body>
+</html>
