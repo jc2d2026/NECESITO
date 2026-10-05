@@ -7,7 +7,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ ENLACES GEOGRÁFICOS DE MÁXIMA COMPATIBILIDAD CON SEGURIDAD (HTTPS) -->
+    <!-- 🗺️ IMPORTACIÓN DIRECTA DE MAPAS SATELITALES OPENSTREETMAP -->
     <link rel="stylesheet" href="https://unpkg.com" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
@@ -81,7 +81,7 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD PRIORITARIA -->
+        <!-- 1. CATEGORÍA -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -92,7 +92,7 @@
             </select>
         </section>
 
-        <!-- 2. DETALLE DEL PEDIDO -->
+        <!-- 2. DETALLE -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
             <div class="input-group">
@@ -101,19 +101,19 @@
             </div>
         </section>
 
-        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
+        <!-- 3. UBICACIÓN REAL satelital -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <div class="input-group">
-                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando tu ubicación real..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
+                <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal de satélite real..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             </div>
             <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
+        <!-- Botón Enviar Solicitud -->
         <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
-        <!-- Panel de Resultados de Auxilio -->
+        <!-- Panel de Resultados -->
         <section class="results-section">
             <div class="card-title">✨ Soluciones Encontradas</div>
             <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
@@ -121,11 +121,12 @@
     </main>
 
     <script>
-        // Base de datos de prueba
+        // Base de datos de comercios locales para Chorrillos
         const comerciosBD = [
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. Cerca de Chorrillos." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos y alimentos de primera necesidad." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico y emergencias eléctricas en la zona." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales. A solo unos pasos de tu ubicación en Las Antaras." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
@@ -142,28 +143,28 @@
             }
         }
 
-        // Anuncio inicial de bienvenida al tocar la pantalla
+        // Anuncio asistido de voz inicial al interactuar
         let vozAnunciada = false;
         document.body.addEventListener('click', () => {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Buscando tu señal satelital actual.");
+                hablarTexto("Aplicación Necesito iniciada. Conectando con los sensores de tu dispositivo.");
                 vozAnunciada = true;
             }
         });
 
-        // 🛰️ CORRECCIÓN CLAVE: SISTEMA DE GPS DINÁMICO REAL Y RENDERS DE MAPA
-        function obtenerUbicacionReal() {
+        // 🛰️ FUNCION DE RASTREO SATELITAL EN TIEMPO REAL NATIVO (GPS)
+        function activarRastreoGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
 
-                        // Actualiza el texto de ubicación con coordenadas reales reales
-                        document.getElementById('txt-ubicacion').value = `Ubicación Certificada GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)} ✔️`;
-                        hablarTexto("Ubicación satelital encontrada y certificada con éxito.");
+                        // Modifica el cuadro de texto con la ubicación exacta donde estés parado
+                        document.getElementById('txt-ubicacion').value = `Ubicación Real Detectada ✔️`;
+                        hablarTexto("Ubicación satelital establecida con éxito.");
 
-                        // Dibujar el plano cartográfico real sin recuadros grises
+                        // Crear o mover el mapa satelital sin recuadros grises
                         if (objetoMapa === null) {
                             objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([lat, lng], 16);
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(objetoMapa);
@@ -173,30 +174,28 @@
                             pinVisual.setLatLng([lat, lng]);
                         }
 
-                        // Forzar el redibujado de Leaflet para destruir el recuadro gris
-                        setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
+                        // Destruir el recuadro gris forzando el renderizado
+                        setTimeout(() => { objetoMapa.invalidateSize(); }, 400);
                     },
                     (error) => {
                         console.error(error);
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Señal Base) ✔️";
-                        hablarTexto("No se pudo obtener el GPS exacto. Usando dirección base de contingencia.");
-                        // Mapa por defecto si el GPS está apagado en el teléfono
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Ubicación Base) ✔️";
+                        hablarTexto("No se pudo conectar al GPS. Usando ubicación base.");
+                        
+                        // Mapa de contingencia por defecto si el GPS del celular está apagado
                         if (objetoMapa === null) {
-                            objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([-12.1936, -77.0044], 16);
+                            objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([-12.1936699, -77.0044871], 16);
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(objetoMapa);
-                            L.marker([-12.1936, -77.0044]).addTo(objetoMapa);
+                            L.marker([-12.1936699, -77.0044871]).addTo(objetoMapa);
                         }
                     },
-                    { enableHighAccuracy: true, timeout: 10000 }
+                    { enableHighAccuracy: true, timeout: 8000 }
                 );
             }
         }
 
-        window.addEventListener('load', obtenerUbicacionReal);
+        // Ejecutar de inmediato al cargar la interfaz web
+        window.addEventListener('load', activarRastreoGPS);
 
-        // BOTÓN VERDE "ENVIAR SOLICITUD"
+        // LÓGICA DE PROCESAMIENTO Y FILTRADO AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const contenedorResultados = document.getElementById('lista-resultados');
-            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
-            
