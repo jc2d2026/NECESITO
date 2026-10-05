@@ -7,9 +7,9 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ LIBRERÍAS GEOGRÁFICAS ACTUALIZADAS PARA EVITAR CUADROS GRISES -->
-    <link rel="stylesheet" href="https://jsdelivr.net" />
-    <script src="https://jsdelivr.net"></script>
+    <!-- 🗺️ IMPORTACIÓN COMPATIBLE DE MAPAS ACCESIBLES -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
 
     <style>
         :root { 
@@ -110,22 +110,23 @@
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS AMPLIADA CON POLLERÍAS RECONOCIDAS Y FARMACIAS
+        // 🏢 BASE DE DATOS LOCAL INMEDIATA (INCLUYE POLLERÍAS Y FARMACIAS)
         const comerciosBD = [
-            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", palabrasClave: ["pollo", "polleria", "brasa", "rokys", "norkys"], info: "Pollo a la brasa caliente y combos familiares. Delivery cercano a Las Antaras." },
-            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", palabrasClave: ["pollo", "polleria", "brasa", "norkys"], info: "Atención rápida en platos a la brasa y parrillas locales." },
-            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", palabrasClave: ["pollo", "polleria", "canastas"], info: "Especialidad en pollos a la brasa y cortes tradicionales." },
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", palabrasClave: ["salbutamol", "medicina", "farmacia", "pastillas", "jarabe"], info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", palabrasClave: ["abarrotes", "bodega", "comida", "alimentos", "leche", "arroz"], info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", palabrasClave: ["verduras", "bodega", "abarrotes", "comida"], info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", palabrasClave: ["electricista", "luz", "corto", "tecnico"], info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", palabrasClave: ["medico", "doctor", "emergencia", "salud", "clinica"], info: "Atención médica, chequeos rápidos y guardias asistenciales." }
+            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
+            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
+            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", info: "Especialidad en pollos a la brasa tradicionales." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
         let objetoMapa = null;
         let coordenadasLat = -12.1936699;
         let coordenadasLng = -77.0044871;
 
+        // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -135,60 +136,72 @@
             }
         }
 
+        // Anuncio de voz asistida al tocar la pantalla
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Ubicación establecida en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CARGA FORZADA E INMEDIATA DEL MAPA URBANO A COLOR
+        // 🛰️ CARGA EN SEGUNDO PLANO DEL PLANO DE CALLES
         function inicializarSistemaMapa() {
             try {
-                // Forzar limpieza si existía un lienzo previo
                 if (objetoMapa !== null) { objetoMapa.remove(); }
 
-                objetoMapa = L.map('mapa-emergencia', { 
-                    zoomControl: false,
-                    fadeAnimation: false,
-                    markerZoomAnimation: false
-                }).setView([coordenadasLat, coordenadasLng], 17);
+                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
                 
-                // Capa directa de OpenStreetMap sin bloqueos de seguridad
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                    maxZoom: 19,
-                    updateWhenIdle: false,
-                    updateWhenZooming: true
+                    maxZoom: 19 
                 }).addTo(objetoMapa);
                 
-                // Agregar el pin rojo de localización
                 L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
                     .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
                     .openPopup();
 
-                // 🌟 REFRESCO CLAVE: Rompe la pantalla gris forzando al navegador a pintar los colores
-                setTimeout(() => { 
-                    objetoMapa.invalidateSize(true); 
-                }, 400);
-
+                // Forzar refresco visual rápido
+                setTimeout(() => { objetoMapa.invalidateSize(); }, 300);
             } catch (error) {
-                console.error("Error cargando plano de calles:", error);
+                console.error("Error al cargar la interfaz gráfica:", error);
             }
         }
 
         window.addEventListener('load', inicializarSistemaMapa);
 
-        // 🚀 FILTRO INTELIGENTE AL PRESIONAR "ENVIAR SOLICITUD"
+        // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const textoPedido = document.getElementById('txt-pedido').value.toLowerCase().trim();
             const contenedorResultados = document.getElementById('lista-resultados');
             
-            let filtrados = [];
+            // Filtrar los locales que corresponden a la opción elegida del menú
+            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
+            
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
+                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
+                return;
+            }
 
-            // Si el usuario escribió un texto, buscamos por palabra clave (Ej: "pollo" o "salbutamol")
-            if (textoPedido !== "") {
-                filtrados = comerciosBD.filter(comercio => {
+            contenedorResultados.innerHTML = "";
+            let textoVoz = `Solicitud procesada con éxito. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
+
+            filtrados.forEach(comercio => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <strong>🏢 ${comercio.nombre}</strong>
+                    <div class="local-info">ℹ️ ${comercio.info}</div>
+                `;
+                contenedorResultados.appendChild(itemDiv);
+                textoVoz += `Establecimiento: ${comercio.nombre}. ${comercio.info} `;
+            });
+
+            // Dictar resultados de comercios inmediatamente por los parlantes del teléfono
+            hablarTexto(textoVoz);
+        });
+    </script>
+</body>
+</html>
