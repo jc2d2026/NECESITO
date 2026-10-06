@@ -6,6 +6,10 @@
     <title>NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
+    
+    <!-- 🗺️ LIBRERÍA DE MAPAS LIBRES TOTALMENTE COMPATIBLE -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
 
     <style>
         :root { 
@@ -46,10 +50,8 @@
         .contenedor-mapa { 
             width: 100%; height: 240px; border-radius: 12px; 
             overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #e2e8f0; 
-        }
-        .mapa-iframe {
-            width: 100%; height: 100%; border: none;
+            margin-top: 10px; background-color: #cbd5e1; 
+            position: relative; z-index: 1; 
         }
         .results-section { margin-top: 20px; }
         .result-item { 
@@ -73,12 +75,13 @@
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD -->
+        <!-- 1. CATEGORÍA DE NECESIDAD (SEPARADA Y OPTIMIZADA) -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Pizzerías)</option>
+                <option value="comida">🍕 Comida Preparada (Pizzerías, Pollerías)</option>
+                <option value="compras">🛒 Abarrotes y Abastecimiento (Bodegas)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
             </select>
@@ -94,11 +97,7 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
-            
-            <!-- 🌟 MAPA DIRECTO ESTILO WAZE / GOOGLE MAPS SIN ERRORES -->
-            <div id="mapa-emergencia" class="contenedor-mapa">
-                <iframe class="mapa-iframe" src="https://google.com"></iframe>
-            </div>
+            <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
@@ -112,17 +111,23 @@
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS LOCAL AMPLIADA (INCLUYE PIZZERÍAS)
+        // 🏢 BASE DE DATOS CATEGORIZADA DE FORMA OBJETIVA
         const comerciosBD = [
-            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
-            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "compras", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
+            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
+            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
+            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // Lector de voz asistida
+        let objetoMapa = null;
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
+
+        // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -132,22 +137,58 @@
             }
         }
 
-        // Activar voz asistida al tocar la pantalla
+        // Función para forzar al mapa a renderizarse a color sin quedarse gris
+        function forzarRefrescoMapa() {
+            if (objetoMapa !== null) {
+                setTimeout(() => {
+                    objetoMapa.invalidateSize(true);
+                }, 200);
+            }
+        }
+
+        // Anuncio de voz asistida al tocar la interfaz
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada correctamente. Ubicación establecida en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
+            forzarRefrescoMapa();
         }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
-        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('touchstart', activarAnuncioInmediato);
+        document.body.addEventListener('click', activarAnuncioInmediato);
+
+        // 🛰️ INITIALIZACIÓN DEL MAPA ESTILO WAZE SIN BLOQUEOS
+        function inicializarSistemaMapa() {
+            try {
+                if (objetoMapa !== null) { objetoMapa.remove(); }
+
+                // Crear el mapa interactivo directamente
+                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+                    maxZoom: 19 
+                }).addTo(objetoMapa);
+                
+                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
+                    .openPopup();
+
+                // Forzar dibujo de colores inmediatamente
+                setTimeout(forzarRefrescoMapa, 500);
+            } catch (error) {
+                console.error("Error cargando plano de calles:", error);
+            }
+        }
+
+        window.addEventListener('load', inicializarSistemaMapa);
 
         // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const contenedorResultados = document.getElementById('lista-resultados');
             
+            // Filtrar únicamente los locales que pertenecen a la categoría elegida
             const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
             
             if (filtrados.length === 0) {
@@ -164,15 +205,3 @@
                 itemDiv.className = 'result-item';
                 itemDiv.innerHTML = `
                     <strong>🏢 ${comercio.nombre}</strong>
-                    <div class="local-info">ℹ️ ${comercio.info}</div>
-                `;
-                contenedorResultados.appendChild(itemDiv);
-                textoVoz += `Establecimiento: ${comercio.nombre}. `;
-            });
-
-            // Dictar respuestas encontradas
-            hablarTexto(textoVoz);
-        });
-    </script>
-</body>
-</html>
