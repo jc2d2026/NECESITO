@@ -44,26 +44,12 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
         .contenedor-mapa { 
-            width: 100%; height: 240px; border-radius: 12px; 
+            width: 100%; height: 260px; border-radius: 12px; 
             overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #cbd5e1;
+            margin-top: 10px; background-color: #e2e8f0;
         }
-        .mapa-imagen {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .results-section { margin-top: 20px; }
-        .result-item { 
-            padding: 16px; background: #ffffff; margin: 10px 0; 
-            border-radius: 12px; border-left: 8px solid var(--primary-blue); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px; 
-            line-height: 1.5; 
-        }
-        .local-info { 
-            background-color: #f1f5f9; padding: 12px; border-radius: 8px; 
-            margin-top: 8px; font-size: 14px; color: #334155; 
-            border-left: 3px solid #10b981; 
+        .mapa-visor {
+            width: 100%; height: 100%; border: none;
         }
     </style>
 </head>
@@ -79,8 +65,8 @@
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
-                <option value="comida">🍕 Comida Preparada (Pizzerías, Pollerías)</option>
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
+                <option value="comida">🍕 Comida Preparada (Pizzerías, Pollerías)</option>
                 <option value="compras">🛒 Abarrotes y Abastecimiento (Bodegas)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
@@ -90,41 +76,28 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pizza americana familiar, salbutamol, alimentos">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
         <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
+            <input type="text" class="input-control" id="txt-ubicacion" value="Buscando tu señal satelital GPS..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             
-            <!-- 🌟 MAPA REAL CON IMAGEN ESTÁTICA PARA COMPATIBILIDAD MÁXIMA EN CELULARES -->
-            <div class="contenedor-mapa">
-                <img class="mapa-imagen" src="https://openplaceguide.org" alt="Mapa de Chorrillos Las Antaras">
+            <!-- 🌟 VISOR DE MAPA REAL EN TIEMPO REAL SIN BLOQUEOS GRISES -->
+            <div class="contenedor-mapa" id="bloque-mapa">
+                <iframe id="visor-gps" class="mapa-visor" src="about:blank"></iframe>
             </div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
-        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
-
-        <!-- Panel de Resultados de Auxilio -->
-        <section class="results-section">
-            <div class="card-title">✨ Soluciones Encontradas</div>
-            <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
-        </section>
+        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD REAL</button>
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS LOCAL INMEDIATA
-        const comerciosBD = [
-            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
-            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
-            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
-            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
-            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
-        ];
+        let miLatitud = -12.1936699; // Coordenadas por defecto (Las Antaras)
+        let miLongitud = -77.0044871;
+        let gpsActivo = false;
 
         // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
@@ -136,46 +109,79 @@
             }
         }
 
-        // Anuncio de voz asistida inmediato al tocar la interfaz
+        // Anuncio inicial de voz asistida
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada. Conectando con los satélites de tu ubicación actual.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
+        // 🛰️ CAPTURA SATELITAL COMPLETA DEL GPS REAL DEL TELÉFONO
+        function capturarUbicacionDispositivo() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        miLatitud = position.coords.latitude;
+                        miLongitud = position.coords.longitude;
+                        gpsActivo = true;
+
+                        // Cambia el cuadro de texto mostrando que el satélite lo localizó con éxito
+                        document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
+                        hablarTexto("Satélite conectado. Tu ubicación actual ha sido detectada con éxito.");
+
+                        // Carga el plano interactivo real con las calles y manzanas donde estés parado
+                        const urlMapa = `https://google.com{miLatitud},${miLongitud}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+                        document.getElementById('visor-gps').src = urlMapa;
+                    },
+                    (error) => {
+                        console.error("GPS denegado o apagado:", error);
+                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Señal Base) ✔️";
+                        hablarTexto("No se pudo acceder al GPS del teléfono. Usando ubicación base de contingencia.");
+                        
+                        // Carga el mapa base de Las Antaras por defecto si el GPS del celular está apagado
+                        const urlMapaBase = `https://google.com`;
+                        document.getElementById('visor-gps').src = urlMapaBase;
+                    },
+                    { enableHighAccuracy: true, timeout: 7000 }
+                );
+            } else {
+                // Si el navegador es muy antiguo
+                const urlMapaBase = `https://google.com`;
+                document.getElementById('visor-gps').src = urlMapaBase;
+            }
+        }
+
+        // Ejecutar el rastreo GPS inmediatamente al abrir la pantalla
+        window.addEventListener('load', capturarUbicacionDispositivo);
+
+        // 🚀 ENRUTADOR DINÁMICO AL PRESIONAR "ENVIAR SOLICITUD" (ABRE RESULTADOS REALES)
         document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const contenedorResultados = document.getElementById('lista-resultados');
+            const categoria = document.getElementById('select-categoria').value;
+            const pedido = document.getElementById('txt-pedido').value.trim();
             
-            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
-            
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
-                hablarTexto("No se encontraron locales cercanos.");
-                return;
+            // Decidir qué buscar en base a la necesidad del usuario
+            let términoBúsqueda = categoria;
+            if (pedido !== "") {
+                términoBúsqueda = pedido;
+            } else {
+                if (categoria === "farmacia") términoBúsqueda = "farmacia botica";
+                if (categoria === "comida") términoBúsqueda = "restaurante polleria pizzeria";
+                if (categoria === "compras") términoBúsqueda = "bodega market";
+                if (categoria === "tecnicos") términoBúsqueda = "servicio tecnico electricista gasfitero";
+                if (categoria === "vital") términoBúsqueda = "hospital clinica emergencia";
             }
 
-            contenedorResultados.innerHTML = "";
-            let textoVoz = `Solicitud procesada. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
+            hablarTexto(`Buscando soluciones de ${términoBúsqueda} en tiempo real a tu alrededor.`);
 
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                itemDiv.innerHTML = `
-                    <strong>🏢 ${comercio.nombre}</strong>
-                    <div class="local-info">ℹ️ ${comercio.info}</div>
-                `;
-                contenedorResultados.appendChild(itemDiv);
-                textoVoz += `Establecimiento: ${comercio.nombre}. `;
-            });
-
-            // Dictar respuestas encontradas por el parlante
-            hablarTexto(textoVoz);
+            // Genera el enlace de búsqueda geolocalizado real para abrir los locales más cercanos a tu posición actual
+            setTimeout(() => {
+                const urlResultadosReales = `https://google.com{encodeURIComponent(términoBúsqueda)}/@${miLatitud},${miLongitud},15z`;
+                window.open(urlResultadosReales, '_blank');
+            }, 1500);
         });
     </script>
 </body>
