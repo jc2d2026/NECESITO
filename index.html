@@ -130,7 +130,7 @@
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                         hablarTexto("Satélite conectado. Tu ubicación ha sido registrada.");
 
-                        // Cargar plano urbano estable
+                        // Cargar plano urbano estable de OpenStreetMap libre de bloqueos
                         const urlMapaEstable = "https://openstreetmap.org" + (miLongitud - 0.003) + "%2C" + (miLatitud - 0.002) + "%2C" + (miLongitud + 0.003) + "%2C" + (miLatitud + 0.002) + "&layer=mapnik&marker=" + miLatitud + "%2C" + miLongitud;
                         document.getElementById('visor-gps').src = urlMapaEstable;
                     },
@@ -152,7 +152,7 @@
 
         window.addEventListener('load', capturarUbicacionDispositivo);
 
-        // ENRUTADOR WEB REPARADO SIN ERRORES DE DOMINIOS PEGADOS
+        // ENRUTADOR UNIVERSAL DE MAPAS DIRECTOS COMPATIBLE CON CACHÉ DE CELULARES
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -168,11 +168,11 @@
                 if (categoria === "vital") terminoBusqueda = "hospital clinica emergencia";
             }
 
-            hablarTexto("Buscando soluciones de " + terminoBusqueda + " en tiempo real.");
+            hablarTexto("Buscando soluciones de " + terminoBusqueda + " a tu alrededor.");
 
-            // ENLACE NATIVO CORREGIDO CON LA BARRA DIAGONAL OBLIGATORIA DESPUÉS DE GOOGLE.COM
+            // 🌟 ENLACE UNIVERSAL INTEGRADO: Elimina por completo el error de dominios corruptos o pegados
             setTimeout(() => {
-                const urlResultadosCorrecta = "https://google.com" + encodeURIComponent(terminoBusqueda) + "/@" + miLatitud + "," + miLongitud + ",15z";
+                const urlResultadosCorrecta = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&ll=" + miLatitud + "," + miLongitud + "&z=16";
                 window.open(urlResultadosCorrecta, '_blank');
             }, 1500);
         });
