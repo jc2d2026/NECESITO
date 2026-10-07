@@ -109,13 +109,14 @@
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada correctamente. Conectando sensores.");
+                hablarTexto("Aplicación Necesito iniciada correctamente. Conectando sensores satelitales.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
+        // SISTEMA DE CAPTURA SATELITAL GPS NATIVO
         function capturarUbicacionDispositivo() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -142,7 +143,7 @@
 
         window.addEventListener('load', capturarUbicacionDispositivo);
 
-        // 🌟 SISTEMA DE ENRUTAMIENTO ALTERNATIVO ANTIBLOQUEO CACHÉ
+        // ENRUTADOR REPARADO CON ESTÁNDAR OFICIAL INTERNACIONAL DE INTERNET
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -160,10 +161,10 @@
 
             hablarTexto("Buscando soluciones para tu pedido de " + terminoBusqueda);
 
-            // 🌟 CAMBIO RADICAL: Usamos la API universal de Geo-Rutas de Mapas Móviles para burlar el error del celular
+            // RUTA ESTÁNDAR REPARADA: Usa el conector universal libre de errores de enlaces pegados
             setTimeout(() => {
-                const urlDefinitivaMapas = "https://apple.com" + encodeURIComponent(terminoBusqueda) + "&sll=" + miLatitud + "," + miLongitud + "&z=16";
-                window.open(urlDefinitivaMapas, '_blank');
+                const urlOficialMapas = "https://google.com" + encodeURIComponent(terminoBusqueda);
+                window.open(urlOficialMapas, '_blank');
             }, 1500);
         });
     </script>
