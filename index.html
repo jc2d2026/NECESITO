@@ -76,7 +76,7 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, alcohol, comida">
         </section>
 
         <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
@@ -84,7 +84,6 @@
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal GPS..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             
-            <!-- VISOR DE MAPA CONFIGURADO PARA SER CARGADO EN SEGUNDO PLANO -->
             <div class="contenedor-mapa">
                 <iframe id="visor-gps" class="mapa-visor" src="about:blank"></iframe>
             </div>
@@ -98,7 +97,6 @@
         let miLatitud = -12.1936699; 
         let miLongitud = -77.0044871;
 
-        // Lector de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -108,18 +106,16 @@
             }
         }
 
-        // Bienvenida por voz
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Conectando con los sensores satelitales.");
+                hablarTexto("Aplicación Necesito iniciada correctamente. Conectando sensores.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // CAPTURA SATELITAL REAL DEL DISPOSITIVO
         function capturarUbicacionDispositivo() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -128,31 +124,25 @@
                         miLongitud = position.coords.longitude;
 
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
-                        hablarTexto("Satélite conectado. Tu ubicación ha sido registrada.");
+                        hablarTexto("Satélite conectado. Ubicación registrada con éxito.");
 
-                        // Cargar plano urbano estable de OpenStreetMap libre de bloqueos
+                        // Mapa alternativo directo libre de bloqueos
                         const urlMapaEstable = "https://openstreetmap.org" + (miLongitud - 0.003) + "%2C" + (miLatitud - 0.002) + "%2C" + (miLongitud + 0.003) + "%2C" + (miLatitud + 0.002) + "&layer=mapnik&marker=" + miLatitud + "%2C" + miLongitud;
                         document.getElementById('visor-gps').src = urlMapaEstable;
                     },
                     (error) => {
-                        console.error("GPS inaccesible:", error);
                         document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
-                        hablarTexto("Usando ubicación base de contingencia.");
-                        
                         const urlMapaBase = "https://openstreetmap.org-77.0074871%2C-12.1956699%2C-77.0014871%2C-12.1916699&layer=mapnik&marker=-12.1936699%2C-77.0044871";
                         document.getElementById('visor-gps').src = urlMapaBase;
                     },
                     { enableHighAccuracy: true, timeout: 8000 }
                 );
-            } else {
-                const urlMapaBase = "https://openstreetmap.org-77.0074871%2C-12.1956699%2C-77.0014871%2C-12.1916699&layer=mapnik&marker=-12.1936699%2C-77.0044871";
-                document.getElementById('visor-gps').src = urlMapaBase;
             }
         }
 
         window.addEventListener('load', capturarUbicacionDispositivo);
 
-        // ENRUTADOR UNIVERSAL DE MAPAS DIRECTOS COMPATIBLE CON CACHÉ DE CELULARES
+        // 🌟 SISTEMA DE ENRUTAMIENTO ALTERNATIVO ANTIBLOQUEO CACHÉ
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -161,19 +151,19 @@
             if (pedido !== "") {
                 terminoBusqueda = pedido;
             } else {
-                if (categoria === "farmacia") terminoBusqueda = "farmacia botica";
-                if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
-                if (categoria === "compras") terminoBusqueda = "bodega market";
-                if (categoria === "tecnicos") terminoBusqueda = "servicio tecnico electricista";
-                if (categoria === "vital") terminoBusqueda = "hospital clinica emergencia";
+                if (categoria === "farmacia") terminoBusqueda = "farmacia";
+                if (categoria === "comida") terminoBusqueda = "restaurante";
+                if (categoria === "compras") terminoBusqueda = "bodega";
+                if (categoria === "tecnicos") terminoBusqueda = "electricista";
+                if (categoria === "vital") terminoBusqueda = "hospital";
             }
 
-            hablarTexto("Buscando soluciones de " + terminoBusqueda + " a tu alrededor.");
+            hablarTexto("Buscando soluciones para tu pedido de " + terminoBusqueda);
 
-            // 🌟 ENLACE UNIVERSAL INTEGRADO: Elimina por completo el error de dominios corruptos o pegados
+            // 🌟 CAMBIO RADICAL: Usamos la API universal de Geo-Rutas de Mapas Móviles para burlar el error del celular
             setTimeout(() => {
-                const urlResultadosCorrecta = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&ll=" + miLatitud + "," + miLongitud + "&z=16";
-                window.open(urlResultadosCorrecta, '_blank');
+                const urlDefinitivaMapas = "https://apple.com" + encodeURIComponent(terminoBusqueda) + "&sll=" + miLatitud + "," + miLongitud + "&z=16";
+                window.open(urlDefinitivaMapas, '_blank');
             }, 1500);
         });
     </script>
