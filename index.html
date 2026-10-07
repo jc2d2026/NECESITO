@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - Alta Accesibilidad</title>
+    <title>APP NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
 
@@ -55,8 +55,9 @@
 </head>
 <body>
 
+    <!-- TÍTULO CORREGIDO DE ACUERDO A TU SUGERENCIA -->
     <header>
-        <h1>🤝 INGRESAR A LA APP NECESITO</h1>
+        <h1>🤝 APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
@@ -84,20 +85,19 @@
             <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
             <input type="text" class="input-control" id="txt-ubicacion" value="Buscando tu señal satelital GPS..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
             
-            <!-- 🌟 VISOR DE MAPA REAL EN TIEMPO REAL SIN BLOQUEOS GRISES -->
-            <div class="contenedor-mapa" id="bloque-mapa">
+            <!-- 🗺️ VISOR SEGURO DE OPENSTREETMAP LIBRE DE BLOQUEOS DE GOOGLE -->
+            <div class="contenedor-mapa">
                 <iframe id="visor-gps" class="mapa-visor" src="about:blank"></iframe>
             </div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
-        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD REAL</button>
+        <!-- BOTÓN VERDE CORREGIDO COMO SOLICITASTE -->
+        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
     </main>
 
     <script>
-        let miLatitud = -12.1936699; // Coordenadas por defecto (Las Antaras)
+        let miLatitud = -12.1936699; // Coordenadas base por defecto
         let miLongitud = -77.0044871;
-        let gpsActivo = false;
 
         // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
@@ -109,79 +109,74 @@
             }
         }
 
-        // Anuncio inicial de voz asistida
+        // Anuncio asistido por voz inicial al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Conectando con los satélites de tu ubicación actual.");
+                hablarTexto("Aplicación Necesito iniciada. Conectando con los sensores satelitales de tu ubicación actual.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CAPTURA SATELITAL COMPLETA DEL GPS REAL DEL TELÉFONO
+        // 🛰️ CAPTURA SATELITAL REAL COMPATIBLE
         function capturarUbicacionDispositivo() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         miLatitud = position.coords.latitude;
                         miLongitud = position.coords.longitude;
-                        gpsActivo = true;
 
-                        // Cambia el cuadro de texto mostrando que el satélite lo localizó con éxito
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
-                        hablarTexto("Satélite conectado. Tu ubicación actual ha sido detectada con éxito.");
+                        hablarTexto("Satélite conectado con éxito. Tu ubicación actual ha sido registrada de forma segura.");
 
-                        // Carga el plano interactivo real con las calles y manzanas donde estés parado
-                        const urlMapa = `https://google.com{miLatitud},${miLongitud}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-                        document.getElementById('visor-gps').src = urlMapa;
+                        // 🌟 DIBUJO DIRECTO DE CALLES EN OPENSTREETMAP (EVITA LA HOJA ROTA GRIS)
+                        const urlMapaLibre = "https://mapbbcode.org" + miLatitud + "&lon=" + miLongitud + "&zoom=16";
+                        document.getElementById('visor-gps').src = urlMapaLibre;
                     },
                     (error) => {
-                        console.error("GPS denegado o apagado:", error);
+                        console.error("GPS inaccesible:", error);
                         document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos (Señal Base) ✔️";
-                        hablarTexto("No se pudo acceder al GPS del teléfono. Usando ubicación base de contingencia.");
+                        hablarTexto("No se pudo obtener el GPS exacto. Usando ubicación de contingencia.");
                         
-                        // Carga el mapa base de Las Antaras por defecto si el GPS del celular está apagado
-                        const urlMapaBase = `https://google.com`;
+                        // Mapa base de contingencia libre de bloqueos
+                        const urlMapaBase = "https://mapbbcode.org-12.1936699&lon=-77.0044871&zoom=17";
                         document.getElementById('visor-gps').src = urlMapaBase;
                     },
-                    { enableHighAccuracy: true, timeout: 7000 }
+                    { enableHighAccuracy: true, timeout: 8000 }
                 );
             } else {
-                // Si el navegador es muy antiguo
-                const urlMapaBase = `https://google.com`;
+                const urlMapaBase = "https://mapbbcode.org-12.1936699&lon=-77.0044871&zoom=17";
                 document.getElementById('visor-gps').src = urlMapaBase;
             }
         }
 
-        // Ejecutar el rastreo GPS inmediatamente al abrir la pantalla
         window.addEventListener('load', capturarUbicacionDispositivo);
 
-        // 🚀 ENRUTADOR DINÁMICO AL PRESIONAR "ENVIAR SOLICITUD" (ABRE RESULTADOS REALES)
+        // 🚀 CORRECCIÓN CRÍTICA DE ENRUTAMIENTO: ABRE LOS LOCALES REALES A TU ALREDEDOR EN GOOGLE MAPS
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
             
-            // Decidir qué buscar en base a la necesidad del usuario
-            let términoBúsqueda = categoria;
+            let terminoBusqueda = categoria;
             if (pedido !== "") {
-                términoBúsqueda = pedido;
+                terminoBusqueda = pedido;
             } else {
-                if (categoria === "farmacia") términoBúsqueda = "farmacia botica";
-                if (categoria === "comida") términoBúsqueda = "restaurante polleria pizzeria";
-                if (categoria === "compras") términoBúsqueda = "bodega market";
-                if (categoria === "tecnicos") términoBúsqueda = "servicio tecnico electricista gasfitero";
-                if (categoria === "vital") términoBúsqueda = "hospital clinica emergencia";
+                if (categoria === "farmacia") terminoBusqueda = "farmacia botica";
+                if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
+                if (categoria === "compras") terminoBusqueda = "bodega market";
+                if (categoria === "tecnicos") terminoBusqueda = "servicio tecnico electricista";
+                if (categoria === "vital") terminoBusqueda = "hospital clinica emergencia";
             }
 
-            hablarTexto(`Buscando soluciones de ${términoBúsqueda} en tiempo real a tu alrededor.`);
+            hablarTexto("Buscando soluciones de " + terminoBusqueda + " en tiempo real en los alrededores de tu ubicación actual.");
 
-            // Genera el enlace de búsqueda geolocalizado real para abrir los locales más cercanos a tu posición actual
+            // 🌟 ENLACE REESCRITO DE FORMA TOTALMENTE NATIVA Y COMPATIBLE PARA EVITAR ERROR DE ACCESO
             setTimeout(() => {
-                const urlResultadosReales = `https://google.com{encodeURIComponent(términoBúsqueda)}/@${miLatitud},${miLongitud},15z`;
-                window.open(urlResultadosReales, '_blank');
-            }, 1500);
+                const urlResultadosCorrecta = "https://google.com" + encodeURIComponent(terminoBusqueda) + "/@" + miLatitud + "," + miLongitud + ",15z";
+                window.open(urlResultadosCorrecta, '_blank');
+            }, 1600);
         });
     </script>
 </body>
