@@ -98,7 +98,7 @@
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
             <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold;">
-            <div id="txt-coordenadas" class="coordenadas-caja">Coordenadas GPS: Cargando señal...</div>
+            <div id="txt-coordenadas" class="coordenadas-caja">GPS Base Lat: -12.19366 | Lon: -77.00448</div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
@@ -116,11 +116,12 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker activo', reg))
-                    .catch(err => console.error('Error al registrar sw', err));
+                    .then(reg => console.log('Service Worker activo'))
+                    .catch(err => console.error('Error sw', err));
             });
         }
 
+        // Base de datos local e inmediata de comercios
         const comerciosBD = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
@@ -146,6 +147,7 @@
             }
         }
 
+        // Lector asistido activo de inmediato al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -156,6 +158,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
+        // 🛰️ CAPTURA GPS CON TIEMPO LÍMITE ULTRA CORTO (EVITA EL ESTADO CONGELADO)
         function inicializarSistemaGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -166,17 +169,17 @@
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                     },
                     (error) => {
-                        document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: " + coordenadasLat + " | Lon: " + coordenadasLng;
+                        // Si falla, mantiene las coordenadas de Las Antaras de inmediato sin trabar el código
+                        document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: -12.19366 | Lon: -77.00448";
                     },
-                    { enableHighAccuracy: true, timeout: 6000 }
+                    { enableHighAccuracy: true, timeout: 1200 } // Máximo espera 1.2 segundos y continúa
                 );
-            } else {
-                document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: " + coordenadasLat + " | Lon: " + coordenadasLng;
             }
         }
 
         window.addEventListener('load', inicializarSistemaGPS);
 
+        // LOGICA INTERACTIVA DEL BOTÓN DE ENVÍO
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -192,6 +195,3 @@
                 if (categoria === "vital") terminoBusqueda = "hospital";
             }
 
-            hablarTexto("Buscando soluciones en tiempo real para tu pedido de " + terminoBusqueda);
-            
-            const filtrados = comerciosBD.filter(item => item.categoria === categoria);
