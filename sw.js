@@ -1,32 +1,44 @@
-const CACHE_NAME = 'necesito-v2';
-const ASSETS = [
+const CACHE_NAME = 'necesito-v3'; 
+const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
+// Instalar y forzar al teléfono a destruir la memoria vieja en el acto
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting()) // Fuerza la desactivación del código viejo de inmediato
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
+// Activar y eliminar cualquier copia corrupta del pasado (Borra el google.com1)
+self.addEventListener('activate', e => {
+  const cacheWhitelist = [CACHE_NAME];
+  e.waitUntil(
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName); 
+          }
         })
       );
     }).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+// Procesar peticiones de forma fluida y veloz
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(res => {
+      if (res) {
+        return res;
+      }
+      return fetch(e.request);
+    })
   );
 });
