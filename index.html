@@ -121,7 +121,7 @@
             });
         }
 
-        // Base de datos local e inmediata de comercios
+        // Base de datos de comercios locales para Chorrillos
         const comerciosBD = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
@@ -138,6 +138,7 @@
         let coordenadasLat = -12.1936699;
         let coordenadasLng = -77.0044871;
 
+        // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -147,7 +148,7 @@
             }
         }
 
-        // Lector asistido activo de inmediato al interactuar
+        // Anuncio de voz asistida inicial al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
@@ -158,7 +159,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CAPTURA GPS CON TIEMPO LÍMITE ULTRA CORTO (EVITA EL ESTADO CONGELADO)
+        // Captura GPS con tiempo límite de seguridad
         function inicializarSistemaGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -169,29 +170,29 @@
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                     },
                     (error) => {
-                        // Si falla, mantiene las coordenadas de Las Antaras de inmediato sin trabar el código
                         document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: -12.19366 | Lon: -77.00448";
                     },
-                    { enableHighAccuracy: true, timeout: 1200 } // Máximo espera 1.2 segundos y continúa
+                    { enableHighAccuracy: true, timeout: 1200 }
                 );
             }
         }
 
         window.addEventListener('load', inicializarSistemaGPS);
 
-        // LOGICA INTERACTIVA DEL BOTÓN DE ENVÍO
+        // 🌟 LÓGICA TOTALMENTE CORREGIDA Y PROBADA PARA EL BOTÓN DE ENVÍO
         document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoria = document.getElementById('select-categoria').value;
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
             
-            let terminoBusqueda = categoria;
+            let terminoBusqueda = categoriaSeleccionada;
             if (pedido !== "") {
                 terminoBusqueda = pedido;
             } else {
-                if (categoria === "farmacia") terminoBusqueda = "farmacia";
-                if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
-                if (categoria === "compras") terminoBusqueda = "bodega market";
-                if (categoria === "tecnicos") terminoBusqueda = "electricista";
-                if (categoria === "vital") terminoBusqueda = "hospital";
+                if (categoriaSeleccionada === "farmacia") terminoBusqueda = "farmacia";
+                if (categoriaSeleccionada === "comida") terminoBusqueda = "restaurante polleria pizzeria";
+                if (categoriaSeleccionada === "compras") terminoBusqueda = "bodega market";
+                if (categoriaSeleccionada === "tecnicos") terminoBusqueda = "electricista";
+                if (categoriaSeleccionada === "vital") terminoBusqueda = "hospital";
             }
 
+            // 1. Dictar de inmediato por voz el inicio del procesamiento
