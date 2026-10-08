@@ -116,7 +116,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // SISTEMA DE CAPTURA SATELITAL GPS NATIVO
+        // CAPTURA SATELITAL REAL DEL DISPOSITIVO
         function capturarUbicacionDispositivo() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -127,7 +127,7 @@
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                         hablarTexto("Satélite conectado con éxito. Ubicación registrada.");
 
-                        // Carga directa del plano urbano en OpenStreetMap libre de bloqueos
+                        // Carga directa del plano urbano en OpenStreetMap estable libre de bloqueos
                         const urlMapaEstable = "https://openstreetmap.org" + (miLongitud - 0.003) + "%2C" + (miLatitud - 0.002) + "%2C" + (miLongitud + 0.003) + "%2C" + (miLatitud + 0.002) + "&layer=mapnik&marker=" + miLatitud + "%2C" + miLongitud;
                         document.getElementById('visor-gps').src = urlMapaEstable;
                     },
@@ -141,7 +141,7 @@
             }
         }
 
-        window.addEventListener('load', capturarUbicacionDispositivo);
+        window.addEventListener('load', capturarU引icacionDispositivo);
 
         // ENRUTADOR REDISEÑADO CON API DE MAPAS COMPLETA (DESTRUYE EL ERROR DE INTERPOLACIÓN)
         document.getElementById('btn-enviar').addEventListener('click', () => {
@@ -161,7 +161,7 @@
 
             hablarTexto("Buscando soluciones en tiempo real para tu pedido de " + terminoBusqueda);
 
-            // 🌟 DETONADOR ABSOLUTO INTEGRADO: Reemplaza la ruta antigua y engaña a la memoria corrupta del teléfono
+            // DETONADOR ABSOLUTO INTEGRADO: Reemplaza la ruta antigua y engaña a la memoria corrupta del teléfono
             setTimeout(() => {
                 const urlSeguraMapas = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&ll=" + miLatitud + "," + miLongitud + "&z=15";
                 window.open(urlSeguraMapas, '_blank');
