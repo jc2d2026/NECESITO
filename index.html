@@ -43,13 +43,28 @@
             font-size: 18px; font-weight: bold; cursor: pointer; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
-        .contenedor-mapa { 
-            width: 100%; height: 260px; border-radius: 12px; 
-            overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #cbd5e1;
+        .results-section { margin-top: 20px; }
+        .result-item { 
+            padding: 16px; background: #ffffff; margin: 10px 0; 
+            border-radius: 12px; border-left: 8px solid var(--primary-blue); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px; 
+            line-height: 1.5; 
         }
-        .mapa-visor {
-            width: 100%; height: 100%; border: none;
+        .local-info { 
+            background-color: #f1f5f9; padding: 12px; border-radius: 8px; 
+            margin-top: 8px; font-size: 14px; color: #334155; 
+            border-left: 3px solid #10b981; 
+        }
+        .coordenadas-caja {
+            background-color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-family: monospace;
+            font-size: 15px;
+            color: #334155;
+            border-left: 4px solid var(--primary-blue);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -76,26 +91,51 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, alcohol, comida">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
-        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
+        <!-- 3. MI UBICACIÓN EN COORDENADAS -->
         <section class="card">
-            <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal GPS..." readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
-            
-            <div class="contenedor-mapa">
-                <iframe id="visor-gps" class="mapa-visor" src="about:blank"></iframe>
-            </div>
+            <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold;">
+            <div id="txt-coordenadas" class="coordenadas-caja">Coordenadas GPS: Cargando señal...</div>
         </section>
 
-        <!-- BOTÓN DE ENVÍO DE SOLICITUD -->
+        <!-- Botón Enviar Solicitud Directo -->
         <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
+
+        <!-- Panel de Resultados de Auxilio -->
+        <section class="results-section">
+            <div class="card-title">✨ Soluciones Encontradas</div>
+            <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
+        </section>
     </main>
 
     <script>
-        let miLatitud = -12.1936699; 
-        let miLongitud = -77.0044871;
+        // Registrar el Service Worker de forma segura
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker activo', reg))
+                    .catch(err => console.error('Error al registrar sw', err));
+            });
+        }
+
+        const comerciosBD = [
+            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
+            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
+            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
+            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
+            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "comida", info: "Especialidad en pollos a la brasa tradicionales." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
+            { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
+            { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
+            { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
+        ];
+
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
 
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
@@ -109,41 +149,34 @@
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada. Conectando sensores satelitales.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // SISTEMA DE CAPTURA SATELITAL GPS NATIVO
-        function capturarUbicacionDispositivo() {
+        function inicializarSistemaGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        miLatitud = position.coords.latitude;
-                        miLongitud = position.coords.longitude;
-
+                        coordenadasLat = position.coords.latitude;
+                        coordenadasLng = position.coords.longitude;
+                        document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + coordenadasLat.toFixed(5) + " | Lon: " + coordenadasLng.toFixed(5);
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
-                        hablarTexto("Satélite conectado con éxito. Ubicación registrada.");
-
-                        // Carga directa del plano urbano en OpenStreetMap libre de bloqueos
-                        const urlMapaEstable = "https://openstreetmap.org" + (miLongitud - 0.003) + "%2C" + (miLatitud - 0.002) + "%2C" + (miLongitud + 0.003) + "%2C" + (miLatitud + 0.002) + "&layer=mapnik&marker=" + miLatitud + "%2C" + miLongitud;
-                        document.getElementById('visor-gps').src = urlMapaEstable;
                     },
                     (error) => {
-                        document.getElementById('txt-ubicacion').value = "Las Antaras 188, Chorrillos ✔️";
-                        const urlMapaBase = "https://openstreetmap.org-77.0074871%2C-12.1956699%2C-77.0014871%2C-12.1916699&layer=mapnik&marker=-12.1936699%2C-77.0044871";
-                        document.getElementById('visor-gps').src = urlMapaBase;
+                        document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: " + coordenadasLat + " | Lon: " + coordenadasLng;
                     },
-                    { enableHighAccuracy: true, timeout: 8000 }
+                    { enableHighAccuracy: true, timeout: 6000 }
                 );
+            } else {
+                document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: " + coordenadasLat + " | Lon: " + coordenadasLng;
             }
         }
 
-        window.addEventListener('load', capturarUbicacionDispositivo);
+        window.addEventListener('load', inicializarSistemaGPS);
 
-        // ENRUTADOR REDISEÑADO CON API DE MAPAS COMPLETA (DESTRUYE EL ERROR DE INTERPOLACIÓN)
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -152,21 +185,13 @@
             if (pedido !== "") {
                 terminoBusqueda = pedido;
             } else {
-                if (categoria === "farmacia") terminoBusqueda = "farmacia botica";
+                if (categoria === "farmacia") terminoBusqueda = "farmacia";
                 if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
-                if (categoria === "compras") terminoBusqueda = "bodega";
+                if (categoria === "compras") terminoBusqueda = "bodega market";
                 if (categoria === "tecnicos") terminoBusqueda = "electricista";
                 if (categoria === "vital") terminoBusqueda = "hospital";
             }
 
             hablarTexto("Buscando soluciones en tiempo real para tu pedido de " + terminoBusqueda);
-
-            // 🌟 DETONADOR ABSOLUTO INTEGRADO: Reemplaza la ruta antigua y engaña a la memoria corrupta del teléfono
-            setTimeout(() => {
-                const urlSeguraMapas = "https://google.com" + encodeURIComponent(terminoBusqueda) + "&ll=" + miLatitud + "," + miLongitud + "&z=15";
-                window.open(urlSeguraMapas, '_blank');
-            }, 1500);
-        });
-    </script>
-</body>
-</html>
+            
+            const filtrados = comerciosBD.filter(item => item.categoria === categoria);
