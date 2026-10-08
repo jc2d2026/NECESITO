@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - Alta Accesibilidad</title>
+    <title>APP NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
     
-    <!-- 🗺️ IMPORTACIÓN COMPATIBLE DE MAPAS ACCESIBLES -->
+    <!-- 🗺️ LIBRERÍA DE MAPAS INTERACTIVOS -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
 
@@ -70,17 +70,18 @@
 <body>
 
     <header>
-        <h1>🤝 INGRESAR A LA APP NECESITO</h1>
+        <h1>🤝 APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD -->
+        <!-- 1. CATEGORÍA DE NECESIDAD (CON EL SEGMENTO DE COMIDAS SEPARADO) -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
                 <option value="farmacia">💊 Farmacia y Medicinas Especiales</option>
-                <option value="compras">🛒 Compra / Abastecimiento (Bodegas, Pollerías)</option>
+                <option value="comida">🍕 Comida Preparada (Pizzerías, Pollerías)</option>
+                <option value="compras">🛒 Abarrotes y Abastecimiento (Bodegas)</option>
                 <option value="tecnicos">👷 Técnicos de Confianza</option>
                 <option value="vital">🧑‍⚕️ Emergencia Vital y Salud</option>
             </select>
@@ -89,7 +90,7 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, alcohol, comida">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
         <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
@@ -110,11 +111,13 @@
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS LOCAL INMEDIATA
+        // 🏢 BASE DE DATOS LOCAL BIEN CATEGORIZADA (COMIDA SEPARADA DE BODEGAS)
         const comerciosBD = [
-            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "compras", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
-            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "compras", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
-            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "compras", info: "Especialidad en pollos a la brasa tradicionales." },
+            { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
+            { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
+            { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
+            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
+            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "comida", info: "Especialidad en pollos a la brasa tradicionales." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
@@ -136,7 +139,7 @@
             }
         }
 
-        // Función para forzar al mapa a renderizarse a color sin quedarse gris
+        // Función para reajustar los gráficos del mapa y romper la pantalla gris
         function forzarRefrescoMapa() {
             if (objetoMapa !== null) {
                 setTimeout(() => {
@@ -190,19 +193,12 @@
                 terminoBusqueda = pedido;
             } else {
                 if (categoria === "farmacia") terminoBusqueda = "farmacia";
-                if (categoria === "compras") terminoBusqueda = "bodega polleria";
+                if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
+                if (categoria === "compras") terminoBusqueda = "bodega market";
                 if (categoria === "tecnicos") terminoBusqueda = "electricista";
                 if (categoria === "vital") terminoBusqueda = "hospital";
             }
 
-            // Dictar la locución por voz del requerimiento antes de abrir el mapa
+            // Dictar requerimiento con voz limpia
             hablarTexto("Buscando soluciones en tiempo real para tu pedido de " + terminoBusqueda);
             
-            // FILTRADO LOCAL EN PANTALLA ABAJO (Muestra las soluciones impresas en la tarjeta)
-            const filtrados = comerciosBD.filter(item => item.categoria === categoria);
-            const contenedorResultados = document.getElementById('lista-resultados');
-            contenedorResultados.innerHTML = "";
-            
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
