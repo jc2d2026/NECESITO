@@ -1,11 +1,11 @@
-const CACHE_NAME = 'necesito-v3'; 
+```javascript
+const CACHE_NAME = 'necesito-v5'; 
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Instalar y forzar al teléfono a destruir la memoria vieja en el acto
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(
@@ -15,7 +15,6 @@ self.addEventListener('install', e => {
   );
 });
 
-// Activar y eliminar cualquier copia corrupta del pasado (Borra el google.com1)
 self.addEventListener('activate', e => {
   const cacheWhitelist = [CACHE_NAME];
   e.waitUntil(
@@ -31,13 +30,10 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Procesar peticiones de forma fluida y veloz
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(res => {
-      if (res) {
-        return res;
-      }
+      if (res) { return res; }
       return fetch(e.request);
     })
   );
