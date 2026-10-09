@@ -94,14 +94,14 @@
             <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
-        <!-- 3. MI UBICACIÓN EN COORDENADAS -->
+        <!-- 3. MI UBICACIÓN EN COORDENADAS (DIRECCIÓN ACTUALIZADA A LA 186 REAL) -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold;">
-            <div id="txt-coordenadas" class="coordenadas-caja">GPS Base Lat: -12.19366 | Lon: -77.00448</div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold;">
+            <div id="txt-coordenadas" class="coordenadas-caja">Coordenadas GPS: Conectando satélites...</div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
+        <!-- Botón Enviar Solicitud -->
         <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
         <!-- Panel de Resultados de Auxilio -->
@@ -112,25 +112,22 @@
     </main>
 
     <script>
-        // Registrar el Service Worker de forma segura
+        // Registrar Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker activo'))
-                    .catch(err => console.error('Error sw', err));
+                    .then(reg => console.log('SW registrado'))
+                    .catch(err => console.error('Error SW', err));
             });
         }
 
-        // Base de datos de comercios locales para Chorrillos
         const comerciosBD = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
             { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
-            { nombre: "Pollería Las Canastas (Chorrillos Centro)", categoria: "comida", info: "Especialidad en pollos a la brasa tradicionales." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
@@ -138,7 +135,6 @@
         let coordenadasLat = -12.1936699;
         let coordenadasLng = -77.0044871;
 
-        // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -148,51 +144,60 @@
             }
         }
 
-        // Anuncio de voz asistida inicial al interactuar
         let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación base en Las Antaras 1 8 6, Chorrillos.");
                 vozAnunciada = true;
             }
         }
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // Captura GPS con tiempo límite de seguridad
-        function inicializarSistemaGPS() {
+        // 🛰️ SEGUIMIENTO CONTINUO SATELITAL (FUERZA AL NAVEGADOR A CAMBIAR LAS COORDENADAS)
+        function iniciarRastreoSatelital() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
+                navigator.geolocation.watchPosition(
                     (position) => {
                         coordenadasLat = position.coords.latitude;
                         coordenadasLng = position.coords.longitude;
+                        
                         document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + coordenadasLat.toFixed(5) + " | Lon: " + coordenadasLng.toFixed(5);
-                        document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
+                        document.getElementById('txt-ubicacion').value = "Ubicación Satelital Activa ✔️";
                     },
                     (error) => {
-                        document.getElementById('txt-coordenadas').innerText = "GPS Base Lat: -12.19366 | Lon: -77.00448";
+                        document.getElementById('txt-coordenadas').innerText = "GPS Fijo Lat: -12.19366 | Lon: -77.00448";
                     },
-                    { enableHighAccuracy: true, timeout: 1200 }
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                 );
             }
         }
 
-        window.addEventListener('load', inicializarSistemaGPS);
+        window.addEventListener('load', iniciarRastreoSatelital);
 
-        // 🌟 LÓGICA TOTALMENTE CORREGIDA Y PROBADA PARA EL BOTÓN DE ENVÍO
         document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const categoria = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
             
-            let terminoBusqueda = categoriaSeleccionada;
+            let terminoBusqueda = categoria;
             if (pedido !== "") {
                 terminoBusqueda = pedido;
             } else {
-                if (categoriaSeleccionada === "farmacia") terminoBusqueda = "farmacia";
-                if (categoriaSeleccionada === "comida") terminoBusqueda = "restaurante polleria pizzeria";
-                if (categoriaSeleccionada === "compras") terminoBusqueda = "bodega market";
-                if (categoriaSeleccionada === "tecnicos") terminoBusqueda = "electricista";
-                if (categoriaSeleccionada === "vital") terminoBusqueda = "hospital";
+                if (categoria === "farmacia") terminoBusqueda = "farmacia";
+                if (categoria === "comida") terminoBusqueda = "restaurante polleria pizzeria";
+                if (categoria === "compras") terminoBusqueda = "bodega market";
+                if (categoria === "tecnicos") terminoBusqueda = "electricista";
+                if (categoria === "vital") terminoBusqueda = "hospital";
             }
 
-            // 1. Dictar de inmediato por voz el inicio del procesamiento
+            hablarTexto("Buscando soluciones en tiempo real para tu pedido de " + terminoBusqueda);
+            
+            const filtradosReales = comerciosBD.filter(item => item.categoria === categoria);
+            const contenedorResultados = document.getElementById('lista-resultados');
+            contenedorResultados.innerHTML = "";
+            
+            let textoLectorSoluciones = "Encontramos " + filtradosReales.length + " soluciones disponibles cerca de ti. ";
+
+            filtradosReales.forEach(comercio => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
