@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APP NECESITO - Alta Accesibilidad</title>
+    <title>NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
+    
+    <!-- 🗺️ LIBRERÍA DE MAPAS LIBRES TOTALMENTE COMPATIBLE -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
 
     <style>
         :root { 
@@ -43,6 +47,12 @@
             font-size: 18px; font-weight: bold; cursor: pointer; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
+        .contenedor-mapa { 
+            width: 100%; height: 240px; border-radius: 12px; 
+            overflow: hidden; border: 2px solid #cbd5e1; 
+            margin-top: 10px; background-color: #cbd5e1; 
+            position: relative; z-index: 1; 
+        }
         .results-section { margin-top: 20px; }
         .result-item { 
             padding: 16px; background: #ffffff; margin: 10px 0; 
@@ -55,28 +65,17 @@
             margin-top: 8px; font-size: 14px; color: #334155; 
             border-left: 3px solid #10b981; 
         }
-        .coordenadas-caja {
-            background-color: #e2e8f0;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            font-family: monospace;
-            font-size: 15px;
-            color: #334155;
-            border-left: 4px solid var(--primary-blue);
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🤝 APP NECESITO</h1>
+        <h1>🤝 INGRESAR A LA APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD -->
+        <!-- 1. CATEGORÍA DE NECESIDAD (SEPARADA Y OPTIMIZADA) -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -91,14 +90,14 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pizza hawaiana familiar, salbutamol, alimentos">
         </section>
 
-        <!-- 3. MI UBICACIÓN EN COORDENADAS -->
+        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
         <section class="card">
-            <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold;">
-            <div id="txt-coordenadas" class="coordenadas-caja">GPS Activo Lat: -12.19366 | Lon: -77.00448</div>
+            <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
+            <div id="mapa-emergencia" class="contenedor-mapa"></div>
         </section>
 
         <!-- Botón Enviar Solicitud Directo -->
@@ -112,92 +111,97 @@
     </main>
 
     <script>
-        // Registrar el Service Worker de forma segura
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(function(reg) { console.log('SW activo'); })
-                    .catch(function(err) { console.error('Error SW', err); });
-            });
-        }
-
-        // Base de datos de comercios locales para Chorrillos
-        var listaLocales = [
+        // 🏢 BASE DE DATOS CATEGORIZADA DE FORMA OBJETIVA
+        const comerciosBD = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
-            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
+            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        var coordenadasLat = -12.1936699;
-        var coordenadasLng = -77.0044871;
+        let objetoMapa = null;
+        let coordenadasLat = -12.1936699;
+        let coordenadasLng = -77.0044871;
 
         // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                var utterance = new SpeechSynthesisUtterance(mensaje);
+                const utterance = new SpeechSynthesisUtterance(mensaje);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // Anuncio de voz asistida inicial al interactuar
-        var vozAnunciada = false;
+        // Función para forzar al mapa a renderizarse a color sin quedarse gris
+        function forzarRefrescoMapa() {
+            if (objetoMapa !== null) {
+                setTimeout(() => {
+                    objetoMapa.invalidateSize(true);
+                }, 200);
+            }
+        }
+
+        // Anuncio de voz asistida al tocar la interfaz
+        let vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 6, Chorrillos.");
+                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
                 vozAnunciada = true;
             }
+            forzarRefrescoMapa();
         }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
-        document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
+        document.body.addEventListener('touchstart', activarAnuncioInmediato);
+        document.body.addEventListener('click', activarAnuncioInmediato);
 
-        // Captura GPS asíncrona estable
-        function inicializarSistemaGPS() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        coordenadasLat = position.coords.latitude;
-                        coordenadasLng = position.coords.longitude;
-                        document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + coordenadasLat.toFixed(5) + " | Lon: " + coordenadasLng.toFixed(5);
-                        document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
-                    },
-                    function(error) {
-                        console.log("Manteniendo coordenadas base.");
-                    },
-                    { enableHighAccuracy: true, timeout: 2000 }
-                );
+        // 🛰️ INITIALIZACIÓN DEL MAPA ESTILO WAZE SIN BLOQUEOS
+        function inicializarSistemaMapa() {
+            try {
+                if (objetoMapa !== null) { objetoMapa.remove(); }
+
+                // Crear el mapa interactivo directamente
+                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+                    maxZoom: 19 
+                }).addTo(objetoMapa);
+                
+                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
+                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
+                    .openPopup();
+
+                // Forzar dibujo de colores inmediatamente
+                setTimeout(forzarRefrescoMapa, 500);
+            } catch (error) {
+                console.error("Error cargando plano de calles:", error);
             }
         }
 
-        window.addEventListener('load', inicializarSistemaGPS);
+        window.addEventListener('load', inicializarSistemaMapa);
 
-        // 🚀 LÓGICA DE OPERATIVIDAD REESCRITA DESDE CERO (SIN DUPLICACIONES)
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            var categoriaSeleccionada = document.getElementById('select-categoria').value;
-            var pedido = document.getElementById('txt-pedido').value.trim();
+        // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
+        document.getElementById('btn-enviar').addEventListener('click', () => {
+            const categoriaSeleccionada = document.getElementById('select-categoria').value;
+            const contenedorResultados = document.getElementById('lista-resultados');
             
-            var terminoBusqueda = categoriaSeleccionada;
-            if (pedido !== "") {
-                terminoBusqueda = pedido;
-            } else {
-                if (categoriaSeleccionada === "farmacia") terminoBusqueda = "farmacia";
-                if (categoriaSeleccionada === "comida") terminoBusqueda = "restaurante polleria pizzeria";
-                if (categoriaSeleccionada === "compras") terminoBusqueda = "bodega market";
-                if (categoriaSeleccionada === "tecnicos") terminoBusqueda = "electricista";
-                if (categoriaSeleccionada === "vital") terminoBusqueda = "hospital";
+            // Filtrar únicamente los locales que pertenecen a la categoría elegida
+            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
+            
+            if (filtrados.length === 0) {
+                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
+                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
+                return;
             }
 
-            // 1. Dictar requerimiento de forma inmediata por voz
-            hablarTexto("Procesando tu requerimiento de " + terminoBusqueda);
-            
-            // 2. Filtrado limpio e impresión en tarjetas abajo en pantalla
-            var filtradosReales = listaLocales.filter(function(item) {
-                return item.categoria === categoriaSeleccionada;
-            });
-            
+            contenedorResultados.innerHTML = "";
+            let textoVoz = `Solicitud procesada con éxito. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
+
+            filtrados.forEach(comercio => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <strong>🏢 ${comercio.nombre}</strong>
