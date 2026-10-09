@@ -1,4 +1,3 @@
-```javascript
 const CACHE_NAME = 'necesito-v5'; 
 const urlsToCache = [
   './',
