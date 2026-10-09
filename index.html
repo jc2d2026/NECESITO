@@ -3,79 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - Alta Accesibilidad</title>
+    <title>APP NECESITO - Alta Accesibilidad</title>
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#2563eb">
-    
-    <!-- 🗺️ LIBRERÍA DE MAPAS LIBRES TOTALMENTE COMPATIBLE -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <script src="https://unpkg.com"></script>
+    <meta name="theme-color" content="#1e3a8a">
 
     <style>
+        /* 🌟 DISEÑO OXIGENADO DE ALTO CONTRASTE PARA FACILITAR TU LECTURA */
         :root { 
-            --primary-blue: #2563eb; 
-            --accent-green: #10b981; 
-            --bg-light: #f8fafc; 
-            --text-dark: #1e293b; 
-            --card-bg: #ffffff; 
+            --bg-principal: #0f172a; /* Fondo oscuro profundo */
+            --tarjeta-bg: #1e293b;   /* Gris oscuro para bloques */
+            --texto-blanco: #ffffff; /* Letras ultra blancas */
+            --texto-amarillo: #fde047;/* Amarillo brillante para títulos */
+            --verde-boton: #22c55e;   /* Verde vivo para enviar */
+            --azul-borde: #3b82f6;
         }
+        
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
+            font-family: system-ui, -apple-system, Arial, sans-serif; 
             margin: 0; padding: 0; 
-            background-color: var(--bg-light); color: var(--text-dark); 
+            background-color: var(--bg-principal); 
+            color: var(--texto-blanco);
         }
+        
         header { 
-            background-color: var(--primary-blue); color: white; 
-            text-align: center; padding: 15px 10px; 
+            background-color: #1e3a8a; 
+            text-align: center; 
+            padding: 20px 10px;
+            border-bottom: 4px solid var(--azul-borde);
         }
-        main { max-width: 500px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        
+        header h1 { margin: 0; font-size: 28px; color: var(--texto-amarillo); }
+        header p { margin: 5px 0 0 0; font-size: 16px; color: var(--texto-blanco); }
+
+        main { max-width: 500px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+        
         .card { 
-            background: var(--card-bg); border-radius: 16px; 
-            padding: 16px; margin-bottom: 16px; 
-            border: 2px solid #cbd5e1; 
+            background: var(--tarjeta-bg); 
+            border-radius: 16px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border: 3px solid var(--azul-borde); 
         }
-        .card-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px; text-transform: uppercase; }
+        
+        .card-title { 
+            font-size: 16px; 
+            font-weight: bold; 
+            color: var(--texto-amarillo); 
+            margin-bottom: 12px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
         .input-control { 
-            width: 100%; padding: 16px; border: 2px solid #94a3b8; 
-            border-radius: 12px; font-size: 16px; outline: none; 
-            color: var(--text-dark); box-sizing: border-box;
+            width: 100%; 
+            padding: 18px; 
+            border: 3px solid #64748b; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            outline: none; 
+            background-color: #0f172a;
+            color: var(--texto-blanco);
+            box-sizing: border-box;
+            font-weight: bold;
         }
-        select.input-control { height: 54px; font-weight: bold; }
+        
+        .input-control:focus { border-color: var(--texto-amarillo); }
+        select.input-control { height: 60px; cursor: pointer; color: var(--texto-amarillo); }
+        
         .btn-submit { 
-            width: 100%; background-color: var(--accent-green); color: white; 
-            border: none; border-radius: 14px; padding: 20px; 
-            font-size: 18px; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            width: 100%; 
+            background-color: var(--verde-boton); 
+            color: #000000; 
+            border: none; 
+            border-radius: 16px; 
+            padding: 22px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .contenedor-mapa { 
-            width: 100%; height: 240px; border-radius: 12px; 
-            overflow: hidden; border: 2px solid #cbd5e1; 
-            margin-top: 10px; background-color: #cbd5e1; 
-            position: relative; z-index: 1; 
-        }
-        .results-section { margin-top: 20px; }
+        
+        .results-section { margin-top: 25px; }
+        
         .result-item { 
-            padding: 16px; background: #ffffff; margin: 10px 0; 
-            border-radius: 12px; border-left: 8px solid var(--primary-blue); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); font-size: 16px; 
-            line-height: 1.5; 
+            padding: 18px; 
+            background: #1e293b; 
+            margin: 12px 0; 
+            border-radius: 12px; 
+            border-left: 10px solid var(--azul-borde); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15); 
+            font-size: 18px; 
+            line-height: 1.5;
         }
+        
         .local-info { 
-            background-color: #f1f5f9; padding: 12px; border-radius: 8px; 
-            margin-top: 8px; font-size: 14px; color: #334155; 
-            border-left: 3px solid #10b981; 
+            background-color: #0f172a; 
+            padding: 14px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            font-size: 16px; 
+            color: #cbd5e1; 
+            border-left: 4px solid var(--verde-boton); 
+        }
+        
+        .coordenadas-caja {
+            background-color: #0f172a;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            color: #cbd5e1;
+            border-left: 4px solid var(--texto-amarillo);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🤝 INGRESAR A LA APP NECESITO</h1>
+        <h1>🤝 APP NECESITO</h1>
         <p>Plataforma de Alta Accesibilidad Social</p>
     </header>
 
     <main>
-        <!-- 1. CATEGORÍA DE NECESIDAD (SEPARADA Y OPTIMIZADA) -->
+        <!-- 1. CATEGORÍA DE NECESIDAD -->
         <section class="card">
             <div class="card-title">📁 1. Categoría de necesidad prioritaria</div>
             <select class="input-control" id="select-categoria">
@@ -90,118 +144,89 @@
         <!-- 2. DETALLE DEL PEDIDO -->
         <section class="card">
             <div class="card-title">📝 2. Detalle de tu pedido</div>
-            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: 1 pizza hawaiana familiar, salbutamol, alimentos">
+            <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
-        <!-- 3. MI UBICACIÓN AUTOMÁTICA -->
+        <!-- 3. MI UBICACIÓN EN COORDENADAS -->
         <section class="card">
-            <div class="card-title">📍 3. Mi ubicación automática (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 188, Chorrillos ✔️" readonly style="background-color: #f1f5f9; border-color: #cbd5e1;">
-            <div id="mapa-emergencia" class="contenedor-mapa"></div>
+            <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos ✔️" readonly style="background-color: #0f172a; border-color: #334155; color: var(--texto-amarillo);">
+            <div id="txt-coordenadas" class="coordenadas-caja">GPS Activo Lat: -12.19366 | Lon: -77.00448</div>
         </section>
 
-        <!-- Botón Enviar Solicitud Directo -->
+        <!-- BOTÓN GIGANTE VERDE -->
         <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
 
-        <!-- Panel de Resultados de Auxilio -->
+        <!-- PANEL DE RESULTADOS DE SOLUCIONES -->
         <section class="results-section">
-            <div class="card-title">✨ Soluciones Encontradas</div>
-            <div id="lista-resultados">Los resultados aparecerán aquí al presionar Enviar.</div>
+            <div class="card-title" style="color: var(--texto-blanco);">✨ Soluciones Encontradas</div>
+            <div id="lista-resultados" style="font-size: 16px; color: #94a3b8;">Los resultados aparecerán aquí al presionar el botón verde.</div>
         </section>
     </main>
 
     <script>
-        // 🏢 BASE DE DATOS CATEGORIZADA DE FORMA OBJETIVA
-        const comerciosBD = [
+        // Registrar Service Worker de forma segura
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js').catch(function(err) { console.error(err); });
+            });
+        }
+
+        // Base de datos de comercios locales optimizada
+        var baseDatosLocales = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
+            { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
-            { nombre: "Bodega Charito (Prol. Av. Huaylas / Las Antaras)", categoria: "compras", info: "Abastecimiento rápido de verduras, lácteos y productos diarios." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let objetoMapa = null;
-        let coordenadasLat = -12.1936699;
-        let coordenadasLng = -77.0044871;
+        var posicionLat = -12.1936699;
+        var posicionLng = -77.0044871;
 
-        // Sistema de locución de voz asistida
-        function hablarTexto(mensaje) {
+        // Lector de voz claro y estable
+        function ejecutarVoz(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(mensaje);
-                utterance.lang = 'es-PE';
-                window.speechSynthesis.speak(utterance);
+                var vocalizador = new SpeechSynthesisUtterance(mensaje);
+                vocalizador.lang = 'es-PE';
+                window.speechSynthesis.speak(vocalizador);
             }
         }
 
-        // Función para forzar al mapa a renderizarse a color sin quedarse gris
-        function forzarRefrescoMapa() {
-            if (objetoMapa !== null) {
-                setTimeout(() => {
-                    objetoMapa.invalidateSize(true);
-                }, 200);
+        // Bienvenida inmediata al primer toque
+        var audioIniciado = false;
+        function darBienvenida() {
+            if (!audioIniciado) {
+                ejecutarVoz("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 6, Chorrillos.");
+                audioIniciado = true;
             }
         }
+        document.body.addEventListener('touchstart', darBienvenida, { once: true });
+        document.body.addEventListener('click', darBienvenida, { once: true });
 
-        // Anuncio de voz asistida al tocar la interfaz
-        let vozAnunciada = false;
-        function activarAnuncioInmediato() {
-            if (!vozAnunciada) {
-                hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 8, Chorrillos.");
-                vozAnunciada = true;
-            }
-            forzarRefrescoMapa();
-        }
-        document.body.addEventListener('touchstart', activarAnuncioInmediato);
-        document.body.addEventListener('click', activarAnuncioInmediato);
-
-        // 🛰️ INITIALIZACIÓN DEL MAPA ESTILO WAZE SIN BLOQUEOS
-        function inicializarSistemaMapa() {
-            try {
-                if (objetoMapa !== null) { objetoMapa.remove(); }
-
-                // Crear el mapa interactivo directamente
-                objetoMapa = L.map('mapa-emergencia', { zoomControl: false }).setView([coordenadasLat, coordenadasLng], 17);
-                
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-                    maxZoom: 19 
-                }).addTo(objetoMapa);
-                
-                L.marker([coordenadasLat, coordenadasLng]).addTo(objetoMapa)
-                    .bindPopup('<b>Tu ubicación asistida</b><br>Las Antaras 188')
-                    .openPopup();
-
-                // Forzar dibujo de colores inmediatamente
-                setTimeout(forzarRefrescoMapa, 500);
-            } catch (error) {
-                console.error("Error cargando plano de calles:", error);
+        // Captura satelital asíncrona rápida (Evita cuelgues)
+        function ejecutarGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        posicionLat = position.coords.latitude;
+                        posicionLng = position.coords.longitude;
+                        document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + posicionLat.toFixed(5) + " | Lon: " + posicionLng.toFixed(5);
+                        document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
+                    },
+                    function() {
+                        console.log("Carga de coordenadas de respaldo activa.");
+                    },
+                    { enableHighAccuracy: true, timeout: 2000 }
+                );
             }
         }
+        window.addEventListener('load', ejecutarGPS);
 
-        window.addEventListener('load', inicializarSistemaMapa);
-
-        // PROCESAMIENTO DIRECTO AL PRESIONAR "ENVIAR SOLICITUD"
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const contenedorResultados = document.getElementById('lista-resultados');
-            
-            // Filtrar únicamente los locales que pertenecen a la categoría elegida
-            const filtrados = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
-            
-            if (filtrados.length === 0) {
-                contenedorResultados.innerHTML = `<div class="result-item">No se hallaron locales cercanos.</div>`;
-                hablarTexto("No se encontraron locales cercanos para tu solicitud.");
-                return;
-            }
-
-            contenedorResultados.innerHTML = "";
-            let textoVoz = `Solicitud procesada con éxito. Encontramos ${filtrados.length} soluciones disponibles cerca de ti. `;
-
-            filtrados.forEach(comercio => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                itemDiv.innerHTML = `
-                    <strong>🏢 ${comercio.nombre}</strong>
+        // ACCIÓN DEL BOTÓN VERDE TOTALMENTE OXIGENADA
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            var catElegida = document.getElementById('select-categoria').value;
