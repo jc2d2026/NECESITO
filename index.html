@@ -157,7 +157,7 @@
         document.body.addEventListener('touchstart', activarAnuncioInmediato, { once: true });
         document.body.addEventListener('click', activarAnuncioInmediato, { once: true });
 
-        // 🛰️ CAPTURA GPS ASÍNCRONA: No detiene el resto de la aplicación si el satélite demora
+        // Captura GPS asíncrona estable
         function inicializarSistemaGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -168,7 +168,7 @@
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                     },
                     (error) => {
-                        console.log("Manteniendo coordenadas numéricas base para no trabar el audio.");
+                        console.log("Manteniendo coordenadas base.");
                     },
                     { enableHighAccuracy: true, timeout: 2000 }
                 );
@@ -177,7 +177,7 @@
 
         window.addEventListener('load', inicializarSistemaGPS);
 
-        // LÓGICA DE PROCESAMIENTO SIN RIESGO DE CONGELAMIENTO
+        // 🚀 LÓGICA DE OPERATIVIDAD TOTALMENTE REPARADA
         document.getElementById('btn-enviar').addEventListener('click', () => {
             const categoriaSeleccionada = document.getElementById('select-categoria').value;
             const pedido = document.getElementById('txt-pedido').value.trim();
@@ -193,8 +193,9 @@
                 if (categoriaSeleccionada === "vital") terminoBusqueda = "hospital";
             }
 
-            // 1. Dictar inmediatamente tu requerimiento por voz
+            // 1. Dictar requerimiento de forma inmediata por voz
             hablarTexto("Procesando tu requerimiento de " + terminoBusqueda);
             
-            // 2. Filtrado limpio e impresión instantánea de soluciones abajo
+            // 2. CORRECCIÓN EFECTIVA: Filtrado limpio e impresión en tarjetas abajo en pantalla
             const filtradosReales = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
+            const contenedorResultados = document.getElementById('lista-resultados');
