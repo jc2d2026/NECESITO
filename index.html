@@ -114,15 +114,15 @@
     <script>
         // Registrar el Service Worker de forma segura
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+            window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker activo'))
-                    .catch(err => console.error('Error sw', err));
+                    .then(function(reg) { console.log('SW activo'); })
+                    .catch(function(err) { console.error('Error SW', err); });
             });
         }
 
         // Base de datos de comercios locales para Chorrillos
-        const comerciosBD = [
+        var listaLocales = [
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
@@ -133,21 +133,21 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        let coordenadasLat = -12.1936699;
-        let coordenadasLng = -77.0044871;
+        var coordenadasLat = -12.1936699;
+        var coordenadasLng = -77.0044871;
 
         // Sistema de locución de voz asistida
         function hablarTexto(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(mensaje);
+                var utterance = new SpeechSynthesisUtterance(mensaje);
                 utterance.lang = 'es-PE';
                 window.speechSynthesis.speak(utterance);
             }
         }
 
         // Anuncio de voz asistida inicial al interactuar
-        let vozAnunciada = false;
+        var vozAnunciada = false;
         function activarAnuncioInmediato() {
             if (!vozAnunciada) {
                 hablarTexto("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 6, Chorrillos.");
@@ -161,13 +161,13 @@
         function inicializarSistemaGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    function(position) {
                         coordenadasLat = position.coords.latitude;
                         coordenadasLng = position.coords.longitude;
                         document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + coordenadasLat.toFixed(5) + " | Lon: " + coordenadasLng.toFixed(5);
                         document.getElementById('txt-ubicacion').value = "Ubicación Certificada por GPS ✔️";
                     },
-                    (error) => {
+                    function(error) {
                         console.log("Manteniendo coordenadas base.");
                     },
                     { enableHighAccuracy: true, timeout: 2000 }
@@ -177,12 +177,12 @@
 
         window.addEventListener('load', inicializarSistemaGPS);
 
-        // 🚀 LÓGICA DE OPERATIVIDAD TOTALMENTE REPARADA
-        document.getElementById('btn-enviar').addEventListener('click', () => {
-            const categoriaSeleccionada = document.getElementById('select-categoria').value;
-            const pedido = document.getElementById('txt-pedido').value.trim();
+        // 🚀 LÓGICA DE OPERATIVIDAD REESCRITA DESDE CERO (SIN DUPLICACIONES)
+        document.getElementById('btn-enviar').addEventListener('click', function() {
+            var categoriaSeleccionada = document.getElementById('select-categoria').value;
+            var pedido = document.getElementById('txt-pedido').value.trim();
             
-            let terminoBusqueda = categoriaSeleccionada;
+            var terminoBusqueda = categoriaSeleccionada;
             if (pedido !== "") {
                 terminoBusqueda = pedido;
             } else {
@@ -196,6 +196,8 @@
             // 1. Dictar requerimiento de forma inmediata por voz
             hablarTexto("Procesando tu requerimiento de " + terminoBusqueda);
             
-            // 2. CORRECCIÓN EFECTIVA: Filtrado limpio e impresión en tarjetas abajo en pantalla
-            const filtradosReales = comerciosBD.filter(item => item.categoria === categoriaSeleccionada);
-            const contenedorResultados = document.getElementById('lista-resultados');
+            // 2. Filtrado limpio e impresión en tarjetas abajo en pantalla
+            var filtradosReales = listaLocales.filter(function(item) {
+                return item.categoria === categoriaSeleccionada;
+            });
+            
