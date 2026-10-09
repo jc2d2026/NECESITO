@@ -1,4 +1,4 @@
-const CACHE_NAME = 'necesito-v5'; 
+const CACHE_NAME = 'necesito-v6'; // Cambiado a v6 para limpiar la memoria
 const urlsToCache = [
   './',
   './index.html',
