@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#1e3a8a">
 
     <style>
-        /* DISEÑO DE ALTO CONTRASTE PARA FACILITAR TU LECTURA */
+        /* DISEÑO DE ALTO CONTRASTE REFORZADO */
         :root { 
             --bg-principal: #0f172a; 
             --tarjeta-bg: #1e293b;   
@@ -150,7 +150,7 @@
             <div id="txt-coordenadas" class="coordenadas-caja">GPS Activo Lat: -12.19366 | Lon: -77.00448</div>
         </section>
 
-        <!-- BOTÓN GIGANTE VERDE CON MARCADOR DE COMPROBACIÓN -->
+        <!-- BOTÓN GIGANTE VERDE CON ACCIÓN FORZADA -->
         <button class="btn-submit" id="btn-enviar">🚀 PROCESAR SOLICITUD NOW</button>
 
         <!-- PANEL DE RESULTADOS DE SOLUCIONES -->
@@ -161,7 +161,7 @@
     </main>
 
     <script>
-        // 🌟 DESACTIVACIÓN FORZADA DEL SERVICE WORKER VIEJO PARA DESTRUIR LA CACHÉ CONGELADA
+        // Desactivar cualquier rastro de Service Worker viejo para limpiar por completo
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for (var registration of registrations) {
@@ -170,7 +170,7 @@
             });
         }
 
-        // Base de datos de comercios locales para Chorrillos
+        // Base de datos local e inmediata de Chorrillos
         var baseDatosLocales = [
             { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
@@ -186,7 +186,7 @@
         var posicionLat = -12.1936699;
         var posicionLng = -77.0044871;
 
-        // Lector de voz asistida blindado
+        // Lector de voz asistida forzado
         function ejecutarVoz(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -196,18 +196,12 @@
             }
         }
 
-        // Anuncio asistido de bienvenida inmediato
-        var audioIniciado = false;
-        function darBienvenida() {
-            if (!audioIniciado) {
-                ejecutarVoz("Aplicación Necesito iniciada de forma correcta. Ubicación asistida en Las Antaras 1 8 6, Chorrillos.");
-                audioIniciado = true;
-            }
-        }
-        document.body.addEventListener('touchstart', darBienvenida, { once: true });
-        document.body.addEventListener('click', darBienvenida, { once: true });
+        // Forzar saludo en el primer toque de pantalla en cualquier lugar
+        document.body.addEventListener('click', function() {
+            ejecutarVoz("Aplicación Necesito en línea. Ubicación en Las Antaras 1 8 6.");
+        }, { once: true });
 
-        // LÓGICA DE PROCESAMIENTO DIRECTA E INMUNE A BLOQUEOS
+        // LÓGICA DE PROCESAMIENTO TOTALMENTE INTEGRADA AL BOTÓN VERDE
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var catElegida = document.getElementById('select-categoria').value;
             var textoPedido = document.getElementById('txt-pedido').value.trim();
@@ -217,10 +211,10 @@
                 palabraBuscar = textoPedido;
             }
 
-            // 1. Dictar inmediatamente tu requerimiento por voz
-            ejecutarVoz("Procesando tu requerimiento de " + palabraBuscar);
+            // 1. Forzar al parlante a hablar de inmediato destruyendo los bloqueos de Chrome
+            ejecutarVoz("Procesando solicitud de " + palabraBuscar);
             
-            // 2. Filtrado limpio e impresión de tarjetas abajo
+            // 2. Filtrar e imprimir tarjetas limpias abajo de forma nativa
             var localesFiltrados = baseDatosLocales.filter(function(comercio) {
                 return comercio.categoria === catElegida;
             });
@@ -228,7 +222,10 @@
             var zonaTarjetas = document.getElementById('lista-resultados');
             zonaTarjetas.innerHTML = "";
             
-            var mensajeDeVozSoluciones = "Encontramos " + localesFiltrados.length + " soluciones disponibles cerca de ti. ";
+            var mensajeDeVozSoluciones = "Encontramos " + localesFiltrados.length + " soluciones disponibles. ";
 
             localesFiltrados.forEach(function(item) {
                 var tarjetaDiv = document.createElement('div');
+                tarjetaDiv.className = 'result-item';
+                tarjetaDiv.innerHTML = "<strong>🏢 " + item.nombre + "</strong><div class='local-info'>ℹ️ " + item.info + "</div>";
+                zonaTarjetas.appendChild(tarjetaDiv);
