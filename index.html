@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APP NECESITO - Alta Accesibilidad</title>
-    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#1e3a8a">
 
     <style>
@@ -151,8 +150,8 @@
             <div id="txt-coordenadas" class="coordenadas-caja">GPS Activo Lat: -12.19366 | Lon: -77.00448</div>
         </section>
 
-        <!-- BOTÓN GIGANTE VERDE -->
-        <button class="btn-submit" id="btn-enviar">🚀 ENVIAR SOLICITUD</button>
+        <!-- BOTÓN GIGANTE VERDE CON MARCADOR DE COMPROBACIÓN -->
+        <button class="btn-submit" id="btn-enviar">🚀 PROCESAR SOLICITUD NOW</button>
 
         <!-- PANEL DE RESULTADOS DE SOLUCIONES -->
         <section class="results-section">
@@ -162,14 +161,23 @@
     </main>
 
     <script>
+        // 🌟 DESACTIVACIÓN FORZADA DEL SERVICE WORKER VIEJO PARA DESTRUIR LA CACHÉ CONGELADA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (var registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+
         // Base de datos de comercios locales para Chorrillos
         var baseDatosLocales = [
+            { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
+            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Pizzería Presto (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pizzas familiares e individuales. Entrega rápida en la zona de Las Antaras." },
             { nombre: "Pizza Hut (Prolongación Av. Huaylas)", categoria: "comida", info: "Especialidad en pizzas americanas, hawaianas y pastas." },
             { nombre: "Pollería Roky's (Av. Huaylas / Chorrillos)", categoria: "comida", info: "Pollo a la brasa caliente y combos familiares. Atención rápida." },
             { nombre: "Pollería Norkys (Prolongación Av. Huaylas)", categoria: "comida", info: "Atención local en platos a la brasa, papas fritas y parrillas." },
-            { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
-            { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
             { nombre: "Bodega Delia (Calle Las Antaras 190)", categoria: "compras", info: "Abarrotes completos, alimentos de primera necesidad y atención local." },
             { nombre: "Servicios Eléctricos San Juan Bautista", categoria: "tecnicos", info: "Soporte técnico, reparaciones y emergencies eléctricas en la zona." },
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
@@ -178,7 +186,7 @@
         var posicionLat = -12.1936699;
         var posicionLng = -77.0044871;
 
-        // Lector de voz asistida blindado e independiente
+        // Lector de voz asistida blindado
         function ejecutarVoz(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -188,7 +196,7 @@
             }
         }
 
-        // Anuncio asistido de bienvenida al primer toque
+        // Anuncio asistido de bienvenida inmediato
         var audioIniciado = false;
         function darBienvenida() {
             if (!audioIniciado) {
@@ -199,14 +207,7 @@
         document.body.addEventListener('touchstart', darBienvenida, { once: true });
         document.body.addEventListener('click', darBienvenida, { once: true });
 
-        // Carga inmediata de las coordenadas numéricas estables
-        function ejecutarGPS() {
-            document.getElementById('txt-coordenadas').innerText = "GPS Activo Lat: -12.19366 | Lon: -77.00448";
-            document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos ✔️";
-        }
-        window.addEventListener('load', ejecutarGPS);
-
-        // LÓGICA DE PROCESAMIENTO COMPLETA Y REPARADA
+        // LÓGICA DE PROCESAMIENTO DIRECTA E INMUNE A BLOQUEOS
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var catElegida = document.getElementById('select-categoria').value;
             var textoPedido = document.getElementById('txt-pedido').value.trim();
@@ -214,12 +215,6 @@
             var palabraBuscar = catElegida;
             if (textoPedido !== "") {
                 palabraBuscar = textoPedido;
-            } else {
-                if (catElegida === "farmacia") palabraBuscar = "farmacia";
-                if (catElegida === "comida") palabraBuscar = "restaurante polleria pizzeria";
-                if (catElegida === "compras") palabraBuscar = "bodega market";
-                if (catElegida === "tecnicos") palabraBuscar = "electricista";
-                if (catElegida === "vital") palabraBuscar = "hospital";
             }
 
             // 1. Dictar inmediatamente tu requerimiento por voz
@@ -227,3 +222,13 @@
             
             // 2. Filtrado limpio e impresión de tarjetas abajo
             var localesFiltrados = baseDatosLocales.filter(function(comercio) {
+                return comercio.categoria === catElegida;
+            });
+            
+            var zonaTarjetas = document.getElementById('lista-resultados');
+            zonaTarjetas.innerHTML = "";
+            
+            var mensajeDeVozSoluciones = "Encontramos " + localesFiltrados.length + " soluciones disponibles cerca de ti. ";
+
+            localesFiltrados.forEach(function(item) {
+                var tarjetaDiv = document.createElement('div');
