@@ -201,7 +201,7 @@
             ejecutarVoz("Aplicación Necesito en línea. Ubicación en Las Antaras 1 8 6.");
         }, { once: true });
 
-        // 🌟 LÓGICA DE PROCESAMIENTO TOTALMENTE REPARADA Y COMPROBADA
+        // LÓGICA DE PROCESAMIENTO TOTALMENTE CORREGIDA Y COMPROBADA
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var catElegida = document.getElementById('select-categoria').value;
             var textoPedido = document.getElementById('txt-pedido').value.trim();
@@ -220,7 +220,7 @@
             // 1. Forzar al parlante a hablar de inmediato
             ejecutarVoz("Procesando solicitud de " + palabraBuscar);
             
-            // 2. REPARACIÓN REFORZADA: Filtrar de forma limpia sin errores de tipeo
+            // 2. REPARACIÓN REFORZADA: Filtrar de forma limpia
             var localesFiltrados = baseDatosLocales.filter(function(comercio) {
                 return comercio.categoria === catElegida;
             });
