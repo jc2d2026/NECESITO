@@ -143,14 +143,14 @@
             <input type="text" class="input-control" id="txt-pedido" placeholder="Ej: salbutamol, pollo a la brasa, electricista">
         </section>
 
-        <!-- 3. MI UBICACIÓN EN COORDENADAS -->
+        <!-- 3. MI UBICACIÓN EN COORDENADAS DINÁMICAS -->
         <section class="card">
             <div class="card-title">📍 3. Mi ubicación en coordenadas (Tiempo Real)</div>
-            <input type="text" class="input-control" id="txt-ubicacion" value="Las Antaras 186, Chorrillos ✔️" readonly style="background-color: #0f172a; border-color: #334155; color: var(--texto-amarillo);">
-            <div id="txt-coordenadas" class="coordenadas-caja">GPS Activo Lat: -12.19366 | Lon: -77.00448</div>
+            <input type="text" class="input-control" id="txt-ubicacion" value="Buscando señal de satélite real..." readonly style="background-color: #0f172a; border-color: #334155; color: var(--texto-amarillo);">
+            <div id="txt-coordenadas" class="coordenadas-caja">GPS: Esperando señal del dispositivo móvil...</div>
         </section>
 
-        <!-- BOTÓN GIGANTE VERDE CON ACCIÓN FORZADA -->
+        <!-- BOTÓN GIGANTE VERDE -->
         <button class="btn-submit" id="btn-enviar">🚀 PROCESAR SOLICITUD NOW</button>
 
         <!-- PANEL DE RESULTADOS DE SOLUCIONES -->
@@ -161,7 +161,7 @@
     </main>
 
     <script>
-        // Desactivar cualquier rastro de Service Worker viejo para limpiar por completo
+        // Forzar desactivación de Service Workers viejos que congelan la caché en la dirección de la PC
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for (var registration of registrations) {
@@ -170,7 +170,7 @@
             });
         }
 
-        // Base de datos local e inmediata de Chorrillos
+        // Base de datos de comercios locales para Chorrillos (Mantenemos la separación objetiva)
         var baseDatosLocales = [
             { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
@@ -183,10 +183,11 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        var posicionLat = -12.1936699;
-        var posicionLng = -77.0044871;
+        // 🌟 COORDENADAS INICIALES EN BLANCO: Obliga al teléfono celular a buscar su propia antena
+        var posicionLat = null;
+        var posicionLng = null;
 
-        // Lector de voz asistida forzado
+        // Lector de voz asistida forzado e independiente
         function ejecutarVoz(mensaje) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -196,37 +197,27 @@
             }
         }
 
-        // Forzar saludo en el primer toque de pantalla en cualquier lugar
+        // Forzar saludo de bienvenida en el primer toque de pantalla
         document.body.addEventListener('click', function() {
-            ejecutarVoz("Aplicación Necesito en línea. Ubicación en Las Antaras 1 8 6.");
+            ejecutarVoz("Aplicación Necesito en línea. Detectando posicionamiento de tu equipo.");
         }, { once: true });
 
-        // LÓGICA DE PROCESAMIENTO TOTALMENTE CORREGIDA Y COMPROBADA
-        document.getElementById('btn-enviar').addEventListener('click', function() {
-            var catElegida = document.getElementById('select-categoria').value;
-            var textoPedido = document.getElementById('txt-pedido').value.trim();
-            
-            var palabraBuscar = catElegida;
-            if (textoPedido !== "") {
-                palabraBuscar = textoPedido;
-            } else {
-                if (catElegida === "farmacia") palabraBuscar = "farmacia";
-                if (catElegida === "comida") palabraBuscar = "restaurante polleria pizzeria";
-                if (catElegida === "compras") palabraBuscar = "bodega market";
-                if (catElegida === "tecnicos") palabraBuscar = "electricista";
-                if (catElegida === "vital") palabraBuscar = "hospital";
-            }
-
-            // 1. Forzar al parlante a hablar de inmediato
-            ejecutarVoz("Procesando solicitud de " + palabraBuscar);
-            
-            // 2. REPARACIÓN REFORZADA: Filtrar de forma limpia
-            var localesFiltrados = baseDatosLocales.filter(function(comercio) {
-                return comercio.categoria === catElegida;
-            });
-            
-            var zonaTarjetas = document.getElementById('lista-resultados');
-            zonaTarjetas.innerHTML = "";
-            
-            var mensajeDeVozSoluciones = "Encontramos " + localesFiltrados.length + " soluciones disponibles. ";
-
+        // 🛰️ SISTEMA DE RASTREO SATELITAL CONTINUO DE ALTA PRECISIÓN (MUEVE LOS NÚMEROS CON EL CELULAR)
+        function activarRastreoGPSReal() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    function(position) {
+                        posicionLat = position.coords.latitude;
+                        posicionLng = position.coords.longitude;
+                        
+                        // Actualiza numéricamente la latitud y longitud exacta de donde esté parado el teléfono
+                        document.getElementById('txt-coordenadas').innerText = "GPS MOVIL Lat: " + posicionLat.toFixed(5) + " | Lon: " + posicionLng.toFixed(5);
+                        document.getElementById('txt-ubicacion').value = "Tu Ubicación Real Detectada ✔️";
+                    },
+                    function(error) {
+                        console.log("Esperando activación de permisos GPS en el celular.");
+                        // Respaldo práctico si el teléfono tiene el sensor apagado del todo
+                        if(posicionLat === null) {
+                            document.getElementById('txt-coordenadas').innerText = "GPS Fijo PC Lat: -12.19366 | Lon: -77.00448";
+                            document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos ✔️";
+                        }
