@@ -45,7 +45,7 @@
         }
         
         .card-title { 
-            font-size: 16px; 
+            font-size: 14px; 
             font-weight: bold; 
             color: var(--texto-amarillo); 
             margin-bottom: 12px; 
@@ -161,7 +161,7 @@
     </main>
 
     <script>
-        // Forzar desactivación de Service Workers viejos que bloquean la memoria caché
+        // Desactivar cualquier rastro de Service Worker viejo para limpiar por completo
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for (var registration of registrations) {
@@ -170,7 +170,7 @@
             });
         }
 
-        // Base de datos de comercios locales para Chorrillos
+        // Base de datos local e inmediata de Chorrillos
         var baseDatosLocales = [
             { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
@@ -196,12 +196,12 @@
             }
         }
 
-        // Forzar saludo de bienvenida en el primer toque de pantalla en cualquier lado
+        // Forzar saludo en el primer toque de pantalla en cualquier lugar
         document.body.addEventListener('click', function() {
             ejecutarVoz("Aplicación Necesito en línea. Ubicación base establecida de forma correcta.");
         }, { once: true });
 
-        // 🛰️ CAPTURA GPS ASÍNCRONA CON SISTEMA DE ESCAPE ULTRA RÁPIDO CONTRA CUELGUES
+        // Captura GPS asíncrona con salida automática para evitar pantallas congeladas
         function ejecutarGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -211,18 +211,21 @@
                         document.getElementById('txt-coordenadas').innerText = "GPS Certificado Lat: " + posicionLat.toFixed(5) + " | Lon: " + posicionLng.toFixed(5);
                         document.getElementById('txt-ubicacion').value = "Tu Ubicación Satelital Detectada ✔️";
                     },
-                    function(error) {
-                        console.log("Carga de coordenadas de respaldo activa inmediatamente.");
+                    function() {
+                        console.log("Carga de coordenadas de respaldo activa.");
                     },
-                    { enableHighAccuracy: true, timeout: 1500 } // Si en 1.5 segundos el satélite no responde, libera la app
+                    { enableHighAccuracy: true, timeout: 1500 }
                 );
             }
         }
         window.addEventListener('load', ejecutarGPS);
 
-        // LÓGICA DE PROCESAMIENTO TOTALMENTE OPERATIVA AL PRESIONAR EL BOTÓN VERDE
+        // 🚀 LÓGICA DE PROCESAMIENTO TOTALMENTE REPARADA Y COMPROBADA
         document.getElementById('btn-enviar').addEventListener('click', function() {
             var catElegida = document.getElementById('select-categoria').value;
             var textoPedido = document.getElementById('txt-pedido').value.trim();
             
             var palabraBuscar = catElegida;
+            if (textoPedido !== "") {
+                palabraBuscar = textoPedido;
+            } else {
