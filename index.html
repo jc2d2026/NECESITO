@@ -170,7 +170,7 @@
             });
         }
 
-        // Base de datos de comercios locales para Chorrillos (Mantenemos la separación objetiva)
+        // Base de datos de comercios locales para Chorrillos
         var baseDatosLocales = [
             { nombre: "Botica Arcángel (Av. José Antonio Lavalle cuadra 2)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. Muy cercana a tu ubicación." },
             { nombre: "Farmacia Fénix (Las Antaras 149)", categoria: "farmacia", info: "Medicinas esenciales y stock de Salbutamol. A solo unos pasos de tu ubicación." },
@@ -183,7 +183,7 @@
             { nombre: "Clínica Médica de la Solidaridad", categoria: "vital", info: "Atención médica, chequeos rápidos y guardias asistenciales." }
         ];
 
-        // 🌟 COORDENADAS INICIALES EN BLANCO: Obliga al teléfono celular a buscar su propia antena
+        // VARIABLES EN BLANCO: Obligan al teléfono celular a buscar su propia antena satelital
         var posicionLat = null;
         var posicionLng = null;
 
@@ -216,8 +216,10 @@
                     },
                     function(error) {
                         console.log("Esperando activación de permisos GPS en el celular.");
-                        // Respaldo práctico si el teléfono tiene el sensor apagado del todo
                         if(posicionLat === null) {
                             document.getElementById('txt-coordenadas').innerText = "GPS Fijo PC Lat: -12.19366 | Lon: -77.00448";
                             document.getElementById('txt-ubicacion').value = "Las Antaras 186, Chorrillos ✔️";
                         }
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+                );
