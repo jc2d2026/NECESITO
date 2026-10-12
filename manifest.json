@@ -1,17 +1,9 @@
 {
-  "short_name": "NECESITO",
-  "name": "NECESITO - Alta Accesibilidad Social",
-  "icons": [
-    {
-      "src": "https://flaticon.com",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    }
-  ],
+  "short_name": "Necesito",
+  "name": "APP NECESITO",
   "start_url": "./index.html",
-  "background_color": "#2563eb",
-  "theme-color": "#2563eb",
+  "background_color": "#0f172a",
+  "theme-color": "#1e3a8a",
   "display": "standalone",
   "orientation": "portrait"
 }
