@@ -1,28 +1,19 @@
-// 🌟 VERSIÓN DE LIMPIEZA ABSOLUTA - DESTRUYE LA CACHÉ CORRUPTA
-const CACHE_NAME = 'necesito-limpieza-total';
+const CACHE_NAME = 'necesito-v10';
+const urlsToCache = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
-  // Obliga al teléfono a activar este limpiador de inmediato
   self.skipWaiting();
+  e.waitUntil(caches.open(CACHE_NAME).then(c => cache.addAll(urlsToCache)));
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    // Busca todas las memorias guardadas en el celular y las borra por completo
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          return caches.delete(cacheName); // Borra el código viejo congelado
-        })
-      );
-    }).then(() => {
-      // Desregistra el Service Worker del teléfono para liberar el audio y el botón
-      return self.registration.unregister();
-    }).then(() => self.clients.claim())
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => { if (k !== CACHE_NAME) return caches.delete(k); })
+    )).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
-  // Deja pasar las peticiones limpias directamente a internet sin guardar copias trabadas
-  e.respondWith(fetch(e.request));
+  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
 });
