@@ -1,39 +1,28 @@
-const CACHE_NAME = 'necesito-v6'; // Cambiado a v6 para limpiar la memoria
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json'
-];
+// 🌟 VERSIÓN DE LIMPIEZA ABSOLUTA - DESTRUYE LA CACHÉ CORRUPTA
+const CACHE_NAME = 'necesito-limpieza-total';
 
 self.addEventListener('install', e => {
+  // Obliga al teléfono a activar este limpiador de inmediato
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
-  );
 });
 
 self.addEventListener('activate', e => {
-  const cacheWhitelist = [CACHE_NAME];
   e.waitUntil(
+    // Busca todas las memorias guardadas en el celular y las borra por completo
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName); 
-          }
+          return caches.delete(cacheName); // Borra el código viejo congelado
         })
       );
+    }).then(() => {
+      // Desregistra el Service Worker del teléfono para liberar el audio y el botón
+      return self.registration.unregister();
     }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(res => {
-      if (res) { return res; }
-      return fetch(e.request);
-    })
-  );
+  // Deja pasar las peticiones limpias directamente a internet sin guardar copias trabadas
+  e.respondWith(fetch(e.request));
 });
