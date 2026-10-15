@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Ficha Digital del Fundador</title>
+    <style>
+        /* Diseño de Máximo Contraste para el Trabajo de Campo del Fundador */
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            color: #FFFF00; /* Amarillo brillante */
+            margin-bottom: 5px;
+        }
+        .subtitulo {
+            font-size: 18px;
+            color: #CCCCCC;
+            margin-bottom: 25px;
+        }
+        .seccion-validacion {
+            border: 2px solid #333333;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .titulo-seccion {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #FFFFFF;
+        }
+        /* Contenedor para poner dos botones gigantes lado a lado */
+        .bloque-botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        /* Botones gigantescos para interacción táctil fácil */
+        .btn-gigante {
+            flex: 1;
+            padding: 35px 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000000;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .btn-aprobar {
+            background-color: #00FF00; /* Verde fosforescente */
+        }
+        .btn-rechazar {
+            background-color: #FF0000; /* Rojo brillante */
+            color: #FFFFFF;
+        }
+        /* Estilos de estado seleccionado para confirmación visual */
+        .seleccionado {
+            outline: 6px solid #FFFFFF;
+            transform: scale(0.98);
+        }
+        /* Botón Matriz de activación final */
+        .btn-activar-final {
+            background-color: #FFFF00;
+            color: #000000;
+            width: 100%;
+            padding: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FICHA DE EVALUACIÓN</h1>
+    <div class="subtitulo">Exclusivo Administrador Fundador</div>
+
+    <!-- 🪪 BLOQUE 1: VALIDACIÓN DE IDENTIDAD -->
+    <div class="seccion-validacion">
+        <div class="titulo-seccion">1. Validación de DNI Físico</div>
+        <div class="bloque-botones">
+            <button class="btn-gigante btn-aprobar" onclick="validarDni(true, this)">DNI<br>CORRECTO</button>
+            <button class="btn-gigante btn-rechazar" onclick="validarDni(false, this)">DNI<br>RECHAZADO</button>
+        </div>
+    </div>
+
+    <!-- 🏠 BLOQUE 2: VERIFICACIÓN DOMICILIARIA -->
+    <div class="seccion-validacion">
+        <div class="titulo-seccion">2. Constatación de Vivienda</div>
+        <div class="bloque-botones">
+            <button class="btn-gigante btn-aprobar" onclick="validarDomicilio(true, this)">VIVIENDA<br>COMPROBADA</button>
+            <button class="btn-gigante btn-rechazar" onclick="validarDomicilio(false, this)">VIVIENDA<br>RECHAZADA</button>
+        </div>
+    </div>
+
+    <!-- 🏆 BOTÓN MATRIZ DE ACTIVACIÓN -->
+    <button class="btn-activar-final" onclick="firmarAprobacionFinal()">FIRMAR Y ACTIVAR ASISTENTE</button>
+
+    <script>
+        // Variables de estado interno
+        let dniVerificado = null;
+        let domicilioVerificado = null;
+
+        // El motor de voz del celular habla instantáneamente al presionar los botones
+        function hablar(texto) {
+            window.speechSynthesis.cancel(); // Detiene audios previos
+            const mensaje = new SpeechSynthesisUtterance(texto);
+            mensaje.lang = 'es-PE'; // Acento peruano
+            window.speechSynthesis.speak(mensaje);
+        }
+
+        function validarDni(estado, elemento) {
+            dniVerificado = estado;
+            // Manejo visual de selección
+            const hermanos = elemento.parentNode.children;
+            hermanos[0].classList.remove('seleccionado');
+            hermanos[1].classList.remove('seleccionado');
+            elemento.classList.add('seleccionado');
+
+            if (estado) {
+                hablar("DNI verificado como correcto.");
+            } else {
+                hablar("DNI marcado como no válido.");
+            }
+        }
+
+        function validarDomicilio(estado, elemento) {
+            domicilioVerificado = estado;
+            // Manejo visual de selección
+            const hermanos = elemento.parentNode.children;
+            hermanos[0].classList.remove('seleccionado');
+            hermanos[1].classList.remove('seleccionado');
+            elemento.classList.add('seleccionado');
+
+            if (estado) {
+                hablar("Vivienda del asistente confirmada en campo.");
+            } else {
+                hablar("Vivienda rechazada.");
+            }
+        }
+
+        function firmarAprobacionFinal() {
+            if (dniVerificado === null || domicilioVerificado === null) {
+                hablar("Atención. Primero debes evaluar el DNI y la vivienda antes de firmar.");
+                return;
+            }
+
+            if (dniVerificado && domicilioVerificado) {
+                hablar("Procesando firma del fundador... ¡Éxito! Asistente aprobado. Ha sido activado en la lista de primer orden y ya es visible en el radar.");
+                // Aquí el programador conectará el envío de datos al servidor de GitHub/Firebase
+            } else {
+                hablar("Registro denegado. El asistente no cumple con los requisitos mínimos de seguridad controlada.");
+            }
+        }
+    </script>
+
+</body>
+</html>
