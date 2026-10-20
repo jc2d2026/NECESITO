@@ -3,110 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - App de Asistencia con Maps</title>
+    <title>NECESITO</title>
     <style>
-        /* Estilos de Alto Contraste y Letras Gigantes para Baja Visión */
-        body {
-            background-color: #000000;
-            color: #FFFFFF;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
+        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 20px; }
+        h1 { font-size: 32px; color: #FFF000; margin-bottom: 20px; }
+        
+        /* El cuadro verde amigable de tu Figura 1 y 2 */
+        #cuadro-gps {
+            width: 100%; height: 350px; background-color: #1A1A1A;
+            border: 6px solid #00FF00; border-radius: 25px;
+            padding: 25px; box-sizing: border-box; text-align: left;
         }
-        h1 {
-            font-size: 32px;
-            color: #FFFF00; /* Amarillo brillante */
-            margin-bottom: 15px;
-        }
-        /* 🗺️ VENTANA DE GOOGLE MAPS INTEGRADA EN PANTALLA */
-        #contenedor-mapa {
-            width: 100%;
-            height: 250px;
-            background-color: #222222;
-            border: 4px solid #00FF00; /* Borde verde de confirmación */
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-sizing: border-box;
-        }
-        .contenedor-categorias {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .boton-categoria {
-            background-color: #1A1A1A;
-            border: 4px solid #FFFF00;
-            border-radius: 15px;
-            color: #FFFFFF;
-            font-size: 24px;
-            font-weight: bold;
-            padding: 25px;
-            cursor: pointer;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .boton-categoria:active {
-            background-color: #FFFF00;
-            color: #000000;
-        }
-        .emergencia {
-            border: 4px solid #FF0000 !important;
-            color: #FF3333 !important;
-        }
+        /* Enlace rojo grande y subrayado */
+        .texto-rojo-maps { color: #FF3333; font-size: 22px; font-weight: bold; text-decoration: underline; line-height: 1.5; }
+        
+        .contenedor-botones { display: flex; flex-direction: column; gap: 20px; max-width: 500px; margin: 30px auto 0; }
+        .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 15px; color: #FFF; font-size: 24px; font-weight: bold; padding: 25px; cursor: pointer; }
+        .boton:active { background-color: #FFF000; color: #000; }
+        .alert { border: 4px solid #FF0000 !important; color: #FF3333 !important; }
     </style>
 </head>
 <body>
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🗺️ EL MAPA DE GOOGLE SE CARGARÁ AUTOMÁTICAMENTE AQUÍ ADENTRO -->
-    <iframe id="contenedor-mapa" src="" allowfullscreen="" loading="lazy"></iframe>
-
-    <div class="contenedor-categorias">
-        <button class="boton-categoria" onclick="procesarPedido('Farmacia')">1. Farmacia y Medicinas</button>
-        <button class="boton-categoria" onclick="procesarPedido('Comida')">2. Comidas Preparadas</button>
-        <button class="boton-categoria" onclick="procesarPedido('Bodega')">3. Bodegas y Abastecimiento</button>
-        <button class="boton-categoria" onclick="procesarPedido('Tecnico')">4. Técnicos de Confianza</button>
-        <button class="boton-categoria emergencia" onclick="procesarPedido('Emergencia')">5. Emergencia Vital y Salud</button>
-        <button class="boton-categoria">6. OTROS - Personalizado</button>
+    <div id="cuadro-gps">
+        <div id="enlace-dinamico" class="texto-rojo-maps">Buscando señal satelital...</div>
     </div>
 
-    <!-- 🔌 ENLACE MANDATORIO AL MOTOR GPS (PROCESA LA UBICACIÓN EN SEGUNDO PLANO) -->
+    <div class="contenedor-botones">
+        <button class="boton" onclick="pedir('Farmacia y Medicinas')">1. Farmacia y Medicinas</button>
+        <button class="boton" onclick="pedir('Comidas Preparadas')">2. Comidas Preparadas</button>
+        <button class="boton" onclick="pedir('Bodegas y Abastecimiento')">3. Bodegas y Abastecimiento</button>
+        <button class="boton" onclick="pedir('Técnicos de Confianza')">4. Técnicos de Confianza</button>
+        <button class="boton alert" onclick="pedir('Emergencia Vital')">5. Emergencia Vital y Salud</button>
+        <button class="boton" onclick="pedir('Otros Servicios')">6. OTROS - Personalizado</button>
+    </div>
+
+    <!-- Conexión directa a tu motor GPS -->
     <script src="gps.js"></script>
 
     <script>
-        // Monitoreo constante del éxito del GPS para actualizar el mapa en pantalla
+        // Revisa la memoria cada segundo y pinta el enlace real de Google Maps
         setInterval(() => {
-            const precision = localStorage.getItem("precision_gps");
-            const mapaIframe = document.getElementById("contenedor-mapa");
-            
-            // Si el motor gps.js ya capturó las coordenadas, incrustamos el mapa vivo
-            if (precision && mapaIframe.src === "") {
-                // Recuperamos el punto guardado por el chip del celular
-                const enlaceGuardado = localStorage.getItem("ubicacion_remitente");
-                if (enlaceGuardado) {
-                    // Extraemos las coordenadas para meterlas al visor de Google Maps oficial
-                    const coordenadas = enlaceGuardado.split("?q=")[1];
-                    mapaIframe.src = `https://google.com{coordenadas}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-                    console.log("Google Maps vinculado y dibujado con éxito en la pantalla.");
-                }
+            const gpsReal = localStorage.getItem("ubicacion_remitente");
+            if (gpsReal) {
+                document.getElementById("enlace-dinamico").innerHTML = `MI UBICACION EN TIEMPO REAL:<br><a href="${gpsReal}" target="_blank" style="color: #FF3333;">${gpsReal}</a>`;
             }
-        }, 2000);
+        }, 1000);
 
-        function procesarPedido(categoria) {
-            const enlaceGps = localStorage.getItem("ubicacion_remitente");
-            if (!enlaceGps) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, calculando ubicación precisa."));
-                return;
-            }
-
+        // Sistema de respuesta amigable por voz
+        function pedir(servicio) {
+            const puntoMaps = localStorage.getItem("ubicacion_remitente");
             window.speechSynthesis.cancel();
-            const respuesta = new SpeechSynthesisUtterance(`Solicitud de ${categoria} recibida. Tu ubicación en Prolongación Huaylas ha sido enviada de forma automática.`);
-            respuesta.lang = 'es-PE';
-            window.speechSynthesis.speak(respuesta);
+            
+            const voz = new SpeechSynthesisUtterance(puntoMaps 
+                ? `Solicitud de ${servicio} recibida. Tu ubicación real en el mapa ha sido enlazada con éxito.`
+                : "Calculando ubicación precisa, por favor espere un segundo.");
+            voz.lang = 'es-PE';
+            window.speechSynthesis.speak(voz);
         }
     </script>
 
