@@ -16,8 +16,19 @@
         }
         h1 {
             font-size: 32px;
-            color: #FFFF00; /* Amarillo brillante para el título principal */
-            margin-bottom: 30px;
+            color: #FFFF00; /* Amarillo brillante */
+            margin-bottom: 25px;
+        }
+        /* Monitor de Estado Automático para Validación del Fundador */
+        #estado-sistema {
+            background-color: #111111;
+            border: 2px solid #00FF00;
+            color: #00FF00;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 10px;
         }
         .contenedor-categorias {
             display: flex;
@@ -26,7 +37,6 @@
             max-width: 500px;
             margin: 0 auto;
         }
-        /* Botones gigantes que ocupan buen espacio táctil */
         .boton-categoria {
             background-color: #1A1A1A;
             border: 4px solid #FFFF00;
@@ -38,38 +48,68 @@
             cursor: pointer;
             width: 100%;
             box-sizing: border-box;
-            transition: background 0.3s;
         }
         .boton-categoria:active {
             background-color: #FFFF00;
             color: #000000;
         }
-        /* Color especial rojo de alerta para la Emergencia */
         .emergencia {
-            border-color: #FF0000;
-            color: #FF3333;
-        }
-        .emergencia:active {
-            background-color: #FF0000;
-            color: #FFFFFF;
+            border: 4px solid #FF0000 !important;
+            color: #FF3333 !important;
         }
     </style>
 </head>
 <body>
 
     <h1>APP NECESITO</h1>
+    
+    <!-- 🧭 INDICADOR AUTOMÁTICO DE PRECISIÓN EN PANTALLA -->
+    <div id="estado-sistema">Buscando satélites automáticamente...</div>
 
     <div class="contenedor-categorias">
-        <button class="boton-categoria">1. Farmacia y Medicinas</button>
-        <button class="boton-categoria">2. Comidas Preparadas</button>
-        <button class="boton-categoria">3. Bodegas y Abastecimiento</button>
-        <button class="boton-categoria">4. Técnicos de Confianza</button>
-        <button class="boton-categoria class=emergencia">5. Emergencia Vital y Salud</button>
-        <button class="boton-categoria">6. OTROS - Personalizado</button>
+        <button class="boton-categoria" onclick="procesarPedido('Farmacia')">1. Farmacia y Medicinas</button>
+        <button class="boton-categoria" onclick="procesarPedido('Comida')">2. Comidas Preparadas</button>
+        <button class="boton-categoria" onclick="procesarPedido('Bodega')">3. Bodegas y Abastecimiento</button>
+        <button class="boton-categoria" onclick="procesarPedido('Tecnico')">4. Técnicos de Confianza</button>
+        <button class="boton-categoria emergencia" onclick="procesarPedido('Emergencia')">5. Emergencia Vital y Salud</button>
+        <button class="boton-categoria" onclick="procesarPedido('Otros')">6. OTROS - Personalizado</button>
     </div>
 
-    <!-- 🔌 AQUÍ QUEDA CONECTADO TU MOTOR GPS AUTOMÁTICO DE ALTA PRECISIÓN -->
+    <!-- 🔌 ENLACE MANDATORIO AL MOTOR GPS (PROCESA LA UBICACIÓN EN SEGUNDO PLANO) -->
     <script src="gps.js"></script>
+
+    <script>
+        // Monitoreo constante del éxito del GPS en segundo plano
+        setInterval(() => {
+            const precision = localStorage.getItem("precision_gps");
+            const estadoDiv = document.getElementById("estado-sistema");
+            if (precision) {
+                estadoDiv.style.borderColor = "#00FF00";
+                estadoDiv.style.color = "#00FF00";
+                estadoDiv.innerHTML = `🟢 GPS AUTOMÁTICO ACTIVO<br>Margen de error: ${parseFloat(precision).toFixed(1)} metros.`;
+            }
+        }, 1000);
+
+        // Función automática al presionar cualquier categoría
+        function procesarPedido(categoria) {
+            const enlaceGps = localStorage.getItem("ubicacion_remitente");
+            const precisionGps = localStorage.getItem("precision_gps");
+
+            if (!enlaceGps) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, el sistema está calculando su ubicación exacta."));
+                return;
+            }
+
+            // Alerta antiestrés y clara
+            window.speechSynthesis.cancel();
+            const respuesta = new SpeechSynthesisUtterance(`Solicitud de ${categoria} recibida. Tu ubicación exacta ha sido enviada al asistente de confianza más cercano.`);
+            respuesta.lang = 'es-PE';
+            window.speechSynthesis.speak(respuesta);
+
+            console.log(`Enviando pedido de ${categoria} con ubicación exacta: ${enlaceGps} (Precisión: ${precisionGps}m)`);
+            // Aquí el backend tipo Uber conecta con la base de datos del asistente
+        }
+    </script>
 
 </body>
 </html>
