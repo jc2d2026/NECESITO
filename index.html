@@ -8,18 +8,23 @@
         body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
         h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* 🟩 BOTÓN GIGANTE DE CONTROL DE UBICACIÓN REAL */
-        #boton-ubicacion-directa {
+        /* 🟩 EL MONOBLOCK: UNA SOLA PIEZA TÁCTIL INDESTRUCTIBLE */
+        .bloque-ubicacion-unico {
             width: 100%; max-width: 500px; background-color: #1A1A1A;
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
             padding: 25px; box-sizing: border-box; cursor: pointer;
             text-align: left; display: block;
+            
+            /* Evita que el celular intente seleccionar o buscar las palabras individualmente */
+            user-select: none;
+            -webkit-user-select: none;
         }
-        #boton-ubicacion-directa:active { background-color: #00FF00; }
-        #boton-ubicacion-directa:active #texto-gps { color: #000; }
+        .bloque-ubicacion-unico:active { background-color: #00FF00; }
+        .bloque-ubicacion-unico:active #texto-gps { color: #000; }
+        .bloque-ubicacion-unico:active .instruccion-toque { color: #000; }
 
-        #texto-gps { color: #FF3333; font-size: 18px; font-weight: bold; line-height: 1.4; }
-        .instruccion-toque { color: #00FF00; font-size: 14px; display: block; margin-top: 8px; text-transform: uppercase; }
+        #texto-gps { color: #FF3333; font-size: 18px; font-weight: bold; line-height: 1.4; pointer-events: none; }
+        .instruccion-toque { color: #00FF00; font-size: 14px; display: block; margin-top: 8px; text-transform: uppercase; font-weight: bold; pointer-events: none; }
         
         .contenedor-botones { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
         .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 12px; color: #FFF; font-size: 22px; font-weight: bold; padding: 20px; cursor: pointer; }
@@ -31,8 +36,8 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🟩 CAJA CONVERTIDA EN ELEMENTO ACCIONABLE POR INTERRUPCIÓN JAVASCRIPT -->
-    <div id="boton-ubicacion-directa" onclick="abrirMapaNativo()">
+    <!-- 🟩 TODO EL RECUADRO REACCIONA EN CONJUNTO COMO UN SOLO BOTÓN MATRIZ -->
+    <div class="bloque-ubicacion-unico" onclick="abrirMapaNativo()">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
     </div>
@@ -46,7 +51,6 @@
     </div>
 
     <script>
-        // Variables globales para almacenar las coordenadas vivas
         let latitudActual = null;
         let longitudActual = null;
 
@@ -67,19 +71,18 @@
             longitudActual = posicion.coords.longitude;
             const precision = posicion.coords.accuracy;
 
-            // Actualizar la data en texto rojo para el usuario o fundador
             document.getElementById("texto-gps").innerHTML = 
                 `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
         }
 
-        // REDIRECCIÓN INTERNA EVITANDO EL BLOQUEO 'ABOUT:BLANK'
+        // REDIRECCIÓN DIRECTA UTILIZANDO EL CONCEPTO DE MONOBLOCK
         function abrirMapaNativo() {
             if (latitudActual && longitudActual) {
-                // Forzar el cambio de url en la misma pestaña sin abrir ventanas flotantes
+                // Abre el mapa limpio usando el estándar universal de redirección directa
                 const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
-                window.location.replace(urlSeguraMaps);
+                window.location.href = urlSeguraMaps;
             } else {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando señal estable."));
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando satélites."));
             }
         }
 
