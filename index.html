@@ -8,12 +8,12 @@
         body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
         h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* 🟩 BOTÓN GIGANTE DE UBICACIÓN REAL (SISTEMA INTEGRADO) */
+        /* 🟩 BOTÓN GIGANTE DE CONTROL DE UBICACIÓN REAL */
         #boton-ubicacion-directa {
             width: 100%; max-width: 500px; background-color: #1A1A1A;
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
             padding: 25px; box-sizing: border-box; cursor: pointer;
-            text-align: left; display: block; text-decoration: none;
+            text-align: left; display: block;
         }
         #boton-ubicacion-directa:active { background-color: #00FF00; }
         #boton-ubicacion-directa:active #texto-gps { color: #000; }
@@ -31,11 +31,11 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🟩 ELIMINADO EL TARGET BLANK PARA EVITAR EL BLOQUEO 'ABOUT:BLANK' -->
-    <a id="boton-ubicacion-directa" href="#">
+    <!-- 🟩 CAJA CONVERTIDA EN ELEMENTO ACCIONABLE POR INTERRUPCIÓN JAVASCRIPT -->
+    <div id="boton-ubicacion-directa" onclick="abrirMapaNativo()">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
-    </a>
+    </div>
 
     <div class="contenedor-botones">
         <button class="boton" onclick="pedir('Farmacia y Medicinas')">1. Farmacia y Medicinas</button>
@@ -46,6 +46,10 @@
     </div>
 
     <script>
+        // Variables globales para almacenar las coordenadas vivas
+        let latitudActual = null;
+        let longitudActual = null;
+
         // CAPTURA AUTOMÁTICA DEL GPS DEL CELULAR
         document.addEventListener("DOMContentLoaded", () => {
             if (navigator.geolocation) {
@@ -59,17 +63,24 @@
         });
 
         function coordenadasExitosas(posicion) {
-            const lat = posicion.coords.latitude;
-            const lon = posicion.coords.longitude;
+            latitudActual = posicion.coords.latitude;
+            longitudActual = posicion.coords.longitude;
             const precision = posicion.coords.accuracy;
 
-            // Actualizar la data en texto rojo
+            // Actualizar la data en texto rojo para el usuario o fundador
             document.getElementById("texto-gps").innerHTML = 
-                `🟢 UBICACIÓN REAL:<br>Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
+                `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
+        }
 
-            // ENLACE NATIVO DIRECTO: Forzamos la apertura en la misma pestaña actual
-            const enlaceGpsReal = `https://google.com{lat},${lon}`;
-            document.getElementById("boton-ubicacion-directa").href = enlaceGpsReal;
+        // REDIRECCIÓN INTERNA EVITANDO EL BLOQUEO 'ABOUT:BLANK'
+        function abrirMapaNativo() {
+            if (latitudActual && longitudActual) {
+                // Forzar el cambio de url en la misma pestaña sin abrir ventanas flotantes
+                const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
+                window.location.replace(urlSeguraMaps);
+            } else {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando señal estable."));
+            }
         }
 
         function errorGps() {
