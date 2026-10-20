@@ -5,20 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO</title>
     <style>
-        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 20px; }
-        h1 { font-size: 32px; color: #FFF000; margin-bottom: 20px; }
+        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
+        h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* El cuadro verde amigable de tu Figura 1 y 2 */
-        #cuadro-gps {
-            width: 100%; height: 350px; background-color: #1A1A1A;
-            border: 6px solid #00FF00; border-radius: 25px;
-            padding: 25px; box-sizing: border-box; text-align: left;
+        /* 🟩 EL RECUADRO VERDE DE PRESENTACIÓN INTEGRADO */
+        #cuadro-presentacion {
+            width: 100%; max-width: 500px; height: 380px; background-color: #1A1A1A;
+            border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
+            padding: 15px; box-sizing: border-box; display: flex; flex-direction: column;
         }
-        /* Enlace rojo grande y subrayado */
-        .texto-rojo-maps { color: #FF3333; font-size: 22px; font-weight: bold; text-decoration: underline; line-height: 1.5; }
         
-        .contenedor-botones { display: flex; flex-direction: column; gap: 20px; max-width: 500px; margin: 30px auto 0; }
-        .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 15px; color: #FFF; font-size: 24px; font-weight: bold; padding: 25px; cursor: pointer; }
+        /* 🔴 DATA DE COORDENADAS EN LETRAS ROJAS */
+        #data-coordenadas {
+            color: #FF3333; font-size: 16px; font-weight: bold; text-align: left;
+            margin-bottom: 10px; min-height: 40px; line-height: 1.3;
+        }
+
+        /* 🗺️ MAPA INTERACTIVO DE GOOGLE MAPS DENTRO DEL CUADRO */
+        #visor-mapa {
+            width: 100%; flex-grow: 1; background-color: #222;
+            border: 2px solid #333; border-radius: 10px; box-sizing: border-box;
+        }
+        
+        .contenedor-botones { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 12px; color: #FFF; font-size: 22px; font-weight: bold; padding: 20px; cursor: pointer; }
         .boton:active { background-color: #FFF000; color: #000; }
         .alert { border: 4px solid #FF0000 !important; color: #FF3333 !important; }
     </style>
@@ -27,8 +37,10 @@
 
     <h1>APP NECESITO</h1>
     
-    <div id="cuadro-gps">
-        <div id="enlace-dinamico" class="texto-rojo-maps">Buscando señal satelital...</div>
+    <!-- 🟩 RECUADRO CON DATA DE COORDENADAS Y MAPA VIVO EN TIEMPO REAL -->
+    <div id="cuadro-presentacion">
+        <div id="data-coordenadas">Buscando señal satelital automática...</div>
+        <iframe id="visor-mapa" src="" allowfullscreen="" loading="lazy"></iframe>
     </div>
 
     <div class="contenedor-botones">
@@ -37,29 +49,49 @@
         <button class="boton" onclick="pedir('Bodegas y Abastecimiento')">3. Bodegas y Abastecimiento</button>
         <button class="boton" onclick="pedir('Técnicos de Confianza')">4. Técnicos de Confianza</button>
         <button class="boton alert" onclick="pedir('Emergencia Vital')">5. Emergencia Vital y Salud</button>
-        <button class="boton" onclick="pedir('Otros Servicios')">6. OTROS - Personalizado</button>
     </div>
 
-    <!-- Conexión directa a tu motor GPS -->
-    <script src="gps.js"></script>
-
     <script>
-        // Revisa la memoria cada segundo y pinta el enlace real de Google Maps
-        setInterval(() => {
-            const gpsReal = localStorage.getItem("ubicacion_remitente");
-            if (gpsReal) {
-                document.getElementById("enlace-dinamico").innerHTML = `MI UBICACION EN TIEMPO REAL:<br><a href="${gpsReal}" target="_blank" style="color: #FF3333;">${gpsReal}</a>`;
+        // MOTOR DE LOCALIZACIÓN LIGERO INTEGRADO DIRECTAMENTE AQUÍ
+        document.addEventListener("DOMContentLoaded", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(coordenadasExitosas, errorGps, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                });
+            } else {
+                document.getElementById("data-coordenadas").innerHTML = "Tu dispositivo no soporta GPS.";
             }
-        }, 1000);
+        });
 
-        // Sistema de respuesta amigable por voz
-        function pedir(servicio) {
-            const puntoMaps = localStorage.getItem("ubicacion_remitente");
-            window.speechSynthesis.cancel();
+        function coordenadasExitosas(posicion) {
+            const lat = posicion.coords.latitude;
+            const lon = posicion.coords.longitude;
+            const precision = posicion.coords.accuracy;
+
+            // 1. Mostrar la data visual de coordenadas en el texto rojo
+            document.getElementById("data-coordenadas").innerHTML = 
+                `🟢 UBICACIÓN REAL:<br>Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)} (Error: ${precision.toFixed(1)}m)`;
+
+            // 2. Cargar el mapa interactivo de Google Maps automáticamente dentro del cuadro
+            const visor = document.getElementById("visor-mapa");
+            const urlMapaEmbed = `https://google.com{lat},${lon}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
             
-            const voz = new SpeechSynthesisUtterance(puntoMaps 
-                ? `Solicitud de ${servicio} recibida. Tu ubicación real en el mapa ha sido enlazada con éxito.`
-                : "Calculando ubicación precisa, por favor espere un segundo.");
+            if (visor.src !== urlMapaEmbed) {
+                visor.src = urlMapaEmbed;
+            }
+
+            // Guardar en memoria temporal el enlace directo por si se pulsa
+            localStorage.setItem("enlace_directo_maps", `https://google.com{lat},${lon}`);
+        }
+
+        function errorGps() {
+            document.getElementById("data-coordenadas").innerHTML = "Buscando mejor señal de satélite en Chorrillos...";
+        }
+
+        function pedir(servicio) {
+            window.speechSynthesis.cancel();
+            const voz = new SpeechSynthesisUtterance(`Solicitud de ${servicio} recibida. Tu ubicación real ha sido enlazada.`);
             voz.lang = 'es-PE';
             window.speechSynthesis.speak(voz);
         }
