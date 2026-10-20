@@ -8,7 +8,7 @@
         body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
         h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* 🟩 BOTÓN GIGANTE DE UBICACIÓN REAL (SUSTITUYE AL CUADRO ROTO) */
+        /* 🟩 BOTÓN GIGANTE DE UBICACIÓN REAL (SISTEMA INTEGRADO) */
         #boton-ubicacion-directa {
             width: 100%; max-width: 500px; background-color: #1A1A1A;
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
@@ -31,8 +31,8 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🟩 UN SOLO TOQUE AQUÍ ABRE INSTANTÁNEAMENTE GOOGLE MAPS COMPLETO -->
-    <a id="boton-ubicacion-directa" href="#" target="_blank">
+    <!-- 🟩 ELIMINADO EL TARGET BLANK PARA EVITAR EL BLOQUEO 'ABOUT:BLANK' -->
+    <a id="boton-ubicacion-directa" href="#">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
     </a>
@@ -67,7 +67,7 @@
             document.getElementById("texto-gps").innerHTML = 
                 `🟢 UBICACIÓN REAL:<br>Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
 
-            // VINCULACIÓN DIRECTA: Configuramos el botón verde para abrir la app nativa de mapas al instante
+            // ENLACE NATIVO DIRECTO: Forzamos la apertura en la misma pestaña actual
             const enlaceGpsReal = `https://google.com{lat},${lon}`;
             document.getElementById("boton-ubicacion-directa").href = enlaceGpsReal;
         }
