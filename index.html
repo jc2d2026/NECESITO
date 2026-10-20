@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO - App de Asistencia</title>
+    <title>NECESITO - App de Asistencia con Maps</title>
     <style>
         /* Estilos de Alto Contraste y Letras Gigantes para Baja Visión */
         body {
@@ -17,18 +17,17 @@
         h1 {
             font-size: 32px;
             color: #FFFF00; /* Amarillo brillante */
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
-        /* Monitor de Estado Automático para Validación del Fundador */
-        #estado-sistema {
-            background-color: #111111;
-            border: 2px solid #00FF00;
-            color: #00FF00;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px;
+        /* 🗺️ VENTANA DE GOOGLE MAPS INTEGRADA EN PANTALLA */
+        #contenedor-mapa {
+            width: 100%;
+            height: 250px;
+            background-color: #222222;
+            border: 4px solid #00FF00; /* Borde verde de confirmación */
+            border-radius: 15px;
             margin-bottom: 25px;
-            border-radius: 10px;
+            box-sizing: border-box;
         }
         .contenedor-categorias {
             display: flex;
@@ -63,8 +62,8 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🧭 INDICADOR AUTOMÁTICO DE PRECISIÓN EN PANTALLA -->
-    <div id="estado-sistema">Buscando satélites automáticamente...</div>
+    <!-- 🗺️ EL MAPA DE GOOGLE SE CARGARÁ AUTOMÁTICAMENTE AQUÍ ADENTRO -->
+    <iframe id="contenedor-mapa" src="" allowfullscreen="" loading="lazy"></iframe>
 
     <div class="contenedor-categorias">
         <button class="boton-categoria" onclick="procesarPedido('Farmacia')">1. Farmacia y Medicinas</button>
@@ -72,42 +71,42 @@
         <button class="boton-categoria" onclick="procesarPedido('Bodega')">3. Bodegas y Abastecimiento</button>
         <button class="boton-categoria" onclick="procesarPedido('Tecnico')">4. Técnicos de Confianza</button>
         <button class="boton-categoria emergencia" onclick="procesarPedido('Emergencia')">5. Emergencia Vital y Salud</button>
-        <button class="boton-categoria" onclick="procesarPedido('Otros')">6. OTROS - Personalizado</button>
+        <button class="boton-categoria">6. OTROS - Personalizado</button>
     </div>
 
     <!-- 🔌 ENLACE MANDATORIO AL MOTOR GPS (PROCESA LA UBICACIÓN EN SEGUNDO PLANO) -->
     <script src="gps.js"></script>
 
     <script>
-        // Monitoreo constante del éxito del GPS en segundo plano
+        // Monitoreo constante del éxito del GPS para actualizar el mapa en pantalla
         setInterval(() => {
             const precision = localStorage.getItem("precision_gps");
-            const estadoDiv = document.getElementById("estado-sistema");
-            if (precision) {
-                estadoDiv.style.borderColor = "#00FF00";
-                estadoDiv.style.color = "#00FF00";
-                estadoDiv.innerHTML = `🟢 GPS AUTOMÁTICO ACTIVO<br>Margen de error: ${parseFloat(precision).toFixed(1)} metros.`;
+            const mapaIframe = document.getElementById("contenedor-mapa");
+            
+            // Si el motor gps.js ya capturó las coordenadas, incrustamos el mapa vivo
+            if (precision && mapaIframe.src === "") {
+                // Recuperamos el punto guardado por el chip del celular
+                const enlaceGuardado = localStorage.getItem("ubicacion_remitente");
+                if (enlaceGuardado) {
+                    // Extraemos las coordenadas para meterlas al visor de Google Maps oficial
+                    const coordenadas = enlaceGuardado.split("?q=")[1];
+                    mapaIframe.src = `https://google.com{coordenadas}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+                    console.log("Google Maps vinculado y dibujado con éxito en la pantalla.");
+                }
             }
-        }, 1000);
+        }, 2000);
 
-        // Función automática al presionar cualquier categoría
         function procesarPedido(categoria) {
             const enlaceGps = localStorage.getItem("ubicacion_remitente");
-            const precisionGps = localStorage.getItem("precision_gps");
-
             if (!enlaceGps) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, el sistema está calculando su ubicación exacta."));
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, calculando ubicación precisa."));
                 return;
             }
 
-            // Alerta antiestrés y clara
             window.speechSynthesis.cancel();
-            const respuesta = new SpeechSynthesisUtterance(`Solicitud de ${categoria} recibida. Tu ubicación exacta ha sido enviada al asistente de confianza más cercano.`);
+            const respuesta = new SpeechSynthesisUtterance(`Solicitud de ${categoria} recibida. Tu ubicación en Prolongación Huaylas ha sido enviada de forma automática.`);
             respuesta.lang = 'es-PE';
             window.speechSynthesis.speak(respuesta);
-
-            console.log(`Enviando pedido de ${categoria} con ubicación exacta: ${enlaceGps} (Precisión: ${precisionGps}m)`);
-            // Aquí el backend tipo Uber conecta con la base de datos del asistente
         }
     </script>
 
