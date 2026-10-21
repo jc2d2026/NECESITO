@@ -1,42 +1,102 @@
-// 📱 MOTOR DE GEOLOCALIZACIÓN REPARADO - APP "NECESITO"
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NECESITO</title>
+    <style>
+        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
+        h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
+        
+        /* 🟩 EL MONOBLOCK: UNA SOLA PIEZA TÁCTIL INDESTRUCTIBLE */
+        .bloque-ubicacion-unico {
+            width: 100%; max-width: 500px; background-color: #1A1A1A;
+            border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
+            padding: 25px; box-sizing: border-box; cursor: pointer;
+            text-align: left; display: block;
+            
+            /* Evita que el celular intente seleccionar o buscar las palabras individualmente */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .bloque-ubicacion-unico:active { background-color: #00FF00; }
+        .bloque-ubicacion-unico:active #texto-gps { color: #000; }
+        .bloque-ubicacion-unico:active .instruccion-toque { color: #000; }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Activa la geolocalización de forma 100% automática al abrir la pantalla
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(coordenadasExitosas, errorGps, {
-            enableHighAccuracy: true, // Fuerza el uso del chip GPS del celular
-            timeout: 10000,
-            maximumAge: 0             // Cero memoria: Borra el anclaje de Las Antaras 186
-        });
-    } else {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Tu dispositivo no soporta localización."));
-    }
-});
+        #texto-gps { color: #FF3333; font-size: 18px; font-weight: bold; line-height: 1.4; pointer-events: none; }
+        .instruccion-toque { color: #00FF00; font-size: 14px; display: block; margin-top: 8px; text-transform: uppercase; font-weight: bold; pointer-events: none; }
+        
+        .contenedor-botones { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 12px; color: #FFF; font-size: 22px; font-weight: bold; padding: 20px; cursor: pointer; }
+        .boton:active { background-color: #FFF000; color: #000; }
+        .alert { border: 4px solid #FF0000 !important; color: #FF3333 !important; }
+    </style>
+</head>
+<body>
 
-function coordenadasExitosas(posicion) {
-    const lat = posicion.coords.latitude;
-    const lon = posicion.coords.longitude;
-    const precisionReal = posicion.coords.accuracy;
-
-    // CORRECCIÓN MATRIZ: Creamos el enlace oficial y limpio de Google Maps con las coordenadas reales
-    const hipervinculoGoogleMaps = `https://google.com{lat},${lon}`;
+    <h1>APP NECESITO</h1>
     
-    // Guardamos la información limpia en la memoria interna del celular
-    localStorage.setItem("ubicacion_remitente", hipervinculoGoogleMaps);
-    localStorage.setItem("precision_gps", precisionReal);
+    <!-- 🟩 TODO EL RECUADRO REACCIONA EN CONJUNTO COMO UN SOLO BOTÓN MATRIZ -->
+    <div class="bloque-ubicacion-unico" onclick="abrirMapaNativo()">
+        <div id="texto-gps">Buscando señal satelital automática...</div>
+        <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
+    </div>
 
-    // Activación de la Voz Amiga y Calmada (Antiestrés)
-    window.speechSynthesis.cancel();
-    const mensajeVoz = new SpeechSynthesisUtterance("Ubicación satelital establecida con éxito. Todo está listo. Dime, ¿qué necesitas hoy?");
-    mensajeVoz.lang = 'es-PE';
-    mensajeVoz.rate = 0.9; // Velocidad pausada para mayor claridad
-    window.speechSynthesis.speak(mensajeVoz);
-}
+    <div class="contenedor-botones">
+        <button class="boton" onclick="pedir('Farmacia y Medicinas')">1. Farmacia y Medicinas</button>
+        <button class="boton" onclick="pedir('Comidas Preparadas')">2. Comidas Preparadas</button>
+        <button class="boton" onclick="pedir('Bodegas y Abastecimiento')">3. Bodegas y Abastecimiento</button>
+        <button class="boton" onclick="pedir('Técnicos de Confianza')">4. Técnicos de Confianza</button>
+        <button class="boton alert" onclick="pedir('Emergencia Vital')">5. Emergencia Vital y Salud</button>
+    </div>
 
-function errorGps(error) {
-    window.speechSynthesis.cancel();
-    const mensajeError = new SpeechSynthesisUtterance("Estoy buscando una mejor señal de satélite para darte total seguridad. No te preocupes, tómate tu tiempo.");
-    mensajeError.lang = 'es-PE';
-    mensajeError.rate = 0.9;
-    window.speechSynthesis.speak(mensajeError);
-}
+    <script>
+        let latitudActual = null;
+        let longitudActual = null;
+
+        // CAPTURA AUTOMÁTICA DEL GPS DEL CELULAR
+        document.addEventListener("DOMContentLoaded", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(coordenadasExitosas, errorGps, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                });
+            } else {
+                document.getElementById("texto-gps").innerHTML = "Tu dispositivo no soporta GPS.";
+            }
+        });
+
+        function coordenadasExitosas(posicion) {
+            latitudActual = posicion.coords.latitude;
+            longitudActual = posicion.coords.longitude;
+            const precision = posicion.coords.accuracy;
+
+            document.getElementById("texto-gps").innerHTML = 
+                `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
+        }
+
+        // REDIRECCIÓN DIRECTA UTILIZANDO EL CONCEPTO DE MONOBLOCK
+        function abrirMapaNativo() {
+            if (latitudActual && longitudActual) {
+                // Abre el mapa limpio usando el estándar universal de redirección directa
+                const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
+                window.location.href = urlSeguraMaps;
+            } else {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando satélites."));
+            }
+        }
+
+        function errorGps() {
+            document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos...";
+        }
+
+        function pedir(servicio) {
+            window.speechSynthesis.cancel();
+            const voz = new SpeechSynthesisUtterance(`Solicitud de ${servicio} recibida.`);
+            voz.lang = 'es-PE';
+            window.speechSynthesis.speak(voz);
+        }
+    </script>
+
+</body>
+</html>
