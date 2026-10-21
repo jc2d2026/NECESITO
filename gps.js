@@ -1,102 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NECESITO</title>
-    <style>
-        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
-        h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
-        
-        /* 🟩 EL MONOBLOCK: UNA SOLA PIEZA TÁCTIL INDESTRUCTIBLE */
-        .bloque-ubicacion-unico {
-            width: 100%; max-width: 500px; background-color: #1A1A1A;
-            border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
-            padding: 25px; box-sizing: border-box; cursor: pointer;
-            text-align: left; display: block;
-            
-            /* Evita que el celular intente seleccionar o buscar las palabras individualmente */
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .bloque-ubicacion-unico:active { background-color: #00FF00; }
-        .bloque-ubicacion-unico:active #texto-gps { color: #000; }
-        .bloque-ubicacion-unico:active .instruccion-toque { color: #000; }
+navigator.geolocation.watchPosition(function(position) {
+    var numLat = position.coords.latitude;
+    var numLon = position.coords.longitude;
+    var numAcc = position.coords.accuracy.toFixed(1);
 
-        #texto-gps { color: #FF3333; font-size: 18px; font-weight: bold; line-height: 1.4; pointer-events: none; }
-        .instruccion-toque { color: #00FF00; font-size: 14px; display: block; margin-top: 8px; text-transform: uppercase; font-weight: bold; pointer-events: none; }
-        
-        .contenedor-botones { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-        .boton { background-color: #1A1A1A; border: 4px solid #FFF000; border-radius: 12px; color: #FFF; font-size: 22px; font-weight: bold; padding: 20px; cursor: pointer; }
-        .boton:active { background-color: #FFF000; color: #000; }
-        .alert { border: 4px solid #FF0000 !important; color: #FF3333 !important; }
-    </style>
-</head>
-<body>
+    // Actualiza el texto en la página web
+    document.getElementById("txt-latitud").innerText = numLat;
+    document.getElementById("txt-longitud").innerText = numLon;
+    document.getElementById("txt-precision").innerText = numAcc;
 
-    <h1>APP NECESITO</h1>
-    
-    <!-- 🟩 TODO EL RECUADRO REACCIONA EN CONJUNTO COMO UN SOLO BOTÓN MATRIZ -->
-    <div class="bloque-ubicacion-unico" onclick="abrirMapaNativo()">
-        <div id="texto-gps">Buscando señal satelital automática...</div>
-        <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
-    </div>
-
-    <div class="contenedor-botones">
-        <button class="boton" onclick="pedir('Farmacia y Medicinas')">1. Farmacia y Medicinas</button>
-        <button class="boton" onclick="pedir('Comidas Preparadas')">2. Comidas Preparadas</button>
-        <button class="boton" onclick="pedir('Bodegas y Abastecimiento')">3. Bodegas y Abastecimiento</button>
-        <button class="boton" onclick="pedir('Técnicos de Confianza')">4. Técnicos de Confianza</button>
-        <button class="boton alert" onclick="pedir('Emergencia Vital')">5. Emergencia Vital y Salud</button>
-    </div>
-
-    <script>
-        let latitudActual = null;
-        let longitudActual = null;
-
-        // CAPTURA AUTOMÁTICA DEL GPS DEL CELULAR
-        document.addEventListener("DOMContentLoaded", () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(coordenadasExitosas, errorGps, {
-                    enableHighAccuracy: true,
-                    maximumAge: 0
-                });
-            } else {
-                document.getElementById("texto-gps").innerHTML = "Tu dispositivo no soporta GPS.";
-            }
-        });
-
-        function coordenadasExitosas(posicion) {
-            latitudActual = posicion.coords.latitude;
-            longitudActual = posicion.coords.longitude;
-            const precision = posicion.coords.accuracy;
-
-            document.getElementById("texto-gps").innerHTML = 
-                `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
-        }
-
-        // REDIRECCIÓN DIRECTA UTILIZANDO EL CONCEPTO DE MONOBLOCK
-        function abrirMapaNativo() {
-            if (latitudActual && longitudActual) {
-                // Abre el mapa limpio usando el estándar universal de redirección directa
-                const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
-                window.location.href = urlSeguraMaps;
-            } else {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando satélites."));
-            }
-        }
-
-        function errorGps() {
-            document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos...";
-        }
-
-        function pedir(servicio) {
-            window.speechSynthesis.cancel();
-            const voz = new SpeechSynthesisUtterance(`Solicitud de ${servicio} recibida.`);
-            voz.lang = 'es-PE';
-            window.speechSynthesis.speak(voz);
-        }
-    </script>
-
-</body>
-</html>
+    // Modifica el atributo href con la URL matemática exacta sin añadir texto extra
+    document.getElementById("enlace-mapa").href = "https://google.com" + numLat + "," + numLon;
+}, function(err) {
+    console.warn("ERROR(" + err.code + "): " + err.message);
+}, {
+    enableHighAccuracy: true
+});
