@@ -15,7 +15,7 @@
             padding: 25px; box-sizing: border-box; cursor: pointer;
             text-align: left; display: block;
             
-            /* Evita que el celular intente seleccionar o buscar las palabras individualmente */
+            /* Evita que el celular intente seleccionar o buscar las palabras */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -51,8 +51,8 @@
     </div>
 
     <script>
-        let latitudActual = null;
-        let longitudActual = null;
+        let valorEjeX = null;
+        let valorEjeY = null;
 
         // CAPTURA AUTOMÁTICA DEL GPS DEL CELULAR
         document.addEventListener("DOMContentLoaded", () => {
@@ -67,20 +67,20 @@
         });
 
         function coordenadasExitosas(posicion) {
-            latitudActual = posicion.coords.latitude;
-            longitudActual = posicion.coords.longitude;
-            const precision = posicion.coords.accuracy;
+            valorEjeX = posicion.coords.latitude;
+            valorEjeY = posicion.coords.longitude;
+            const metrosPrecision = posicion.coords.accuracy;
 
-            // Muestra en pantalla el texto visual bonito para el usuario (con Lat y Lon)
+            // ELIMINACIÓN TOTAL: Se quitaron por completo las etiquetas de texto que generaban el bloqueo
             document.getElementById("texto-gps").innerHTML = 
-                `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
+                `🟢 UBICACIÓN REAL:<br>${valorEjeX.toFixed(6)}, ${valorEjeY.toFixed(6)}<br>(Precisión: ${metrosPrecision.toFixed(1)} metros)`;
         }
 
-        // REDIRECCIÓN DIRECTA UTILIZANDO EL CONCEPTO DE MONOBLOCK
+        // REDIRECCIÓN DIRECTA EN FORMATO NUMÉRICO PURO
         function abrirMapaNativo() {
-            if (latitudActual && longitudActual) {
-                // CORRECCIÓN AQUÍ: Se genera el enlace limpio con los números puros para que Maps responda de inmediato
-                const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
+            if (valorEjeX && valorEjeY) {
+                // ENLACE LIMPIO: Estructura exacta idéntica a tu ejemplo, sin letras intermedias
+                const urlSeguraMaps = `https://google.com{valorEjeX},${valorEjeY}`;
                 window.location.href = urlSeguraMaps;
             } else {
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando satélites."));
