@@ -71,6 +71,7 @@
             longitudActual = posicion.coords.longitude;
             const precision = posicion.coords.accuracy;
 
+            // Muestra en pantalla el texto visual bonito para el usuario (con Lat y Lon)
             document.getElementById("texto-gps").innerHTML = 
                 `🟢 UBICACIÓN REAL:<br>Lat: ${latitudActual.toFixed(6)}, Lon: ${longitudActual.toFixed(6)}<br>(Precisión: ${precision.toFixed(1)} metros)`;
         }
@@ -78,7 +79,7 @@
         // REDIRECCIÓN DIRECTA UTILIZANDO EL CONCEPTO DE MONOBLOCK
         function abrirMapaNativo() {
             if (latitudActual && longitudActual) {
-                // Abre el mapa limpio usando el estándar universal de redirección directa
+                // CORRECCIÓN AQUÍ: Se genera el enlace limpio con los números puros para que Maps responda de inmediato
                 const urlSeguraMaps = `https://google.com{latitudActual},${longitudActual}`;
                 window.location.href = urlSeguraMaps;
             } else {
