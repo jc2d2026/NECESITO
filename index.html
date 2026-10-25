@@ -8,14 +8,15 @@
         body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
         h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* 🟩 EL MONOBLOCK: UNA SOLA PIEZA TÁCTIL INDESTRUCTIBLE */
+        /* 🟩 EL MONOBLOCK: AHORA ES UN ENLACE DIRECTO SEGURO */
         .bloque-ubicacion-unico {
             width: 100%; max-width: 500px; background-color: #1A1A1A;
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
             padding: 25px; box-sizing: border-box; cursor: pointer;
             text-align: left; display: block;
+            text-decoration: none; /* Quita el subrayado de enlace */
             
-            /* Evita que el celular intente seleccionar o buscar las palabras */
+            /* Evita que el celular intente seleccionar las palabras */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -36,11 +37,11 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🟩 TODO EL RECUADRO REACCIONA EN CONJUNTO COMO UN SOLO BOTÓN MATRIZ -->
-    <div class="bloque-ubicacion-unico" onclick="abrirMapaNativo()">
+    <!-- 🟩 SOLUCIÓN: TODO EL BLOQUE AHORA ES UN ENLACE REAL QUE ABRE EN NUEVA PESTAÑA -->
+    <a id="enlace-monoblock" href="#" target="_blank" class="bloque-ubicacion-unico">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
-    </div>
+    </a>
 
     <div class="contenedor-botones">
         <button class="boton" onclick="pedir('Farmacia y Medicinas')">1. Farmacia y Medicinas</button>
@@ -71,24 +72,18 @@
             valorEjeY = posicion.coords.longitude;
             const metrosPrecision = posicion.coords.accuracy;
 
-            // ELIMINACIÓN TOTAL: Se quitaron por completo las etiquetas de texto que generaban el bloqueo
+            // Muestra los números limpios en pantalla
             document.getElementById("texto-gps").innerHTML = 
                 `🟢 UBICACIÓN REAL:<br>${valorEjeX.toFixed(6)}, ${valorEjeY.toFixed(6)}<br>(Precisión: ${metrosPrecision.toFixed(1)} metros)`;
-        }
 
-        // REDIRECCIÓN DIRECTA EN FORMATO NUMÉRICO PURO
-        function abrirMapaNativo() {
-            if (valorEjeX && valorEjeY) {
-                // ENLACE LIMPIO: Estructura exacta idéntica a tu ejemplo, sin letras intermedias
-                const urlSeguraMaps = `https://google.com{valorEjeX},${valorEjeY}`;
-                window.location.href = urlSeguraMaps;
-            } else {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Espere un segundo, buscando satélites."));
-            }
+            // REPARACIÓN MAESTRA: Modificamos directamente el atributo href del enlace para que actúe de forma nativa externa
+            document.getElementById("enlace-monoblock").href = `https://google.com{valorEjeX},${valorEjeY}`;
         }
 
         function errorGps() {
             document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos...";
+            // Si falla o está buscando, deshabilitamos temporalmente el clic enviándolo a nada
+            document.getElementById("enlace-monoblock").href = "javascript:void(0);";
         }
 
         function pedir(servicio) {
