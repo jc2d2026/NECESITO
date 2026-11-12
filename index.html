@@ -36,7 +36,7 @@
 
     <h1>APP NECESITO</h1>
     
-    <a id="enlace-monoblock" href="https://google.com" target="_blank" rel="noopener noreferrer" class="bloque-ubicacion-unico">
+    <a id="enlace-monoblock" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="bloque-ubicacion-unico">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
     </a>
@@ -108,7 +108,7 @@
 
         function errorGps() {
             document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos... (Toca para abrir mapa)";
-            document.getElementById("enlace-monoblock").href = "https://google.com";
+            document.getElementById("enlace-monoblock").href = "https://maps.google.com";
         }
 
         function pedir(servicio) {
