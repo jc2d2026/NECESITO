@@ -14,9 +14,7 @@
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
             padding: 25px; box-sizing: border-box; cursor: pointer;
             text-align: left; display: block;
-            text-decoration: none; /* Quita el subrayado de enlace */
-            
-            /* Evita que el celular intente seleccionar las palabras */
+            text-decoration: none;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -37,8 +35,8 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- 🟩 SOLUCIÓN: TODO EL BLOQUE AHORA ES UN ENLACE REAL QUE ABRE EN NUEVA PESTAÑA -->
-    <a id="enlace-monoblock" href="#" target="_blank" class="bloque-ubicacion-unico">
+    <!-- 🟩 BLOQUE ENLACE DIRECTO A GOOGLE MAPS -->
+    <a id="enlace-monoblock" href="https://google.com" target="_blank" rel="noopener noreferrer" class="bloque-ubicacion-unico">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
     </a>
@@ -55,12 +53,35 @@
         let valorEjeX = null;
         let valorEjeY = null;
 
-        // CAPTURA AUTOMÁTICA DEL GPS DEL CELULAR
+        // Convierte coordenadas decimales al formato 12°11'37.3"S 77°00'16.4"W
+        function convertirAGrados(lat, lng) {
+            function aDMS(coordenada, pos, neg) {
+                const absoluto = Math.abs(coordenada);
+                const grados = Math.floor(absoluto);
+                const minutosDec = (absoluto - grados) * 60;
+                const minutos = Math.floor(minutosDec);
+                const segundos = ((minutosDec - minutos) * 60).toFixed(1);
+                const direccion = coordenada >= 0 ? pos : neg;
+                return `${grados}°${minutos}'${segundos}"${direccion}`;
+            }
+            return `${aDMS(lat, 'N', 'S')} ${aDMS(lng, 'E', 'W')}`;
+        }
+
+        // CAPTURA INSTANTÁNEA Y CONTINUA DEL GPS
         document.addEventListener("DOMContentLoaded", () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(coordenadasExitosas, errorGps, {
+            if ("geolocation" in navigator) {
+                // 1. Lectura inmediata (usa caché reciente o Wi-Fi para abrir en 1 segundo)
+                navigator.geolocation.getCurrentPosition(coordenadasExitosas, errorGps, {
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 30000
+                });
+
+                // 2. Rastreo continuo de alta precisión para afinar la ubicación en tiempo real
+                navigator.geolocation.watchPosition(coordenadasExitosas, null, {
                     enableHighAccuracy: true,
-                    maximumAge: 0
+                    timeout: 15000,
+                    maximumAge: 5000
                 });
             } else {
                 document.getElementById("texto-gps").innerHTML = "Tu dispositivo no soporta GPS.";
@@ -71,19 +92,21 @@
             valorEjeX = posicion.coords.latitude;
             valorEjeY = posicion.coords.longitude;
             const metrosPrecision = posicion.coords.accuracy;
+            const coordenadasGrados = convertirAGrados(valorEjeX, valorEjeY);
 
-            // Muestra los números limpios en pantalla
-            document.getElementById("texto-gps").innerHTML = 
-                `🟢 UBICACIÓN REAL:<br>${valorEjeX.toFixed(6)}, ${valorEjeY.toFixed(6)}<br>(Precisión: ${metrosPrecision.toFixed(1)} metros)`;
+            const textoGps = document.getElementById("texto-gps");
+            textoGps.style.color = "#00FF00"; // Cambia el texto a verde cuando ya tiene señal
+            textoGps.innerHTML = 
+                `🟢 UBICACIÓN REAL:<br>${coordenadasGrados}<br>(${valorEjeX.toFixed(6)}, ${valorEjeY.toFixed(6)})<br>Precisión: ${metrosPrecision.toFixed(1)} metros`;
 
-            // REPARACIÓN MAESTRA: Modificamos directamente el atributo href del enlace para que actúe de forma nativa externa
-            document.getElementById("enlace-monoblock").href = `https://google.com{valorEjeX},${valorEjeY}`;
+            // URL oficial de Google Maps con parámetros exactos
+            document.getElementById("enlace-monoblock").href = 
+                `https://google.com/search/?api=1&query=${valorEjeX},${valorEjeY}`;
         }
 
         function errorGps() {
-            document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos...";
-            // Si falla o está buscando, deshabilitamos temporalmente el clic enviándolo a nada
-            document.getElementById("enlace-monoblock").href = "javascript:void(0);";
+            document.getElementById("texto-gps").innerHTML = "Buscando satélites en Chorrillos... (Toca para abrir mapa general)";
+            document.getElementById("enlace-monoblock").href = "https://google.com";
         }
 
         function pedir(servicio) {
