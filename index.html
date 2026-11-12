@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NECESITO</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#000000">
     <style>
-        body { background-color: #000; color: #FFF; font-family: Arial; text-align: center; padding: 15px; margin: 0; }
+        body { background-color: #000; color: #FFF; font-family: Arial, sans-serif; text-align: center; padding: 15px; margin: 0; }
         h1 { font-size: 28px; color: #FFF000; margin: 10px 0; font-weight: bold; }
         
-        /* BLOQUE PRINCIPAL DE UBICACIÓN */
         .bloque-ubicacion-unico {
             width: 100%; max-width: 500px; background-color: #1A1A1A;
             border: 6px solid #00FF00; border-radius: 20px; margin: 0 auto 20px;
@@ -35,7 +36,6 @@
 
     <h1>APP NECESITO</h1>
     
-    <!-- ENLACE DIRECTO A GOOGLE MAPS -->
     <a id="enlace-monoblock" href="https://google.com" target="_blank" rel="noopener noreferrer" class="bloque-ubicacion-unico">
         <div id="texto-gps">Buscando señal satelital automática...</div>
         <span class="instruccion-toque">👉 Toca aquí para ver tu mapa instantáneo</span>
@@ -53,7 +53,6 @@
         let valorEjeX = null;
         let valorEjeY = null;
 
-        // Convierte coordenadas decimales al formato 12°11'37.2"S 77°0'16.1"W
         function convertirAGrados(lat, lng) {
             function aDMS(coordenada, pos, neg) {
                 const absoluto = Math.abs(coordenada);
@@ -67,7 +66,6 @@
             return aDMS(lat, 'N', 'S') + " " + aDMS(lng, 'E', 'W');
         }
 
-        // CAPTURA INSTANTÁNEA Y CONTINUA DEL GPS
         document.addEventListener("DOMContentLoaded", function() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(coordenadasExitosas, errorGps, {
@@ -83,6 +81,10 @@
                 });
             } else {
                 document.getElementById("texto-gps").innerHTML = "Tu dispositivo no soporta GPS.";
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js');
             }
         });
 
@@ -100,7 +102,6 @@
                 valorEjeX.toFixed(6) + ", " + valorEjeY.toFixed(6) + ")<br>" +
                 "Precisión: " + metrosPrecision.toFixed(1) + " metros";
 
-            // ENLACE OFICIAL DE GOOGLE MAPS CORREGIDO
             const urlGoogleMaps = "https://google.com/search/?api=1&query=" + valorEjeX + "," + valorEjeY;
             document.getElementById("enlace-monoblock").href = urlGoogleMaps;
         }
