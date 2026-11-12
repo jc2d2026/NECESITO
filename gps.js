@@ -1,42 +1,28 @@
-// gps.js - CAPTURA DE COORDENADAS LIMPIAS
-let valorEjeX = null;
-let valorEjeY = null;
+javascript
+const estadoTexto = document.getElementById('estado'); // Tu texto "Buscando señal..."
+const botonMapa = document.getElementById('btn-mapa'); // Tu botón "Toca aquí para ver tu mapa"
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(coordenadasExitosas, errorGps, {
-            enableHighAccuracy: true,
-            maximumAge: 0
-        });
-    } else {
-        const elementoGps = document.getElementById("texto-gps");
-        if(elementoGps) elementoGps.innerHTML = "Tu dispositivo no soporta GPS.";
-    }
-});
+const opcionesGPS = {
+  enableHighAccuracy: false, // Permite usar Wi-Fi/Red para respuesta instantánea
+  timeout: 5000,             // Máximo 5 segundos de espera antes de lanzar error
+  maximumAge: 60000          // Acepta una ubicación guardada de hasta 1 minuto de antigüedad
+};
 
-function coordenadasExitosas(posicion) {
-    valorEjeX = posicion.coords.latitude;
-    valorEjeY = posicion.coords.longitude;
-    const metrosPrecision = posicion.coords.accuracy;
-
-    const elementoGps = document.getElementById("texto-gps");
-    const elementoEnlace = document.getElementById("enlace-monoblock");
-
-    // Imprime únicamente los números puros en pantalla, sin iniciales "Lat" o "Lon"
-    if (elementoGps) {
-        elementoGps.innerHTML = `🟢 UBICACIÓN REAL:<br>${valorEjeX.toFixed(6)}, ${valorEjeY.toFixed(6)}<br>(Precisión: ${metrosPrecision.toFixed(1)} metros)`;
-    }
-
-    // Inyecta de forma nativa el enlace a Google Maps en el bloque contenedor
-    if (elementoEnlace) {
-        elementoEnlace.href = `https://google.com{valorEjeX},${valorEjeY}`;
-    }
+function exitoUbicacion(posicion) {
+  const lat = posicion.coords.latitude;
+  const lng = posicion.coords.longitude;
+  
+  estadoTexto.textContent = "Ubicación lista";
+  // Actualiza el enlace directo de Google Maps con las coordenadas exactas
+  botonMapa.href = `https://google.com{lat},${lng}`;
 }
 
-function errorGps() {
-    const elementoGps = document.getElementById("texto-gps");
-    const elementoEnlace = document.getElementById("enlace-monoblock");
-    
-    if (elementoGps) elementoGps.innerHTML = "Buscando satélites en Chorrillos...";
-    if (elementoEnlace) elementoEnlace.href = "javascript:void(0);";
+function errorUbicacion(error) {
+  estadoTexto.textContent = "No se pudo obtener la ubicación automática. Toca el botón para abrir el mapa.";
+  // Enlace de respaldo que abre Google Maps centrado en la ubicación del dispositivo
+  botonMapa.href = "https://google.com";
+}
+
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(exitoUbicacion, errorUbicacion, opcionesGPS);
 }
