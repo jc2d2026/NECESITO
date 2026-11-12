@@ -2,8 +2,8 @@
   "short_name": "Necesito",
   "name": "APP NECESITO",
   "start_url": "./index.html",
-  "background_color": "#0f172a",
-  "theme-color": "#1e3a8a",
+  "background_color": "#000000",
+  "theme_color": "#FFF000",
   "display": "standalone",
   "orientation": "portrait"
 }
