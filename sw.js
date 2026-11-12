@@ -1,10 +1,9 @@
-// 🔌 SERVICE WORKER ULTRA LIGERO - APP "NECESITO"
-const CACHE_NAME = 'necesito-final-v1';
+const CACHE_NAME = 'necesito-final-v2';
 const ASSETS = [
   './',
-  './indice.html',
+  './index.html',
   './administrador.html',
-  './manifiesto.json'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
@@ -19,10 +18,9 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// REGLA DE ORO: No interferir jamás con Google Maps ni el GPS en tiempo real
 self.addEventListener('fetch', (e) => {
   const url = e.request.url;
-  if (url.includes('maps') || url.includes('geolocation')) {
+  if (url.includes('maps') || url.includes('google') || url.includes('geolocation')) {
     e.respondWith(fetch(e.request));
     return;
   }
