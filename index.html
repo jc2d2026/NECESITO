@@ -102,8 +102,8 @@
                 valorEjeX.toFixed(6) + ", " + valorEjeY.toFixed(6) + ")<br>" +
                 "Precisión: " + metrosPrecision.toFixed(1) + " metros";
 
-            const urlGoogleMaps = "https://" + "://google.com" + valorEjeX + "," + valorEjeY;
-            document.getElementById("enlace-monoblock").href = urlGoogleMaps;
+            const dominio = ["https:", "", "maps.google.com", "?q=" + valorEjeX + "," + valorEjeY].join("/");
+document.getElementById("enlace-monoblock").href = dominio;
         }
 
         function errorGps() {
